@@ -1,0 +1,9 @@
+com/zephyr/system/pojo/entity/RolePermission.class
+com/zephyr/system/pojo/entity/Role.class
+com/zephyr/system/feign/IUserClient.class
+com/zephyr/system/pojo/entity/Permissions.class
+com/zephyr/system/pojo/vo/DictVO.class
+com/zephyr/system/pojo/entity/User.class
+com/zephyr/system/pojo/entity/Dict.class
+com/zephyr/system/pojo/vo/UserVO.class
+com/zephyr/system/pojo/entity/Menu.class

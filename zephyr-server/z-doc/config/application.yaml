@@ -1,0 +1,38 @@
+spring:
+
+  # redis 单机配置
+  data:
+    redis:
+      host: 115.190.86.189
+      port: 6379
+      password: ""
+      database: 0
+      timeout: 2000
+
+  # 数据库
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://115.190.86.189:3306/zephyr_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: zephyr
+    password: "Zr#db#0830"
+
+  config:
+    import:
+      - optional:nacos:demo-app.yaml?refreshEnabled=true
+
+  main:
+    allow-bean-definition-overriding: true
+
+# mappers
+mybatis-plus:
+  mapper-locations: classpath*:mappers/**/*.xml
+
+# Logging
+logging:
+  level:
+    com:
+      zephyr:
+        auth: DEBUG
+    org:
+      springframework:
+        security: DEBUG

@@ -1,0 +1,89 @@
+server:
+  port: 8001
+
+spring:
+  application:
+    name: zephyr-gateway
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8849
+      config:
+        server-addr: localhost:8849
+        file-extension: yml,yaml
+        namespace: public
+        group: DEFAULT_GROUP
+
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://zephyr-system
+          predicates:
+            - Path=/zephyr-auth/**
+          filters:
+            - StripPrefix=1
+
+        - id: system-service
+          uri: lb://zephyr-system
+          predicates:
+            - Path=/zephyr-system/**
+          filters:
+            - StripPrefix=1
+
+        - id: generator-service
+          uri: http://zephyr-generator:9001
+          predicates:
+            - Path=/zephyr-generator/**
+          filters:
+            - StripPrefix=1
+
+        - id: ops-service
+          uri: lb://zephyr-system
+          predicates:
+            - Path=/zephyr-ops/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+
+  config:
+    import:
+      - optional:nacos:application.yaml?refreshEnabled=true
+
+  main:
+    allow-bean-definition-overriding: true
+
+zephyr:
+  auth:
+    white-api:
+      - /zephyr-auth/login
+      - /zephyr-auth/logout
+      - /zephyr-auth/info
+      - /get
+      - /zephyr-ops/ops/cpu/usage
+      - /doc.html
+      - /v3/api-docs/**
+      - /favicon.ico
+      - /webjars/**
+
+jwt:
+  algorithm: ES256 # HS256 || ES256
+  expiration: 86400000 # Token expiration time in ms (24 hours)
+  # 指定密钥，不指定则自动生成
+  #  hs256:
+  #    secret: XQHlm29SP940xc7Ms/znQ+t25abartjvEsYFXkTHstc=
+  es256:
+    privateKey: MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAeWfO36CnZzvm3R8XlA2tv7d6Jw/vbsCx5PfGg1CMRoQ==
+    publicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEq8rKNtWMFhgkNos/70ciF7kzAUY4B+Qgo2GhRm/lhmJ8U9mO5TnRGeFm1qS29HraAqDBAS+JIQJV89KjH8l4xw==
+
+knife4j:
+  gateway:
+    enabled: true
+    strategy: manual
+    routes:
+      - name: 系统管理
+        url: /zephyr-system/v3/api-docs
+        service-name: zephyr-system
+      - name: 代码生成
+        url: /zephyr-generator/v3/api-docs
+        service-name: zephyr-generator

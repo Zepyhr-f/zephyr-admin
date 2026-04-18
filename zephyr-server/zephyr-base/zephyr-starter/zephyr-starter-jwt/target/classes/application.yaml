@@ -1,0 +1,8 @@
+jwt:
+  algorithm: HS256
+  expiration: 3600000 # Token expiration time in ms
+  hs256:
+    secret: XQHlm29SP940xc7Ms/znQ+t25abartjvEsYFXkTHstc=
+  es256:
+    privateKey: MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAeWfO36CnZzvm3R8XlA2tv7d6Jw/vbsCx5PfGg1CMRoQ==
+    publicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEq8rKNtWMFhgkNos/70ciF7kzAUY4B+Qgo2GhRm/lhmJ8U9mO5TnRGeFm1qS29HraAqDBAS+JIQJV89KjH8l4xw==

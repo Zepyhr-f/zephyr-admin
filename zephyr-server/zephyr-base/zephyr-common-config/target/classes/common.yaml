@@ -1,0 +1,3 @@
+common:
+  nacosServerAddr: 115.190.86.189:8848
+  nacosNamespace: public

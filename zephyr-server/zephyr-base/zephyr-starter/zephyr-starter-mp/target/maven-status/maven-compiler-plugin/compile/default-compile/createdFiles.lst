@@ -1,0 +1,4 @@
+com/zephyr/mp/base/BaseEntity.class
+com/zephyr/mp/base/BaseEntityWrapper.class
+com/zephyr/mp/config/MyBatisPlusConfig.class
+com/zephyr/mp/support/PageQuery.class

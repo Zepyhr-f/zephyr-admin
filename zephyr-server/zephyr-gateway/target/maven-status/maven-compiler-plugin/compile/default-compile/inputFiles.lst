@@ -1,0 +1,5 @@
+/Users/zephyr/z-code/z-manager/zephyr-server/zephyr-gateway/src/main/java/com/zephyr/gateway/GatewayApplication.java
+/Users/zephyr/z-code/z-manager/zephyr-server/zephyr-gateway/src/main/java/com/zephyr/gateway/filter/AuthFilter.java
+/Users/zephyr/z-code/z-manager/zephyr-server/zephyr-gateway/src/main/java/com/zephyr/gateway/util/RequestUtils.java
+/Users/zephyr/z-code/z-manager/zephyr-server/zephyr-gateway/src/main/java/com/zephyr/gateway/config/properties/AuthProperties.java
+/Users/zephyr/z-code/z-manager/zephyr-server/zephyr-gateway/src/main/java/com/zephyr/gateway/config/properties/DefaultSkipProp.java

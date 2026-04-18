@@ -1,0 +1,51 @@
+server:
+  port: 8072
+
+spring:
+  application:
+    name: zephyr-auth
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3307/zephyr_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: zephyr
+    password: "Zr#db#0830"
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: ""
+      database: 0
+      timeout: 2000
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8849
+        username: nacos
+        password: nacos
+      config:
+        server-addr: localhost:8849
+        username: nacos
+        password: nacos
+
+  config:
+    import:
+      - optional:nacos:application.yaml?refreshEnabled=true
+
+  main:
+    allow-bean-definition-overriding: true
+
+jwt:
+  algorithm: ES256
+  expiration: 3600000
+  es256:
+    privateKey: MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCAeWfO36CnZzvm3R8XlA2tv7d6Jw/vbsCx5PfGg1CMRoQ==
+    publicKey: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEq8rKNtWMFhgkNos/70ciF7kzAUY4B+Qgo2GhRm/lhmJ8U9mO5TnRGeFm1qS29HraAqDBAS+JIQJV89KjH8l4xw==
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: mappings,beans,env

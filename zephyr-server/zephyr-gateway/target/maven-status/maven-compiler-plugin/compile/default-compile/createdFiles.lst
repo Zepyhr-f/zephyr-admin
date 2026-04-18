@@ -1,0 +1,4 @@
+com/zephyr/gateway/util/RequestUtils.class
+com/zephyr/gateway/GatewayApplication.class
+com/zephyr/gateway/config/properties/DefaultSkipProp.class
+com/zephyr/gateway/config/properties/AuthProperties.class
