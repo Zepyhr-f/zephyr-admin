@@ -1,0 +1,24 @@
+---
+description: 后端开发指引 (Java/Spring)。在编写、重构或调试后端代码时必须参考。
+globs: zephyr-server/**/*.java, zephyr-server/**/*.xml
+alwaysApply: false
+---
+# 后端开发指引 (Agent 专用)
+
+作为后端架构导师，你在编写代码时必须始终以高性能、高安全性为准则。
+
+## 1. 核心技术栈对齐
+- **环境**：Java 17 / Spring Boot 3.3.4。
+- **持久层**：MyBatis-Plus。所有业务表 Entity 必须继承 `BaseEntity`，严禁遗漏审计字段。
+- **逻辑删除**：必须使用 `del_flag`。在编写自定义 SQL 时，手动检查是否排除了已删除数据。
+
+## 2. 编码契约
+- **响应包装**：所有接口统一返回 `R<T>`。你必须确保 `ResultCode` 枚举的准确使用。
+- **异常处理**：你应预见可能的错误并抛出 `BusinessException`。严禁在代码中出现 `try-catch` 后吞掉异常的操作。
+- **分层调用**：严禁 Service 之间循环依赖，严禁在 Controller 编写逻辑。
+
+## 3. 命名与映射
+- **对象区分**：严格区分 Entity, DTO, VO。你必须优先使用 `MapStruct` 进行对象映射。
+
+> [!TIP]
+> 遇到复杂的 SQL 或 业务逻辑时，优先查阅：[后端开发文档](file:///Users/zephyr/z-code/zephyr-admin/zephyr-doc/05-开发规范/01-后端开发规范/)

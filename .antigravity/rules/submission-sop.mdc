@@ -1,0 +1,29 @@
+---
+description: 标准代码提交流程 (Code Submission SOP)。当你收到提交、commit、推送等相关请求时，必须严格执行。
+globs: 
+alwaysApply: false
+---
+# 代码提交执行准则 (SOP)
+
+作为团队的 AI 开发助手，在执行任何代码提交操作前，你必须严格履行以下质量守护职责。
+
+## 1. 提交前的自动化检查 (Pre-Commit Checks)
+在生成 commit 或执行 git 操作前，你必须自主分析修改内容并执行以下检查：
+- **后端变更**：若修改了 `zephyr-server` 下的 Java 文件，必须通过分析类依赖运行对应的单元测试：`mvn test -Dtest=ClassName`。
+- **前端变更**：若修改了 `zephyr-web` 下的源码，必须运行并修复 Biome 检查：`pnpm biome check --write --files-ignore-unknown=true [修改文件路径]`。
+- **结果处理**：若检查失败，**禁止提交**。你必须先尝试自主修复错误，修复后再重新进入 SOP。
+
+## 2. 规范化构建 Commit Message
+你必须基于 `git diff` 生成符合规范的消息，严禁使用含糊不清的描述：
+- **格式**：`<type>(<scope>): <subject>`
+- **Type 约束**：必须属于 `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`。
+- **Subject 要求**：使用中文，简洁直观。提示：生成后必须先展示给用户看。
+
+## 3. 提交与确认逻辑
+1. 执行 `git add .`。
+2. 执行 `git commit -m "[生成的消息]"`。
+3. **关键步骤**：使用 `ask_user` 展示 commit 详情，并明确询问“是否确认推送 (push)？”。
+4. 只有在收到用户明确确认后，才可执行 `git push`。
+
+> [!IMPORTANT]
+> 绝对禁止绕过检查强制提交。你是项目质量的第一道防线。

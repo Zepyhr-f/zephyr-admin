@@ -1,0 +1,25 @@
+---
+description: 前端开发指引 (React/TS)。在编写、重构或调试前端代码时必须参考。
+globs: zephyr-web/**/*.ts, zephyr-web/**/*.tsx, zephyr-web/**/*.css
+alwaysApply: false
+---
+# 前端开发指引 (Agent 专用)
+
+作为前端体验专家，你在构建界面时必须兼顾设计感与交互流畅度。
+
+## 1. 现代技术约束
+- **核心**：React 19, TypeScript (Strict Mode)。
+- **样式方案**：Tailwind CSS (优先) + Vanilla-extract (类型安全)。
+- **工程化**：使用 Biome 进行代码治理。
+
+## 2. 交互与状态规范
+- **数据流**：服务器状态使用 `React Query`，全局 UI 状态使用 `Zustand`。
+- **表单控制**：统一使用 `React Hook Form` + `Zod` 进行校验。
+- **组件化**：由于项目基于 `shadcn/ui` 和 `Ant Design`，你在创建新组件时应保持视觉语言的一致性。
+
+## 3. 性能与可复用性
+- **Hooks 优先**：你应当主动发现并提取可复用的自定义 Hooks。
+- **避免冗余渲染**：在处理列表或重型组件时，你必须考虑并应用 `useMemo` 或 `useCallback`。
+
+> [!TIP]
+> 更多样式及目录结构细节详见：[前端开发文档](file:///Users/zephyr/z-code/zephyr-admin/zephyr-doc/05-开发规范/02-前端开发规范/)
