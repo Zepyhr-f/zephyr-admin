@@ -1,107 +1,201 @@
-// import { ROLE_LIST } from "@/_mock/assets";
-import { Icon } from "@/components/icon";
-import { Badge } from "@/ui/badge";
-import { Button } from "@/ui/button";
-import { Card, CardContent, CardHeader } from "@/ui/card";
-import Table, { type ColumnsType } from "antd/es/table";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Table, Button, Card, Form, Input, Select, Popconfirm, message, Switch, Space } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import { useState } from "react";
-import type { Role_Old } from "#/entity";
+import roleService from "@/api/services/roleService";
+import menuService from "@/api/services/menuService";
 import { BasicStatus } from "#/enum";
-import { RoleModal, type RoleModalProps } from "./role-modal";
+import RoleModal from "./RoleModal";
+import PermissionModal from "./PermissionModal";
 
-// TODO: fix
-// const ROLES: Role_Old[] = ROLE_LIST as Role_Old[];
-const ROLES: Role_Old[] = [];
-
-const DEFAULE_ROLE_VALUE: Role_Old = {
-	id: "",
-	name: "",
-	code: "",
-	status: BasicStatus.ENABLE,
-	permission: [],
-};
 export default function RolePage() {
-	const [roleModalPros, setRoleModalProps] = useState<RoleModalProps>({
-		formValue: { ...DEFAULE_ROLE_VALUE },
-		title: "New",
-		show: false,
-		onOk: () => {
-			setRoleModalProps((prev) => ({ ...prev, show: false }));
-		},
-		onCancel: () => {
-			setRoleModalProps((prev) => ({ ...prev, show: false }));
+	const queryClient = useQueryClient();
+	const [searchForm] = Form.useForm();
+	const [queryParams, setQueryParams] = useState<any>({});
+	const [roleModalVisible, setRoleModalVisible] = useState(false);
+	const [permissionModalVisible, setPermissionModalVisible] = useState(false);
+	const [currentRole, setCurrentRole] = useState<any>(null);
+	const [currentRoleMenuIds, setCurrentRoleMenuIds] = useState<string[]>([]);
+
+	// Queries
+	const { data, isLoading } = useQuery({
+		queryKey: ["roles", queryParams],
+		queryFn: () => roleService.list(queryParams),
+	});
+
+	const { data: menuTree = [] } = useQuery({
+		queryKey: ["menuTree"],
+		queryFn: () => menuService.getMenuList(),
+	});
+
+	// Mutations
+	const saveMutation = useMutation({
+		mutationFn: (values: any) => (values.id ? roleService.updateRole(values) : roleService.saveRole(values)),
+		onSuccess: () => {
+			message.success("Saved successfully");
+			setRoleModalVisible(false);
+			queryClient.invalidateQueries({ queryKey: ["roles"] });
 		},
 	});
-	const columns: ColumnsType<Role_Old> = [
+
+	const deleteMutation = useMutation({
+		mutationFn: (ids: string[]) => roleService.removeRole(ids),
+		onSuccess: () => {
+			message.success("Deleted successfully");
+			queryClient.invalidateQueries({ queryKey: ["roles"] });
+		},
+	});
+
+	const statusMutation = useMutation({
+		mutationFn: ({ id, status }: { id: string; status: number }) => roleService.updateStatus(id, status),
+		onSuccess: () => {
+			message.success("Status updated");
+			queryClient.invalidateQueries({ queryKey: ["roles"] });
+		},
+	});
+
+	const assignMenusMutation = useMutation({
+		mutationFn: ({ roleId, menuIds }: { roleId: string; menuIds: string[] }) => roleService.assignMenus(roleId, menuIds),
+		onSuccess: () => {
+			message.success("Permissions assigned");
+			setPermissionModalVisible(false);
+			queryClient.invalidateQueries({ queryKey: ["roles"] });
+		},
+	});
+
+	const handleOpenPermission = async (role: any) => {
+		setCurrentRole(role);
+		const ids = await roleService.getMenuIds(role.id);
+		setCurrentRoleMenuIds(ids);
+		setPermissionModalVisible(true);
+	};
+
+	const columns: ColumnsType<any> = [
 		{
-			title: "Name",
-			dataIndex: "name",
-			width: 300,
+			title: "Role Name",
+			dataIndex: "roleName",
+			key: "roleName",
 		},
 		{
-			title: "Label",
-			dataIndex: "label",
+			title: "Role Key",
+			dataIndex: "roleKey",
+			key: "roleKey",
 		},
-		{ title: "Order", dataIndex: "order", width: 60 },
+		{
+			title: "Sort Order",
+			dataIndex: "roleSort",
+			key: "roleSort",
+		},
 		{
 			title: "Status",
 			dataIndex: "status",
-			align: "center",
-			width: 120,
-			render: (status) => <Badge variant={status === BasicStatus.DISABLE ? "error" : "success"}>{status === BasicStatus.DISABLE ? "Disable" : "Enable"}</Badge>,
+			key: "status",
+			render: (status, record) => (
+				<Switch
+					checked={status === BasicStatus.ENABLE}
+					onChange={(checked) => statusMutation.mutate({ id: record.id, status: checked ? BasicStatus.ENABLE : BasicStatus.DISABLE })}
+				/>
+			),
 		},
-		{ title: "Desc", dataIndex: "desc" },
+		{
+			title: "Remark",
+			dataIndex: "remark",
+			key: "remark",
+			ellipsis: true,
+		},
 		{
 			title: "Action",
-			key: "operation",
-			align: "center",
-			width: 100,
+			key: "action",
 			render: (_, record) => (
-				<div className="flex w-full justify-center text-gray">
-					<Button variant="ghost" size="icon" onClick={() => onEdit(record)}>
-						<Icon icon="solar:pen-bold-duotone" size={18} />
+				<Space>
+					<Button
+						type="link"
+						size="small"
+						onClick={() => {
+							setCurrentRole(record);
+							setRoleModalVisible(true);
+						}}
+					>
+						Edit
 					</Button>
-					<Button variant="ghost" size="icon">
-						<Icon icon="mingcute:delete-2-fill" size={18} className="text-error!" />
+					<Button type="link" size="small" onClick={() => handleOpenPermission(record)}>
+						Permissions
 					</Button>
-				</div>
+					<Popconfirm title="Sure to delete?" onConfirm={() => deleteMutation.mutate([record.id])}>
+						<Button type="link" size="small" danger>
+							Delete
+						</Button>
+					</Popconfirm>
+				</Space>
 			),
 		},
 	];
 
-	const onCreate = () => {
-		setRoleModalProps((prev) => ({
-			...prev,
-			show: true,
-			title: "Create New",
-			formValue: {
-				...prev.formValue,
-				...DEFAULE_ROLE_VALUE,
-			},
-		}));
-	};
-
-	const onEdit = (formValue: Role_Old) => {
-		setRoleModalProps((prev) => ({
-			...prev,
-			show: true,
-			title: "Edit",
-			formValue,
-		}));
-	};
-
 	return (
-		<Card>
-			<CardHeader>
-				<div className="flex items-center justify-between">
-					<div>Role List</div>
-					<Button onClick={onCreate}>New</Button>
-				</div>
-			</CardHeader>
-			<CardContent>
-				<Table rowKey="id" size="small" scroll={{ x: "max-content" }} pagination={false} columns={columns} dataSource={ROLES} />
-			</CardContent>
-			<RoleModal {...roleModalPros} />
-		</Card>
+		<Space direction="vertical" style={{ width: "100%" }} size="middle">
+			<Card size="small">
+				<Form
+					form={searchForm}
+					layout="inline"
+					onFinish={(values) => setQueryParams(values)}
+					onReset={() => {
+						setQueryParams({});
+						searchForm.resetFields();
+					}}
+				>
+					<Form.Item name="roleName" label="Role Name">
+						<Input placeholder="Role Name" allowClear />
+					</Form.Item>
+					<Form.Item name="status" label="Status">
+						<Select placeholder="Status" allowClear style={{ width: 120 }}>
+							<Select.Option value={BasicStatus.ENABLE}>Enable</Select.Option>
+							<Select.Option value={BasicStatus.DISABLE}>Disable</Select.Option>
+						</Select>
+					</Form.Item>
+					<Form.Item>
+						<Button type="primary" htmlType="submit">
+							Search
+						</Button>
+						<Button style={{ marginLeft: 8 }} htmlType="reset">
+							Reset
+						</Button>
+					</Form.Item>
+				</Form>
+			</Card>
+
+			<Card
+				title="Role Management"
+				extra={
+					<Button
+						type="primary"
+						onClick={() => {
+							setCurrentRole(null);
+							setRoleModalVisible(true);
+						}}
+					>
+						New
+					</Button>
+				}
+			>
+				<Table rowKey="id" columns={columns} dataSource={data?.records || []} pagination={{ total: data?.total || 0 }} loading={isLoading} size="small" />
+			</Card>
+
+			<RoleModal
+				visible={roleModalVisible}
+				title={currentRole ? "Edit Role" : "New Role"}
+				initialValues={currentRole}
+				onOk={(values) => saveMutation.mutate({ ...currentRole, ...values })}
+				onCancel={() => setRoleModalVisible(false)}
+			/>
+
+			<PermissionModal
+				visible={permissionModalVisible}
+				initialMenuIds={currentRoleMenuIds}
+				menuTree={menuTree}
+				onOk={(menuIds) => assignMenusMutation.mutate({ roleId: currentRole.id, menuIds })}
+				onCancel={() => setPermissionModalVisible(false)}
+			/>
+		</Space>
 	);
 }
+

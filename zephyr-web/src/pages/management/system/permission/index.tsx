@@ -1,132 +1,168 @@
-import { Icon } from "@/components/icon";
-import { Badge } from "@/ui/badge";
-import { Button } from "@/ui/button";
-import { Card, CardContent, CardHeader } from "@/ui/card";
-import Table, { type ColumnsType } from "antd/es/table";
-import { isNil } from "ramda";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Table, Button, Card, Popconfirm, message, Space, Tag } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import type { Permission_Old } from "#/entity";
+import { Icon } from "@/components/icon";
+import menuService from "@/api/services/menuService";
 import { BasicStatus, PermissionType } from "#/enum";
-import PermissionModal, { type PermissionModalProps } from "./permission-modal";
+import MenuModal from "./MenuModal";
 
-const defaultPermissionValue: Permission_Old = {
-	id: "",
-	parentId: "",
-	name: "",
-	label: "",
-	route: "",
-	component: "",
-	icon: "",
-	hide: false,
-	status: BasicStatus.ENABLE,
-	type: PermissionType.CATALOGUE,
-};
 export default function PermissionPage() {
-	// const permissions = useUserPermission();
-	const { t } = useTranslation();
+	const queryClient = useQueryClient();
+	const [menuModalVisible, setMenuModalVisible] = useState(false);
+	const [currentMenu, setCurrentMenu] = useState<any>(null);
 
-	const [permissionModalProps, setPermissionModalProps] = useState<PermissionModalProps>({
-		formValue: { ...defaultPermissionValue },
-		title: "New",
-		show: false,
-		onOk: () => {
-			setPermissionModalProps((prev) => ({ ...prev, show: false }));
-		},
-		onCancel: () => {
-			setPermissionModalProps((prev) => ({ ...prev, show: false }));
+	// Queries
+	const { data: menuTree = [], isLoading } = useQuery({
+		queryKey: ["menuTree"],
+		queryFn: () => menuService.getMenuList(),
+	});
+
+	// Mutations
+	const saveMutation = useMutation({
+		mutationFn: (values: any) => (values.id ? menuService.updateMenu(values) : menuService.saveMenu(values)),
+		onSuccess: () => {
+			message.success("Saved successfully");
+			setMenuModalVisible(false);
+			queryClient.invalidateQueries({ queryKey: ["menuTree"] });
 		},
 	});
-	const columns: ColumnsType<Permission_Old> = [
-		{
-			title: "Name",
-			dataIndex: "name",
-			width: 300,
-			render: (_, record) => <div>{t(record.label)}</div>,
+
+	const deleteMutation = useMutation({
+		mutationFn: (ids: string[]) => menuService.removeMenu(ids),
+		onSuccess: () => {
+			message.success("Deleted successfully");
+			queryClient.invalidateQueries({ queryKey: ["menuTree"] });
 		},
+	});
+
+	const columns: ColumnsType<any> = [
 		{
-			title: "Type",
-			dataIndex: "type",
-			width: 60,
-			render: (_, record) => <Badge variant="info">{PermissionType[record.type]}</Badge>,
+			title: "Menu Name",
+			dataIndex: "menuName",
+			key: "menuName",
+			width: 250,
 		},
 		{
 			title: "Icon",
 			dataIndex: "icon",
-			width: 60,
-			render: (icon: string) => {
-				if (isNil(icon)) return "";
-				if (icon.startsWith("ic")) {
-					return <Icon icon={`local:${icon}`} size={18} className="ant-menu-item-icon" />;
-				}
-				return <Icon icon={icon} size={18} className="ant-menu-item-icon" />;
+			key: "icon",
+			width: 80,
+			align: "center",
+			render: (icon) => (icon ? <Icon icon={icon} size={18} /> : "-"),
+		},
+		{
+			title: "Type",
+			dataIndex: "type",
+			key: "type",
+			width: 100,
+			render: (type) => {
+				const color = type === PermissionType.CATALOGUE ? "blue" : type === PermissionType.MENU ? "green" : "orange";
+				const label = type === PermissionType.CATALOGUE ? "Catalogue" : type === PermissionType.MENU ? "Menu" : "Button";
+				return <Tag color={color}>{label}</Tag>;
 			},
+		},
+		{
+			title: "Route Path",
+			dataIndex: "path",
+			key: "path",
 		},
 		{
 			title: "Component",
 			dataIndex: "component",
+			key: "component",
+		},
+		{
+			title: "Permission",
+			dataIndex: "perms",
+			key: "perms",
+		},
+		{
+			title: "Sort",
+			dataIndex: "orderNum",
+			key: "orderNum",
+			width: 80,
+			align: "center",
 		},
 		{
 			title: "Status",
 			dataIndex: "status",
-			align: "center",
-			width: 120,
-			render: (status) => <Badge variant={status === BasicStatus.DISABLE ? "error" : "success"}>{status === BasicStatus.DISABLE ? "Disable" : "Enable"}</Badge>,
+			key: "status",
+			width: 100,
+			render: (status) => (
+				<Tag color={status === BasicStatus.ENABLE ? "success" : "error"}>{status === BasicStatus.ENABLE ? "Enable" : "Disable"}</Tag>
+			),
 		},
-		{ title: "Order", dataIndex: "order", width: 60 },
 		{
 			title: "Action",
-			key: "operation",
-			align: "center",
-			width: 100,
+			key: "action",
+			width: 150,
 			render: (_, record) => (
-				<div className="flex w-full justify-end text-gray">
-					{record?.type === PermissionType.CATALOGUE && (
-						<Button variant="ghost" size="icon" onClick={() => onCreate(record.id)}>
-							<Icon icon="gridicons:add-outline" size={18} />
+				<Space>
+					<Button
+						type="link"
+						size="small"
+						onClick={() => {
+							setCurrentMenu({ ...record, parentId: record.parentId === "0" ? null : record.parentId });
+							setMenuModalVisible(true);
+						}}
+					>
+						Edit
+					</Button>
+					<Button
+						type="link"
+						size="small"
+						onClick={() => {
+							setCurrentMenu({ parentId: record.id });
+							setMenuModalVisible(true);
+						}}
+					>
+						Add Sub
+					</Button>
+					<Popconfirm title="Sure to delete?" onConfirm={() => deleteMutation.mutate([record.id])}>
+						<Button type="link" size="small" danger>
+							Delete
 						</Button>
-					)}
-					<Button variant="ghost" size="icon" onClick={() => onEdit(record)}>
-						<Icon icon="solar:pen-bold-duotone" size={18} />
-					</Button>
-					<Button variant="ghost" size="icon">
-						<Icon icon="mingcute:delete-2-fill" size={18} className="text-error!" />
-					</Button>
-				</div>
+					</Popconfirm>
+				</Space>
 			),
 		},
 	];
 
-	const onCreate = (parentId?: string) => {
-		setPermissionModalProps((prev) => ({
-			...prev,
-			show: true,
-			...defaultPermissionValue,
-			title: "New",
-			formValue: { ...defaultPermissionValue, parentId: parentId ?? "" },
-		}));
-	};
-
-	const onEdit = (formValue: Permission_Old) => {
-		setPermissionModalProps((prev) => ({
-			...prev,
-			show: true,
-			title: "Edit",
-			formValue,
-		}));
-	};
 	return (
-		<Card>
-			<CardHeader>
-				<div className="flex items-center justify-between">
-					<div>Permission List</div>
-					<Button onClick={() => onCreate()}>New</Button>
-				</div>
-			</CardHeader>
-			<CardContent>
-				<Table rowKey="id" size="small" scroll={{ x: "max-content" }} pagination={false} columns={columns} dataSource={[]} />
-			</CardContent>
-			<PermissionModal {...permissionModalProps} />
+		<Card
+			title="Menu Management"
+			extra={
+				<Button
+					type="primary"
+					onClick={() => {
+						setCurrentMenu(null);
+						setMenuModalVisible(true);
+					}}
+				>
+					New
+				</Button>
+			}
+		>
+			<Table
+				rowKey="id"
+				columns={columns}
+				dataSource={menuTree}
+				loading={isLoading}
+				pagination={false}
+				size="small"
+				scroll={{ x: "max-content" }}
+			/>
+
+			<MenuModal
+				visible={menuModalVisible}
+				title={currentMenu?.id ? "Edit Menu" : "New Menu"}
+				initialValues={currentMenu}
+				onOk={(values) => saveMutation.mutate({ ...currentMenu, ...values })}
+				onCancel={() => setMenuModalVisible(false)}
+				menuTree={menuTree}
+			/>
 		</Card>
 	);
 }
+

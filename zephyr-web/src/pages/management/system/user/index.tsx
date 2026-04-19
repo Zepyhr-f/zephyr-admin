@@ -1,91 +1,227 @@
-// import { USER_LIST } from "@/_mock/assets";
-import { Icon } from "@/components/icon";
-import { usePathname, useRouter } from "@/routes/hooks";
-import { Badge } from "@/ui/badge";
-import { Button } from "@/ui/button";
-import { Card, CardContent, CardHeader } from "@/ui/card";
-import { Table } from "antd";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Table, Button, Card, Form, Input, Select, Popconfirm, message, Switch, Space } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import type { Role_Old, UserInfo } from "#/entity";
+import { useState } from "react";
+import { Icon } from "@/components/icon";
+import userService from "@/api/services/userService";
+import deptService from "@/api/services/deptService";
+import roleService from "@/api/services/roleService";
 import { BasicStatus } from "#/enum";
-
-// TODO: fix
-// const USERS: UserInfo[] = USER_LIST as UserInfo[];
-const USERS: UserInfo[] = [];
+import UserModal from "./UserModal";
+import RoleAssignModal from "./RoleAssignModal";
 
 export default function UserPage() {
-	const { push } = useRouter();
-	const pathname = usePathname();
+	const queryClient = useQueryClient();
+	const [searchForm] = Form.useForm();
+	const [queryParams, setQueryParams] = useState<any>({});
+	const [userModalVisible, setUserModalVisible] = useState(false);
+	const [roleModalVisible, setRoleModalVisible] = useState(false);
+	const [currentUser, setCurrentUser] = useState<any>(null);
 
-	const columns: ColumnsType<UserInfo> = [
+	// Queries
+	const { data: userList = [], isLoading } = useQuery({
+		queryKey: ["users", queryParams],
+		queryKeyHashFn: (queryKey) => JSON.stringify(queryKey),
+		queryFn: () => userService.list(queryParams),
+	});
+
+	const { data: deptTree = [] } = useQuery({
+		queryKey: ["deptTree"],
+		queryFn: () => deptService.tree(),
+	});
+
+	const { data: roleList = [] } = useQuery({
+		queryKey: ["roleAll"],
+		queryFn: () => roleService.all(),
+	});
+
+	// Mutations
+	const deleteMutation = useMutation({
+		mutationFn: (ids: string[]) => userService.removeUser(ids),
+		onSuccess: () => {
+			message.success("Deleted successfully");
+			queryClient.invalidateQueries({ queryKey: ["users"] });
+		},
+	});
+
+	const statusMutation = useMutation({
+		mutationFn: ({ id, status }: { id: string; status: number }) => userService.updateStatus(id, status),
+		onSuccess: () => {
+			message.success("Status updated");
+			queryClient.invalidateQueries({ queryKey: ["users"] });
+		},
+	});
+
+	const resetPwdMutation = useMutation({
+		mutationFn: (id: string) => userService.resetPassword(id),
+		onSuccess: () => message.success("Password reset to 123456"),
+	});
+
+	const saveMutation = useMutation({
+		mutationFn: (values: any) => (values.id ? userService.updateUser(values) : userService.saveUser(values)),
+		onSuccess: () => {
+			message.success("Saved successfully");
+			setUserModalVisible(false);
+			queryClient.invalidateQueries({ queryKey: ["users"] });
+		},
+	});
+
+	const assignRolesMutation = useMutation({
+		mutationFn: ({ userId, roleIds }: { userId: string; roleIds: string[] }) => userService.assignRoles(userId, roleIds),
+		onSuccess: () => {
+			message.success("Roles assigned");
+			setRoleModalVisible(false);
+			queryClient.invalidateQueries({ queryKey: ["users"] });
+		},
+	});
+
+	const columns: ColumnsType<any> = [
 		{
-			title: "Name",
-			dataIndex: "name",
-			width: 300,
-			render: (_, record) => {
-				return (
-					<div className="flex">
-						<img alt="" src={record.avatar} className="h-10 w-10 rounded-full" />
-						<div className="ml-2 flex flex-col">
-							<span className="text-sm">{record.username}</span>
-							<span className="text-xs text-text-secondary">{record.email}</span>
-						</div>
-					</div>
-				);
-			},
+			title: "Username",
+			dataIndex: "username",
+			key: "username",
 		},
 		{
-			title: "Role",
-			dataIndex: "role",
-			align: "center",
-			width: 120,
-			render: (role: Role_Old) => <Badge variant="info">{role.name}</Badge>,
+			title: "Real Name",
+			dataIndex: "realName",
+			key: "realName",
+		},
+		{
+			title: "Department",
+			dataIndex: "deptName",
+			key: "deptName",
+		},
+		{
+			title: "Email",
+			dataIndex: "email",
+			key: "email",
+		},
+		{
+			title: "Phone",
+			dataIndex: "phone",
+			key: "phone",
 		},
 		{
 			title: "Status",
 			dataIndex: "status",
-			align: "center",
-			width: 120,
-			render: (status) => <Badge variant={status === BasicStatus.DISABLE ? "error" : "success"}>{status === BasicStatus.DISABLE ? "Disable" : "Enable"}</Badge>,
+			key: "status",
+			render: (status, record) => (
+				<Switch
+					checked={status === BasicStatus.ENABLE}
+					onChange={(checked) => statusMutation.mutate({ id: record.id, status: checked ? BasicStatus.ENABLE : BasicStatus.DISABLE })}
+				/>
+			),
 		},
 		{
 			title: "Action",
-			key: "operation",
-			align: "center",
-			width: 100,
+			key: "action",
 			render: (_, record) => (
-				<div className="flex w-full justify-center text-gray-500">
+				<Space>
 					<Button
-						variant="ghost"
-						size="icon"
+						type="link"
+						size="small"
 						onClick={() => {
-							push(`${pathname}/${record.id}`);
+							setCurrentUser(record);
+							setUserModalVisible(true);
 						}}
 					>
-						<Icon icon="mdi:card-account-details" size={18} />
+						Edit
 					</Button>
-					<Button variant="ghost" size="icon" onClick={() => {}}>
-						<Icon icon="solar:pen-bold-duotone" size={18} />
+					<Button
+						type="link"
+						size="small"
+						onClick={() => {
+							setCurrentUser(record);
+							setRoleModalVisible(true);
+						}}
+					>
+						Assign Roles
 					</Button>
-					<Button variant="ghost" size="icon">
-						<Icon icon="mingcute:delete-2-fill" size={18} className="text-error!" />
-					</Button>
-				</div>
+					<Popconfirm title="Reset password?" onConfirm={() => resetPwdMutation.mutate(record.id)}>
+						<Button type="link" size="small">
+							Reset Pwd
+						</Button>
+					</Popconfirm>
+					<Popconfirm title="Sure to delete?" onConfirm={() => deleteMutation.mutate([record.id])}>
+						<Button type="link" size="small" danger>
+							Delete
+						</Button>
+					</Popconfirm>
+				</Space>
 			),
 		},
 	];
 
 	return (
-		<Card>
-			<CardHeader>
-				<div className="flex items-center justify-between">
-					<div>User List</div>
-					<Button onClick={() => {}}>New</Button>
-				</div>
-			</CardHeader>
-			<CardContent>
-				<Table rowKey="id" size="small" scroll={{ x: "max-content" }} pagination={false} columns={columns} dataSource={USERS} />
-			</CardContent>
-		</Card>
+		<Space direction="vertical" style={{ width: "100%" }} size="middle">
+			<Card size="small">
+				<Form
+					form={searchForm}
+					layout="inline"
+					onFinish={(values) => setQueryParams(values)}
+					onReset={() => {
+						setQueryParams({});
+						searchForm.resetFields();
+					}}
+				>
+					<Form.Item name="username" label="Username">
+						<Input placeholder="Username" allowClear />
+					</Form.Item>
+					<Form.Item name="phone" label="Phone">
+						<Input placeholder="Phone" allowClear />
+					</Form.Item>
+					<Form.Item name="status" label="Status">
+						<Select placeholder="Status" allowClear style={{ width: 120 }}>
+							<Select.Option value={BasicStatus.ENABLE}>Enable</Select.Option>
+							<Select.Option value={BasicStatus.DISABLE}>Disable</Select.Option>
+						</Select>
+					</Form.Item>
+					<Form.Item>
+						<Button type="primary" htmlType="submit">
+							Search
+						</Button>
+						<Button style={{ marginLeft: 8 }} htmlType="reset">
+							Reset
+						</Button>
+					</Form.Item>
+				</Form>
+			</Card>
+
+			<Card
+				title="User Management"
+				extra={
+					<Button
+						type="primary"
+						onClick={() => {
+							setCurrentUser(null);
+							setUserModalVisible(true);
+						}}
+					>
+						New
+					</Button>
+				}
+			>
+				<Table rowKey="id" columns={columns} dataSource={userList} loading={isLoading} size="small" />
+			</Card>
+
+			<UserModal
+				visible={userModalVisible}
+				title={currentUser ? "Edit User" : "New User"}
+				initialValues={currentUser}
+				onOk={(values) => saveMutation.mutate({ ...currentUser, ...values })}
+				onCancel={() => setUserModalVisible(false)}
+				deptTree={deptTree}
+				roleList={roleList}
+			/>
+
+			<RoleAssignModal
+				visible={roleModalVisible}
+				initialRoleIds={currentUser?.roleIds}
+				allRoles={roleList}
+				onOk={(roleIds) => assignRolesMutation.mutate({ userId: currentUser.id, roleIds })}
+				onCancel={() => setRoleModalVisible(false)}
+			/>
+		</Space>
 	);
 }
+
