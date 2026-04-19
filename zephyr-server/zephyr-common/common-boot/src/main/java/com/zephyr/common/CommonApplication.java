@@ -3,6 +3,7 @@ package com.zephyr.common;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -18,9 +19,10 @@ import org.springframework.context.annotation.ComponentScan;
  * @author Zephyr
  */
 @SpringBootApplication
+@EnableDiscoveryClient
 @EnableFeignClients(basePackages = {"com.zephyr.**.feign"})
 @ComponentScan(basePackages = "com.zephyr")
-@MapperScan({"com.zephyr.auth.mapper", "com.zephyr.system.mapper", "com.zephyr.ops.mapper"})
+@MapperScan({"com.zephyr.auth.mapper", "com.zephyr.system.mapper", "com.zephyr.ops.mapper", "com.zephyr.generator.mapper"})
 public class CommonApplication {
     public static void main(String[] args) {
         SpringApplication.run(CommonApplication.class, args);

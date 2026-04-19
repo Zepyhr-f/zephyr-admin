@@ -17,8 +17,8 @@
         <module>common-boot</module>
         <module>zephyr-auth</module>
         <module>zephyr-system</module>
-        <module>ops</module>
-        <module>support</module>
+        <module>zephyr-ops</module>
+        <module>zephyr-support</module>
     </modules>
 
 </project>

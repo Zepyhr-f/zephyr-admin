@@ -7,7 +7,7 @@ case "$ACTION" in
   start)
     export DOCKER_BUILDKIT=1
     export COMPOSE_DOCKER_CLI_BUILD=1
-    cd "$(dirname "$0")/docker"
+    cd "$(dirname "$0")"
     echo "🐳 正在启动带有 BuildKit 缓存增量挂载的容器并行构建部署..."
     docker compose up -d --build
     
@@ -20,7 +20,7 @@ case "$ACTION" in
     echo "✅ 容器服务更新指令已下发！后端日志正持续写入 $LOG_DIR/backend.log"
     ;;
   stop)
-    cd "$(dirname "$0")/docker"
+    cd "$(dirname "$0")"
     echo "🛑 正在安全停止并下线所有的后端容器服务..."
     docker compose down
     pkill -f "docker compose logs -f" 2>/dev/null || true

@@ -33,6 +33,11 @@
             <artifactId>zephyr-ops</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>com.zephyr</groupId>
+            <artifactId>zephyr-generator</artifactId>
+            <version>${revision}</version>
+        </dependency>
     </dependencies>
 
     <build>

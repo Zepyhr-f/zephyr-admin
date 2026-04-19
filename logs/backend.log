@@ -1,0 +1,255 @@
+zephyr-gateway  | 2026-04-19T01:12:57.759Z  WARN 1 --- [zephyr-gateway] [           main] c.a.nacos.client.logging.NacosLogging    : Load Logback Configuration of Nacos fail, message: Could not initialize Logback Nacos logging from classpath:nacos-logback.xml
+zephyr-gateway  | 
+zephyr-gateway  |   .   ____          _            __ _ _
+zephyr-gateway  |  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+zephyr-gateway  | ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+zephyr-gateway  |  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+zephyr-gateway  |   '  |____| .__|_| |_|_| |_\__, | / / / /
+zephyr-gateway  |  =========|_|==============|___/=/_/_/_/
+zephyr-gateway  | 
+zephyr-gateway  |  :: Spring Boot ::                (v3.3.4)
+zephyr-gateway  | 
+zephyr-gateway  | 2026-04-19T01:12:57.826Z  WARN 1 --- [zephyr-gateway] [           main] c.a.nacos.client.logging.NacosLogging    : Load Logback Configuration of Nacos fail, message: Could not initialize Logback Nacos logging from classpath:nacos-logback.xml
+zephyr-gateway  | 2026-04-19T01:12:57.831Z  INFO 1 --- [zephyr-gateway] [           main] com.zephyr.gateway.GatewayApplication    : Starting GatewayApplication using Java 21.0.10 with PID 1 (/app/app.jar started by root in /app)
+zephyr-gateway  | 2026-04-19T01:12:57.831Z  INFO 1 --- [zephyr-gateway] [           main] com.zephyr.gateway.GatewayApplication    : No active profile set, falling back to 1 default profile: "default"
+zephyr-backend  | 
+zephyr-backend  |   .   ____          _            __ _ _
+zephyr-backend  |  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+zephyr-backend  | ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+zephyr-backend  |  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+zephyr-backend  |   '  |____| .__|_| |_|_| |_\__, | / / / /
+zephyr-backend  |  =========|_|==============|___/=/_/_/_/
+zephyr-backend  | 
+zephyr-backend  |  :: Spring Boot ::                (v3.3.4)
+zephyr-backend  | 
+zephyr-gateway  | 2026-04-19T01:12:57.864Z  INFO 1 --- [zephyr-gateway] [           main] c.a.c.n.c.NacosConfigDataLoader          : [Nacos Config] Load config[dataId=application.yaml, group=DEFAULT_GROUP] success
+zephyr-backend  | 2026-04-19T01:12:57.888Z  INFO 1 --- [zephyr-system] [           main] com.zephyr.common.CommonApplication      : Starting CommonApplication using Java 21.0.10 with PID 1 (/app/app.jar started by root in /app)
+zephyr-backend  | 2026-04-19T01:12:57.891Z  INFO 1 --- [zephyr-system] [           main] com.zephyr.common.CommonApplication      : The following 2 profiles are active: "auth", "system"
+zephyr-backend  | 2026-04-19T01:12:57.938Z  INFO 1 --- [zephyr-system] [           main] c.a.c.n.c.NacosConfigDataLoader          : [Nacos Config] Load config[dataId=application.yaml, group=DEFAULT_GROUP] success
+zephyr-gateway  | 2026-04-19T01:12:58.225Z  INFO 1 --- [zephyr-gateway] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+zephyr-gateway  | 2026-04-19T01:12:58.226Z  INFO 1 --- [zephyr-gateway] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+zephyr-gateway  | 2026-04-19T01:12:58.241Z  INFO 1 --- [zephyr-gateway] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 7 ms. Found 0 Redis repository interfaces.
+zephyr-gateway  | 2026-04-19T01:12:58.349Z  INFO 1 --- [zephyr-gateway] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=aba5390f-f9ee-30a8-a381-8b1b03e08f47
+zephyr-gateway  | 2026-04-19T01:12:58.387Z  WARN 1 --- [zephyr-gateway] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+zephyr-gateway  | 2026-04-19T01:12:58.387Z  WARN 1 --- [zephyr-gateway] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'deferringLoadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.DeferringLoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+zephyr-gateway  | 2026-04-19T01:12:58.389Z  WARN 1 --- [zephyr-gateway] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [loadBalancerWebClientBuilderBeanPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+zephyr-gateway  | 2026-04-19T01:12:58.389Z  WARN 1 --- [zephyr-gateway] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig' of type [org.springframework.cloud.client.loadbalancer.reactive.LoadBalancerBeanPostProcessorAutoConfiguration$ReactorDeferringLoadBalancerFilterConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [loadBalancerWebClientBuilderBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+zephyr-gateway  | 2026-04-19T01:12:58.390Z  WARN 1 --- [zephyr-gateway] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'reactorDeferringLoadBalancerExchangeFilterFunction' of type [org.springframework.cloud.client.loadbalancer.reactive.DeferringLoadBalancerExchangeFilterFunction] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [loadBalancerWebClientBuilderBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+zephyr-backend  | 2026-04-19T01:12:58.679Z  INFO 1 --- [zephyr-system] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+zephyr-backend  | 2026-04-19T01:12:58.683Z  INFO 1 --- [zephyr-system] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+zephyr-backend  | 2026-04-19T01:12:58.699Z  INFO 1 --- [zephyr-system] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 7 ms. Found 0 Redis repository interfaces.
+zephyr-backend  | 2026-04-19T01:12:58.825Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/DeptMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.825Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/LoginLogMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.825Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/MenuMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.825Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/OperLogMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/PermissionsMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/RoleConflictMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/RoleDeptMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/RoleHierarchyMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/RoleMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/RoleMenuMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/RolePermissionMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/SysConfigMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/SysDictDataMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/SysDictTypeMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/SysFileMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/SysNoticeMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/UserMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-system-biz-0.0.1.RELEASE.jar!/com/zephyr/system/mapper/UserRoleMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-ops-0.0.1.RELEASE.jar!/com/zephyr/ops/mapper/SysJobMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-ops-0.0.1.RELEASE.jar!/com/zephyr/ops/mapper/SysJobLogMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-generator-0.0.1.RELEASE.jar!/com/zephyr/generator/mapper/GenTableColumnMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.826Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Identified candidate component class: URL [jar:nested:/app/app.jar/!BOOT-INF/lib/zephyr-generator-0.0.1.RELEASE.jar!/com/zephyr/generator/mapper/GenTableMapper.class]
+zephyr-backend  | 2026-04-19T01:12:58.827Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'deptMapper' and 'com.zephyr.system.mapper.DeptMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.839Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'deptMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.839Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'loginLogMapper' and 'com.zephyr.system.mapper.LoginLogMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.840Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'loginLogMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.840Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'menuMapper' and 'com.zephyr.system.mapper.MenuMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.840Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'menuMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.840Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'operLogMapper' and 'com.zephyr.system.mapper.OperLogMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.840Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'operLogMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.840Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'permissionsMapper' and 'com.zephyr.system.mapper.PermissionsMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.840Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'permissionsMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'roleConflictMapper' and 'com.zephyr.system.mapper.RoleConflictMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'roleConflictMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'roleDeptMapper' and 'com.zephyr.system.mapper.RoleDeptMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'roleDeptMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'roleHierarchyMapper' and 'com.zephyr.system.mapper.RoleHierarchyMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'roleHierarchyMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'roleMapper' and 'com.zephyr.system.mapper.RoleMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'roleMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'roleMenuMapper' and 'com.zephyr.system.mapper.RoleMenuMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'roleMenuMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.841Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'rolePermissionMapper' and 'com.zephyr.system.mapper.RolePermissionMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.842Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'rolePermissionMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.842Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'sysConfigMapper' and 'com.zephyr.system.mapper.SysConfigMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.842Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'sysConfigMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.842Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'sysDictDataMapper' and 'com.zephyr.system.mapper.SysDictDataMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.842Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'sysDictDataMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.842Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'sysDictTypeMapper' and 'com.zephyr.system.mapper.SysDictTypeMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.842Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'sysDictTypeMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.843Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'sysFileMapper' and 'com.zephyr.system.mapper.SysFileMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.843Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'sysFileMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.843Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'sysNoticeMapper' and 'com.zephyr.system.mapper.SysNoticeMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.844Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'sysNoticeMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.844Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'userMapper' and 'com.zephyr.system.mapper.UserMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.844Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'userMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.844Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'userRoleMapper' and 'com.zephyr.system.mapper.UserRoleMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.845Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'userRoleMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.845Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'sysJobMapper' and 'com.zephyr.ops.mapper.SysJobMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.846Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'sysJobMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.847Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'sysJobLogMapper' and 'com.zephyr.ops.mapper.SysJobLogMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.847Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'sysJobLogMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.847Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'genTableColumnMapper' and 'com.zephyr.generator.mapper.GenTableColumnMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.849Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'genTableColumnMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.849Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Creating MapperFactoryBean with name 'genTableMapper' and 'com.zephyr.generator.mapper.GenTableMapper' mapperInterface
+zephyr-backend  | 2026-04-19T01:12:58.849Z DEBUG 1 --- [zephyr-system] [           main] o.m.s.mapper.ClassPathMapperScanner      : Enabling autowire by type for MapperFactoryBean with name 'genTableMapper'.
+zephyr-backend  | 2026-04-19T01:12:58.917Z  INFO 1 --- [zephyr-system] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=e291437d-4368-308d-88fd-6b4f83c2b2c8
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [After]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Before]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Between]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Cookie]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Header]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Host]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Method]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Path]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Query]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [ReadBody]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [RemoteAddr]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Weight]
+zephyr-gateway  | 2026-04-19T01:12:59.023Z  INFO 1 --- [zephyr-gateway] [           main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [CloudFoundryRouteService]
+zephyr-backend  | 2026-04-19T01:12:59.068Z  WARN 1 --- [zephyr-system] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+zephyr-backend  | 2026-04-19T01:12:59.070Z  WARN 1 --- [zephyr-system] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'deferringLoadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.DeferringLoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+zephyr-gateway  | 2026-04-19T01:12:59.201Z  INFO 1 --- [zephyr-gateway] [           main] ctiveUserDetailsServiceAutoConfiguration : 
+zephyr-gateway  | 
+zephyr-gateway  | Using generated security password: 5a76ebfe-b24f-4855-8229-4672f492a777
+zephyr-gateway  | 
+zephyr-backend  | 2026-04-19T01:12:59.221Z  INFO 1 --- [zephyr-system] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8073 (http)
+zephyr-backend  | 2026-04-19T01:12:59.228Z  INFO 1 --- [zephyr-system] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+zephyr-backend  | 2026-04-19T01:12:59.228Z  INFO 1 --- [zephyr-system] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+zephyr-gateway  | 2026-04-19T01:12:59.234Z  WARN 1 --- [zephyr-gateway] [           main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+zephyr-backend  | 2026-04-19T01:12:59.247Z  INFO 1 --- [zephyr-system] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+zephyr-backend  | 2026-04-19T01:12:59.248Z  INFO 1 --- [zephyr-system] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1308 ms
+zephyr-gateway  | 2026-04-19T01:12:59.273Z  INFO 1 --- [zephyr-gateway] [           main] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8001 (http)
+zephyr-gateway  | 2026-04-19T01:12:59.282Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.client.naming          : initializer namespace from ans.namespace attribute : null
+zephyr-gateway  | 2026-04-19T01:12:59.282Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.client.naming          : initializer namespace from ALIBABA_ALIWARE_NAMESPACE attribute :null
+zephyr-gateway  | 2026-04-19T01:12:59.282Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.client.naming          : initializer namespace from namespace attribute :null
+zephyr-gateway  | 2026-04-19T01:12:59.288Z  INFO 1 --- [zephyr-gateway] [           main] c.a.n.p.a.s.c.ClientAuthPluginManager    : [ClientAuthPluginManager] Load ClientAuthService com.alibaba.nacos.client.auth.impl.NacosClientAuthServiceImpl success.
+zephyr-gateway  | 2026-04-19T01:12:59.288Z  INFO 1 --- [zephyr-gateway] [           main] c.a.n.p.a.s.c.ClientAuthPluginManager    : [ClientAuthPluginManager] Load ClientAuthService com.alibaba.nacos.client.auth.ram.RamClientAuthServiceImpl success.
+zephyr-gateway  | 2026-04-19T01:12:59.356Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.common.remote.client   : [RpcClientFactory] create a new rpc client of 015b0284-2b24-484f-b204-557f860ec115
+zephyr-gateway  | 2026-04-19T01:12:59.357Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.common.remote.client   : [015b0284-2b24-484f-b204-557f860ec115] RpcClient init, ServerListFactory = com.alibaba.nacos.client.naming.core.ServerListManager
+zephyr-gateway  | 2026-04-19T01:12:59.358Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.common.remote.client   : [015b0284-2b24-484f-b204-557f860ec115] Registry connection listener to current client:com.alibaba.nacos.client.naming.remote.gprc.redo.NamingGrpcRedoService
+zephyr-gateway  | 2026-04-19T01:12:59.358Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.common.remote.client   : [015b0284-2b24-484f-b204-557f860ec115] Register server push request handler:com.alibaba.nacos.client.naming.remote.gprc.NamingPushRequestHandler
+zephyr-gateway  | 2026-04-19T01:12:59.358Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.common.remote.client   : [015b0284-2b24-484f-b204-557f860ec115] Try to connect to server on start up, server: {serverIp = 'host.docker.internal', server main port = 8849}
+zephyr-gateway  | 2026-04-19T01:12:59.359Z  INFO 1 --- [zephyr-gateway] [           main] c.a.n.c.remote.client.grpc.GrpcClient    : grpc client connection server:host.docker.internal ip,serverPort:9849,grpcTslConfig:{"sslProvider":"OPENSSL","enableTls":false,"mutualAuthEnable":false,"trustAll":false}
+zephyr-backend  | 2026-04-19T01:12:59.424Z  INFO 1 --- [zephyr-system] [           main] o.s.c.openfeign.FeignClientFactoryBean   : For 'zephyr-system' URL not provided. Will try picking an instance via load-balancing.
+zephyr-gateway  | 2026-04-19T01:12:59.470Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.common.remote.client   : [015b0284-2b24-484f-b204-557f860ec115] Success to connect to server [host.docker.internal:8849] on start up, connectionId = 1776561179365_192.168.107.1_46974
+zephyr-gateway  | 2026-04-19T01:12:59.471Z  INFO 1 --- [zephyr-gateway] [t.remote.worker] com.alibaba.nacos.common.remote.client   : [015b0284-2b24-484f-b204-557f860ec115] Notify connected event to listeners.
+zephyr-gateway  | 2026-04-19T01:12:59.471Z  INFO 1 --- [zephyr-gateway] [t.remote.worker] com.alibaba.nacos.client.naming          : Grpc connection connect
+zephyr-gateway  | 2026-04-19T01:12:59.471Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.common.remote.client   : [015b0284-2b24-484f-b204-557f860ec115] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$ConnectResetRequestHandler
+zephyr-gateway  | 2026-04-19T01:12:59.471Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.common.remote.client   : [015b0284-2b24-484f-b204-557f860ec115] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$$Lambda/0x000000d80138f230
+zephyr-gateway  | 2026-04-19T01:12:59.472Z  INFO 1 --- [zephyr-gateway] [           main] com.alibaba.nacos.client.naming          : [REGISTER-SERVICE] public registering service zephyr-gateway with instance Instance{instanceId='null', ip='192.168.97.3', port=8001, weight=1.0, healthy=true, enabled=true, ephemeral=true, clusterName='DEFAULT', serviceName='null', metadata={IPv6=null, preserved.register.source=SPRING_CLOUD}}
+zephyr-backend  | 2026-04-19T01:12:59.474Z DEBUG 1 --- [zephyr-system] [           main] c.z.auth.filter.JwtAuthenticationFilter  : Filter 'jwtAuthenticationFilter' configured for use
+zephyr-gateway  | 2026-04-19T01:12:59.485Z  INFO 1 --- [zephyr-gateway] [           main] c.a.c.n.registry.NacosServiceRegistry    : nacos registry, DEFAULT_GROUP zephyr-gateway 192.168.97.3:8001 register finished
+zephyr-gateway  | 2026-04-19T01:12:59.525Z  INFO 1 --- [zephyr-gateway] [           main] com.zephyr.gateway.GatewayApplication    : Started GatewayApplication in 2.652 seconds (process running for 2.98)
+zephyr-gateway  | 2026-04-19T01:12:59.529Z  INFO 1 --- [zephyr-gateway] [           main] c.a.nacos.client.config.impl.CacheData   : nacos.cache.data.init.snapshot = true 
+zephyr-gateway  | 2026-04-19T01:12:59.530Z  INFO 1 --- [zephyr-gateway] [           main] c.a.n.client.config.impl.ClientWorker    : [fixed-host.docker.internal_8849] [subscribe] application.yaml+DEFAULT_GROUP
+zephyr-gateway  | 2026-04-19T01:12:59.535Z  INFO 1 --- [zephyr-gateway] [           main] c.a.nacos.client.config.impl.CacheData   : [fixed-host.docker.internal_8849] [add-listener] ok, tenant=, dataId=application.yaml, group=DEFAULT_GROUP, cnt=1
+zephyr-gateway  | 2026-04-19T01:12:59.535Z  INFO 1 --- [zephyr-gateway] [           main] c.a.c.n.refresh.NacosContextRefresher    : [Nacos Config] Listening config: dataId=application.yaml, group=DEFAULT_GROUP
+zephyr-backend  | 2026-04-19T01:12:59.587Z  INFO 1 --- [zephyr-system] [           main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+zephyr-backend  | 2026-04-19T01:12:59.587Z  WARN 1 --- [zephyr-system] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used for username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider.
+zephyr-backend  | 2026-04-19T01:12:59.781Z  INFO 1 --- [zephyr-system] [           main] c.a.d.s.b.a.DruidDataSourceAutoConfigure : Init DruidDataSource
+zephyr-backend  | 2026-04-19T01:12:59.904Z  INFO 1 --- [zephyr-system] [           main] com.alibaba.druid.pool.DruidDataSource   : {dataSource-1} inited
+zephyr-backend  | Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+zephyr-backend  | 2026-04-19T01:12:59.975Z DEBUG 1 --- [zephyr-system] [           main] c.b.m.e.s.MybatisSqlSessionFactoryBean   : Registered plugin: 'com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor@736eb2a2'
+zephyr-backend  | 2026-04-19T01:12:59.977Z DEBUG 1 --- [zephyr-system] [           main] c.b.m.e.s.MybatisSqlSessionFactoryBean   : Property 'mapperLocations' was not specified.
+zephyr-backend  | Use localhost address 
+zephyr-backend  | Get 69fc8ee7bad1/192.168.97.2 network interface 
+zephyr-backend  | Get network interface info: name:eth0 (eth0)
+zephyr-backend  | Initialization Sequence datacenterId:12 workerId:16
+zephyr-backend  |  _ _   |_  _ _|_. ___ _ |    _ 
+zephyr-backend  | | | |\/|_)(_| | |_\  |_)||_|_\ 
+zephyr-backend  |      /               |         
+zephyr-backend  |                         3.5.6 
+zephyr-backend  | Can not find table primary key in Class: "com.zephyr.system.pojo.entity.RoleMenu".
+zephyr-backend  | 2026-04-19T01:13:00.269Z  WARN 1 --- [zephyr-system] [           main] c.b.m.core.injector.DefaultSqlInjector   : class com.zephyr.system.pojo.entity.RoleMenu ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+zephyr-backend  | Can not find table primary key in Class: "com.zephyr.system.pojo.entity.UserRole".
+zephyr-backend  | 2026-04-19T01:13:00.398Z  WARN 1 --- [zephyr-system] [           main] c.b.m.core.injector.DefaultSqlInjector   : class com.zephyr.system.pojo.entity.UserRole ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+zephyr-backend  | Can not find table primary key in Class: "com.zephyr.system.pojo.entity.RolePermission".
+zephyr-backend  | 2026-04-19T01:13:00.461Z  WARN 1 --- [zephyr-system] [           main] c.b.m.core.injector.DefaultSqlInjector   : class com.zephyr.system.pojo.entity.RolePermission ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+zephyr-backend  | 2026-04-19T01:13:00.489Z  INFO 1 --- [zephyr-system] [           main] org.quartz.impl.StdSchedulerFactory      : Using default implementation for ThreadExecutor
+zephyr-backend  | 2026-04-19T01:13:00.495Z  INFO 1 --- [zephyr-system] [           main] org.quartz.core.SchedulerSignalerImpl    : Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+zephyr-backend  | 2026-04-19T01:13:00.495Z  INFO 1 --- [zephyr-system] [           main] org.quartz.core.QuartzScheduler          : Quartz Scheduler v.2.3.2 created.
+zephyr-backend  | 2026-04-19T01:13:00.495Z  INFO 1 --- [zephyr-system] [           main] org.quartz.simpl.RAMJobStore             : RAMJobStore initialized.
+zephyr-backend  | 2026-04-19T01:13:00.495Z  INFO 1 --- [zephyr-system] [           main] org.quartz.core.QuartzScheduler          : Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+zephyr-backend  |   Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+zephyr-backend  |   NOT STARTED.
+zephyr-backend  |   Currently in standby mode.
+zephyr-backend  |   Number of jobs executed: 0
+zephyr-backend  |   Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+zephyr-backend  |   Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+zephyr-backend  | 
+zephyr-backend  | 2026-04-19T01:13:00.495Z  INFO 1 --- [zephyr-system] [           main] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+zephyr-backend  | 2026-04-19T01:13:00.495Z  INFO 1 --- [zephyr-system] [           main] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler version: 2.3.2
+zephyr-backend  | 2026-04-19T01:13:00.495Z  INFO 1 --- [zephyr-system] [           main] org.quartz.core.QuartzScheduler          : JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@593db293
+zephyr-backend  | 2026-04-19T01:13:00.674Z  INFO 1 --- [zephyr-system] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoints beneath base path '/actuator'
+zephyr-backend  | 2026-04-19T01:13:00.703Z DEBUG 1 --- [zephyr-system] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, JwtAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+zephyr-backend  | 2026-04-19T01:13:00.956Z  WARN 1 --- [zephyr-system] [           main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+zephyr-backend  | Can not find table primary key in Class: "com.zephyr.system.pojo.entity.RoleConflict".
+zephyr-backend  | 2026-04-19T01:13:00.960Z  WARN 1 --- [zephyr-system] [           main] c.b.m.core.injector.DefaultSqlInjector   : class com.zephyr.system.pojo.entity.RoleConflict ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+zephyr-backend  | Can not find table primary key in Class: "com.zephyr.system.pojo.entity.RoleDept".
+zephyr-backend  | 2026-04-19T01:13:00.965Z  WARN 1 --- [zephyr-system] [           main] c.b.m.core.injector.DefaultSqlInjector   : class com.zephyr.system.pojo.entity.RoleDept ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+zephyr-backend  | Can not find table primary key in Class: "com.zephyr.system.pojo.entity.RoleHierarchy".
+zephyr-backend  | 2026-04-19T01:13:00.968Z  WARN 1 --- [zephyr-system] [           main] c.b.m.core.injector.DefaultSqlInjector   : class com.zephyr.system.pojo.entity.RoleHierarchy ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+zephyr-backend  | 2026-04-19T01:13:01.001Z  INFO 1 --- [zephyr-system] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8073 (http) with context path '/'
+zephyr-backend  | 2026-04-19T01:13:01.194Z  INFO 1 --- [zephyr-system] [           main] c.a.c.n.registry.NacosServiceRegistry    : nacos registry, DEFAULT_GROUP zephyr-system 192.168.97.2:8073 register finished
+zephyr-backend  | 2026-04-19T01:13:01.195Z  INFO 1 --- [zephyr-system] [           main] o.s.s.quartz.SchedulerFactoryBean        : Starting Quartz Scheduler now
+zephyr-backend  | 2026-04-19T01:13:01.196Z  INFO 1 --- [zephyr-system] [           main] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED started.
+zephyr-backend  | 2026-04-19T01:13:01.209Z  INFO 1 --- [zephyr-system] [           main] com.zephyr.common.CommonApplication      : Started CommonApplication in 4.332 seconds (process running for 4.709)
+zephyr-backend  | Creating a new SqlSession
+zephyr-backend  | SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f86cd50] was not registered for synchronization because synchronization is not active
+zephyr-backend  | JDBC Connection [ConnectionProxyImpl{connectedTime=2026-04-19 01:13:01.315, closeCount=0, lastValidateTimeMillis=2026-04-19 01:13:01.318}] will not be managed by Spring
+zephyr-backend  | ==>  Preparing: SELECT id,role_name,role_code,role_sort,data_scope,status,remark,create_user,create_time,update_user,update_time,del_flag AS isDeleted FROM sys_role WHERE del_flag=0
+zephyr-backend  | ==> Parameters: 
+zephyr-backend  | <==    Columns: id, role_name, role_code, role_sort, data_scope, status, remark, create_user, create_time, update_user, update_time, isDeleted
+zephyr-backend  | <==        Row: 1, 超级管理员, admin, 1, 1, 1, null, 1, 2026-04-17 11:06:39, null, 2026-04-17 11:06:39, 0
+zephyr-backend  | <==        Row: 2, 普通角色, common, 2, 2, 1, null, 1, 2026-04-17 11:06:39, null, 2026-04-17 11:06:39, 0
+zephyr-backend  | <==      Total: 2
+zephyr-backend  | Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f86cd50]
+zephyr-backend  | Creating a new SqlSession
+zephyr-backend  | SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1dade178] was not registered for synchronization because synchronization is not active
+zephyr-backend  | JDBC Connection [ConnectionProxyImpl{connectedTime=2026-04-19 01:13:01.315, closeCount=0, lastValidateTimeMillis=2026-04-19 01:13:01.318}] will not be managed by Spring
+zephyr-backend  | ==>  Preparing: SELECT DISTINCT m.perms FROM sys_menu m INNER JOIN sys_role_menu rm ON m.id = rm.menu_id WHERE rm.role_id = ? AND m.perms IS NOT NULL AND m.perms != ''
+zephyr-backend  | ==> Parameters: 1(Long)
+zephyr-backend  | <==    Columns: perms
+zephyr-backend  | <==        Row: sys:user:list
+zephyr-backend  | <==        Row: sys:role:list
+zephyr-backend  | <==        Row: sys:user:query
+zephyr-backend  | <==        Row: sys:user:add
+zephyr-backend  | <==        Row: sys:user:edit
+zephyr-backend  | <==      Total: 5
+zephyr-backend  | Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1dade178]
+zephyr-backend  | Creating a new SqlSession
+zephyr-backend  | SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@178be8fc] was not registered for synchronization because synchronization is not active
+zephyr-backend  | JDBC Connection [ConnectionProxyImpl{connectedTime=2026-04-19 01:13:01.315, closeCount=0, lastValidateTimeMillis=2026-04-19 01:13:01.318}] will not be managed by Spring
+zephyr-backend  | ==>  Preparing: SELECT DISTINCT m.perms FROM sys_menu m INNER JOIN sys_role_menu rm ON m.id = rm.menu_id WHERE rm.role_id = ? AND m.perms IS NOT NULL AND m.perms != ''
+zephyr-backend  | ==> Parameters: 2(Long)
+zephyr-backend  | <==    Columns: perms
+zephyr-backend  | <==        Row: sys:user:list
+zephyr-backend  | <==        Row: sys:user:query
+zephyr-backend  | <==      Total: 2
+zephyr-backend  | Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@178be8fc]
+zephyr-backend  | 2026-04-19T01:13:01.502Z  INFO 1 --- [zephyr-system] [           main] c.zephyr.system.runner.RolePermsLoader   : [RolePermsLoader] 角色权限缓存加载完毕，共加载 2 个角色
+zephyr-backend  | 2026-04-19T01:13:01.502Z  INFO 1 --- [zephyr-system] [           main] com.zephyr.ops.config.QuartzConfig       : ▶ 正在初始化定时任务调度器...
+zephyr-backend  | Creating a new SqlSession
+zephyr-backend  | SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7efcdcde] was not registered for synchronization because synchronization is not active
+zephyr-backend  | JDBC Connection [ConnectionProxyImpl{connectedTime=2026-04-19 01:13:01.315, closeCount=0, lastValidateTimeMillis=2026-04-19 01:13:01.318}] will not be managed by Spring
+zephyr-backend  | ==>  Preparing: SELECT id,job_name,job_group,invoke_target,cron_expression,misfire_policy,concurrent,status,remark,create_user,create_time,update_user,update_time,del_flag AS isDeleted FROM sys_job WHERE del_flag=0
+zephyr-backend  | ==> Parameters: 
+zephyr-backend  | <==      Total: 0
+zephyr-backend  | Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7efcdcde]
+zephyr-backend  | 2026-04-19T01:13:01.503Z  INFO 1 --- [zephyr-system] [           main] com.zephyr.ops.config.QuartzConfig       : ✅ 定时任务调度器初始化完成！加载任务数：0
+zephyr-backend  | 2026-04-19T01:13:01.503Z DEBUG 1 --- [zephyr-system] [           main] c.b.m.a.DdlApplicationRunner             :   ...  DDL start create  ...  
+zephyr-backend  | 2026-04-19T01:13:01.504Z DEBUG 1 --- [zephyr-system] [           main] c.b.m.a.DdlApplicationRunner             :   ...  DDL end create  ...  
+zephyr-backend  | 2026-04-19T01:13:01.508Z  INFO 1 --- [zephyr-system] [           main] c.a.c.n.refresh.NacosContextRefresher    : [Nacos Config] Listening config: dataId=application.yaml, group=DEFAULT_GROUP
