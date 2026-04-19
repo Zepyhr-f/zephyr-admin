@@ -1,4 +1,0 @@
-/Users/zephyr/z-code/z-manager/zephyr-server/zephyr-common/zephyr-auth/zephyr-auth-api/src/main/java/com/zephyr/auth/feign/IAuthClient.java
-/Users/zephyr/z-code/z-manager/zephyr-server/zephyr-common/zephyr-auth/zephyr-auth-api/src/main/java/com/zephyr/auth/pojo/dto/LoginRequest.java
-/Users/zephyr/z-code/z-manager/zephyr-server/zephyr-common/zephyr-auth/zephyr-auth-api/src/main/java/com/zephyr/auth/pojo/vo/LoginResponse.java
-/Users/zephyr/z-code/z-manager/zephyr-server/zephyr-common/zephyr-auth/zephyr-auth-api/src/main/java/com/zephyr/auth/pojo/entity/UserSession.java

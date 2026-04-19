@@ -1,0 +1,33 @@
+# IDE & System
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Backend (Maven)
+target/
+*.class
+*.jar
+*.war
+
+# Frontend (Node)
+node_modules/
+dist/
+.next/
+build/
+.eslintcache
+.stylelintcache
+
+# Local Environment
+.env
+.env.local
+.env.*.local
+
+# Misc
+temp/
+tmp/

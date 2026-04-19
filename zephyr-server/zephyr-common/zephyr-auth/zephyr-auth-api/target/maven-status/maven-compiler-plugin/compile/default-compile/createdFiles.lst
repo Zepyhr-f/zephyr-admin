@@ -1,6 +1,0 @@
-com/zephyr/auth/pojo/dto/LoginRequest.class
-com/zephyr/auth/pojo/dto/LoginRequest$LoginRequestBuilder.class
-com/zephyr/auth/pojo/vo/LoginResponse$LoginResponseBuilder.class
-com/zephyr/auth/pojo/vo/LoginResponse.class
-com/zephyr/auth/pojo/entity/UserSession.class
-com/zephyr/auth/feign/IAuthClient.class
