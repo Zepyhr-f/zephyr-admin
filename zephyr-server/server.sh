@@ -12,7 +12,7 @@ case "$ACTION" in
     docker compose up -d --build
     
     # 统一日志追踪输出
-    LOG_DIR="/Users/zephyr/z-code/z-manager/logs"
+    LOG_DIR="$(cd "$(dirname "$0")/.." && pwd)/logs"
     mkdir -p "$LOG_DIR"
     pkill -f "docker compose logs -f" 2>/dev/null || true
     nohup docker compose logs -f > "$LOG_DIR/backend.log" 2>&1 &

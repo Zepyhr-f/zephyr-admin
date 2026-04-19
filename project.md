@@ -8,39 +8,48 @@
 
 **在开始处理本项目的任何开发、设计或提交任务之前，AI 助手必须首先阅读以下文件：**
 
-👉 **[开发规范总索引](./zephyr-doc/05-开发规范/README.md)**：了解本项目的规范体系全貌，根据当前任务类型找到并阅读对应的具体规范文件，所有方案与操作必须严格对标规范执行，不得绕过。
+👉 **[开发规范总索引](./zephyr-doc/05-开发规范/README.md)**：了解本项目的规范体系全貌。所有方案与操作必须严格对标规范执行（特别是 **[代码提交流程 SOP](./zephyr-doc/05-开发规范/03-其他规范/01-代码提交与发版规范.md)**）。
 
 ## 1. 项目核心结构
 
-*   **[`zephyr-doc`](/Users/zephyr/z-code/z-manager/zephyr-doc)**: 项目文档存放目录。**所有**关于具体业务逻辑、功能说明和场景流程设计的文档请进入此目录查询。
-*   **[`zephyr-server`](/Users/zephyr/z-code/z-manager/zephyr-server)**: 项目后端服务代码。核心采用 Java Spring Cloud / Spring Boot 微服务架构。
-*   **[`zephyr-web`](/Users/zephyr/z-code/z-manager/zephyr-web)**: 项目前端网页应用代码。基于 Ant Design Pro (React / Umi) 现代前端框架构建。
+*   **[`zephyr-doc`](./zephyr-doc)**: 项目文档存放目录。**所有**关于具体业务逻辑、功能说明和场景流程设计的文档请进入此目录查询。
+*   **[`zephyr-server`](./zephyr-server)**: 项目后端服务代码。核心采用 Java Spring Cloud / Spring Boot 微服务架构。
+*   **[`zephyr-web`](./zephyr-web)**: 项目前端网页应用代码。基于 Ant Design Pro (React / Vite) 现代前端框架构建。
 
 ---
 
-## 2. 统一启动与管理指南（推荐）
+## 2. 启动与管理指南
 
-为了提升我们本地全栈联调的效率，我们在项目根目录提供了整套环境的**一键统一启停脚本 `z-run.sh`**。它将会自动在后台管理并拉起后端的微服务容器群与前端的 Ant Design Pro 网页开发服务器。
+为了提高开发灵活性，项目在根目录提供了解耦的启动脚本，方便独立管理前端和后端服务。
 
-### 2.1 快捷全栈联调启停
-日常进行需求测试和前后端联调时，请直接在项目根目录执行以下自动化命令：
+### 2.1 环境准备
+在运行启动脚本前，请确保本地环境已安装以下工具：
+- **Docker & Docker Compose**: 用于拉起后端微服务容器群。
+- **Node.js (v20+) & pnpm (v10+)**: 用于前端 Vite 服务器运行。
+- **Java 17**: 用于本地后端调试。
 
-```bash
-# ✨ 一键拉起全体前后端服务
-sh /Users/zephyr/z-code/z-manager/z-run.sh start
+### 2.2 解耦启动方案 (推荐)
+通过独立脚本管理各端服务，可以避免在只修改一端代码时重启整个全栈环境。
 
-# 🛑 一键下线并清理所有的前后端进程
-sh /Users/zephyr/z-code/z-manager/z-run.sh stop
+| 目标服务 | 启动命令 | 停止命令 | 重启命令 | 日志查看 |
+| :--- | :--- | :--- | :--- | :--- |
+| **前端 (Web)** | `sh z-web.sh start` | `sh z-web.sh stop` | `sh z-web.sh restart` | `tail -f logs/frontend.log` |
+| **后端 (Server)** | `sh z-server.sh start` | `sh z-server.sh stop` | `sh z-server.sh restart` | `tail -f logs/backend.log` |
 
-# ♻️ 一键重启全套服务
-sh /Users/zephyr/z-code/z-manager/z-run.sh restart
-```
+> [!TIP]
+> 所有的日志文件均保存在根目录的 `logs/` 文件夹下。
 
-*(备注：使用此脚本时，前端的 `pnpm dev` 会在后台静默运行并将报错与日志输出至 `zephyr-web/frontend.log`。后端容器也会根据您最新的代码依赖进行并行增量热构建。)*
+---
 
-### 2.2 独立与单步调试补充说明
-根目录下的 `z-run.sh` 是团队联机和 AI 进行全托管联调的基准核心方式。但在某些局部代码出现无法定位的异常时，您依然可以单独调试：
-- **后端独立 DEBUG**：利用 IDE（如 IDEA）依次手动运行 `zephyr-common/common-boot` 及业务服务、`zephyr-gateway` 等的标准 `main` 方法，以便使用 IDE 原生断点和代码步进功能。
-- **前端独立启停**：进入 `zephyr-web` 目录，控制台手工执行 `pnpm install` 及 `pnpm run dev` 在前台暴露运行情况以排查依赖树或语法问题。
+## 3. 开发规范与提交
+
+作为项目成员，你必须严格遵守 **[代码提交 SOP](./zephyr-doc/05-开发规范/03-其他规范/01-代码提交与发版规范.md)**。
+每次提交前，必须确保修改后的端（Web 或 Server）在本地运行无误，并完成必要的 Lint 和单元测试。
+
+---
+
+## 4. 故障排查
+- **前端启动失败**：检查 `logs/frontend.log`，确认依赖已安装（`pnpm install`）。
+- **后端容器无法拉起**：检查 `logs/backend.log`，确认 Docker 引擎已启动且 8080 等核心端口未被占用。
 
 ---
