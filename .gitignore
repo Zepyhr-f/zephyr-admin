@@ -31,3 +31,4 @@ build/
 # Misc
 temp/
 tmp/
+zephyr-web/.frontend.pid
