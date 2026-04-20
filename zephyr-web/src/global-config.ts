@@ -28,8 +28,8 @@ export type GlobalConfig = {
 export const GLOBAL_CONFIG: GlobalConfig = {
 	appName: "Slash Admin",
 	appVersion: packageJson.version,
-	defaultRoute: import.meta.env.VITE_APP_DEFAULT_ROUTE || "/system/user",
+	defaultRoute: import.meta.env.VITE_APP_DEFAULT_ROUTE || "/workbench",
 	publicPath: import.meta.env.VITE_APP_PUBLIC_PATH || "/",
 	apiBaseUrl: import.meta.env.VITE_APP_API_BASE_URL || "/api",
-	routerMode: (import.meta.env.VITE_APP_ROUTER_MODE as "frontend" | "backend") || "backend",
+	routerMode: (import.meta.env.VITE_APP_ROUTER_MODE as "frontend" | "backend") || "frontend",
 };

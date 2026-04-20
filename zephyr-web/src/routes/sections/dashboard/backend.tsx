@@ -1,7 +1,6 @@
-import { DB_MENU } from "@/_mock/assets_backup";
+import useUserStore from "@/store/userStore";
 import type { MenuMetaInfo, MenuTree } from "@/types/entity";
 import { PermissionType } from "@/types/enum";
-import { convertFlatToTree } from "@/utils/tree";
 import type { RouteObject } from "react-router";
 import { Navigate } from "react-router";
 import { Component } from "./utils";
@@ -92,6 +91,7 @@ const convertToRoute = (items: MenuTree[], parent?: MenuTree): RouteObject[] => 
 };
 
 export function getBackendDashboardRoutes() {
-	const backendDashboardRoutes = convertToRoute(convertFlatToTree(DB_MENU));
+	const { userMenus } = useUserStore.getState();
+	const backendDashboardRoutes = convertToRoute(userMenus);
 	return backendDashboardRoutes;
 }

@@ -2,10 +2,11 @@ import { useMutation } from "@tanstack/react-query";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import menuService from "@/api/services/menuService";
 import userService, { type SignInReq } from "@/api/services/userService";
 
 import { toast } from "sonner";
-import type { UserInfo, UserToken } from "#/entity";
+import type { MenuTree, UserInfo, UserToken } from "#/entity";
 import { StorageEnum } from "#/enum";
 
 type UserStore = {
@@ -17,12 +18,6 @@ type UserStore = {
 		setUserInfo: (userInfo: UserInfo) => void;
 		setUserToken: (token: UserToken) => void;
 		setUserMenus: (menus: MenuTree[]) => void; // Action to set menus
-		clearUserInfoAndToken: () => void;
-	};
-
-	actions: {
-		setUserInfo: (userInfo: UserInfo) => void;
-		setUserToken: (token: UserToken) => void;
 		clearUserInfoAndToken: () => void;
 	};
 };
@@ -68,7 +63,7 @@ export const useUserRoles = () => useUserStore((state) => state.userInfo.roles |
 export const useUserActions = () => useUserStore((state) => state.actions);
 
 export const useSignIn = () => {
-	const { setUserToken, setUserInfo } = useUserActions();
+	const { setUserToken, setUserInfo, setUserMenus } = useUserActions();
 
 	const signInMutation = useMutation({
 		mutationFn: userService.signin,
@@ -83,6 +78,10 @@ export const useSignIn = () => {
 			// 获取完整用户信息
 			const userInfo = await userService.getUserInfo();
 			setUserInfo(userInfo);
+
+			// 获取用户菜单
+			const menus = await menuService.getMenuList();
+			setUserMenus(menus || []);
 		} catch (err) {
 			toast.error(err.message, {
 				position: "top-center",

@@ -1,15 +1,19 @@
 import { Navigate, type RouteObject } from "react-router";
 import { authRoutes } from "./auth";
-import { dashboardRoutes } from "./dashboard";
+import { getDashboardRoutes } from "./dashboard";
 import { mainRoutes } from "./main";
 
-export const routesSection: RouteObject[] = [
+/**
+ * 聚合所有路由分段
+ * 将 Auth 放在最前面，确保登录页始终可达
+ */
+export const getRoutesSection = (): RouteObject[] => [
 	// Auth
 	...authRoutes,
-	// Dashboard
-	...dashboardRoutes,
-	// Main
+	// Dashboard Layout & Children
+	...getDashboardRoutes(),
+	// System/Error Paths
 	...mainRoutes,
-	// No Match
+	// Catch-all 404 Redirect
 	{ path: "*", element: <Navigate to="/404" replace /> },
 ];

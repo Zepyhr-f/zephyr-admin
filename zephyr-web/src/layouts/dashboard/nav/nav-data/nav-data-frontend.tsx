@@ -17,39 +17,39 @@ export const frontendNavData: NavProps["data"] = [
 			},
 			{
 				title: "sys.nav.user.index",
-				path: "/management/user",
+				path: "/user",
 				icon: <Icon icon="solar:users-group-rounded-bold-duotone" size="24" />,
 				children: [
 					{
 						title: "sys.nav.user.profile",
-						path: "/management/user/profile",
+						path: "/user/profile",
 					},
 					{
 						title: "sys.nav.user.account",
-						path: "/management/user/account",
+						path: "/user/account",
 					},
 				],
 			},
 			{
 				title: "sys.nav.system.index",
-				path: "/management/system",
+				path: "/system",
 				icon: <Icon icon="solar:settings-bold-duotone" size="24" />,
 				children: [
 					{
 						title: "sys.nav.system.permission",
-						path: "/management/system/permission",
+						path: "/system/permission",
 					},
 					{
 						title: "sys.nav.system.role",
-						path: "/management/system/role",
+						path: "/system/role",
 					},
 					{
 						title: "sys.nav.system.user",
-						path: "/management/system/user",
+						path: "/system/user",
 					},
 					{
 						title: "sys.nav.system.dept",
-						path: "/management/system/dept",
+						path: "/system/dept",
 					},
 				],
 			},

@@ -12,7 +12,7 @@ const authCustom: RouteObject[] = [
 
 export const authRoutes: RouteObject[] = [
 	{
-		path: "auth",
+		path: "/auth",
 		element: (
 			<Suspense>
 				<Outlet />
