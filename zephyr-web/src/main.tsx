@@ -4,7 +4,15 @@ import "./locales/i18n";
 import ReactDOM from "react-dom/client";
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router";
 import App from "./App";
-import { worker } from "./_mock";
+// 强制注销所有 Service Workers 以确保 MSW 彻底失效
+if ("serviceWorker" in navigator) {
+	navigator.serviceWorker.getRegistrations().then((registrations) => {
+		for (const registration of registrations) {
+			registration.unregister();
+		}
+	});
+}
+
 import menuService from "./api/services/menuService";
 import { registerLocalIcons } from "./components/icon";
 import { GLOBAL_CONFIG } from "./global-config";
@@ -13,10 +21,6 @@ import { routesSection } from "./routes/sections";
 import { urlJoin } from "./utils";
 
 await registerLocalIcons();
-await worker.start({
-	onUnhandledRequest: "bypass",
-	serviceWorker: { url: urlJoin(GLOBAL_CONFIG.publicPath, "mockServiceWorker.js") },
-});
 if (GLOBAL_CONFIG.routerMode === "backend") {
 	await menuService.getMenuList();
 }

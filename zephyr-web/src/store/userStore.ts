@@ -11,6 +11,14 @@ import { StorageEnum } from "#/enum";
 type UserStore = {
 	userInfo: Partial<UserInfo>;
 	userToken: UserToken;
+	userMenus: MenuTree[]; // Add user menus for dynamic routing
+
+	actions: {
+		setUserInfo: (userInfo: UserInfo) => void;
+		setUserToken: (token: UserToken) => void;
+		setUserMenus: (menus: MenuTree[]) => void; // Action to set menus
+		clearUserInfoAndToken: () => void;
+	};
 
 	actions: {
 		setUserInfo: (userInfo: UserInfo) => void;
@@ -24,6 +32,7 @@ const useUserStore = create<UserStore>()(
 		(set) => ({
 			userInfo: {},
 			userToken: {},
+			userMenus: [],
 			actions: {
 				setUserInfo: (userInfo) => {
 					set({ userInfo });
@@ -31,8 +40,11 @@ const useUserStore = create<UserStore>()(
 				setUserToken: (userToken) => {
 					set({ userToken });
 				},
+				setUserMenus: (userMenus) => {
+					set({ userMenus });
+				},
 				clearUserInfoAndToken() {
-					set({ userInfo: {}, userToken: {} });
+					set({ userInfo: {}, userToken: {}, userMenus: [] });
 				},
 			},
 		}),
@@ -42,6 +54,7 @@ const useUserStore = create<UserStore>()(
 			partialize: (state) => ({
 				[StorageEnum.UserInfo]: state.userInfo,
 				[StorageEnum.UserToken]: state.userToken,
+				userMenus: state.userMenus,
 			}),
 		},
 	),
@@ -49,6 +62,7 @@ const useUserStore = create<UserStore>()(
 
 export const useUserInfo = () => useUserStore((state) => state.userInfo);
 export const useUserToken = () => useUserStore((state) => state.userToken);
+export const useUserMenus = () => useUserStore((state) => state.userMenus);
 export const useUserPermissions = () => useUserStore((state) => state.userInfo.permissions || []);
 export const useUserRoles = () => useUserStore((state) => state.userInfo.roles || []);
 export const useUserActions = () => useUserStore((state) => state.actions);
@@ -63,9 +77,12 @@ export const useSignIn = () => {
 	const signIn = async (data: SignInReq) => {
 		try {
 			const res = await signInMutation.mutateAsync(data);
-			const { user, accessToken, refreshToken } = res;
+			const { accessToken, refreshToken } = res;
 			setUserToken({ accessToken, refreshToken });
-			setUserInfo(user);
+
+			// 获取完整用户信息
+			const userInfo = await userService.getUserInfo();
+			setUserInfo(userInfo);
 		} catch (err) {
 			toast.error(err.message, {
 				position: "top-center",

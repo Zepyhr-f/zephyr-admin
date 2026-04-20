@@ -14,16 +14,23 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
 	(config) => {
-		config.headers.Authorization = "Bearer Token";
+		const { accessToken } = userStore.getState().userToken;
+		if (accessToken) {
+			config.headers.Authorization = `Bearer ${accessToken}`;
+		}
 		return config;
 	},
 	(error) => Promise.reject(error),
 );
 
 axiosInstance.interceptors.response.use(
-	(res: AxiosResponse<Result<any>>) => {
+	(res: AxiosResponse<any>) => {
 		if (!res.data) throw new Error(t("sys.api.apiRequestFailed"));
-		const { status, data, message } = res.data;
+		// 后端返回的可能是 code 或 status
+		const status = res.data.code ?? res.data.status;
+		const data = res.data.data;
+		const message = res.data.msg ?? res.data.message;
+
 		if (status === ResultStatus.SUCCESS) {
 			return data;
 		}

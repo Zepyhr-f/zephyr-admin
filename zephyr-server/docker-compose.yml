@@ -20,6 +20,12 @@ services:
       SPRING_CLOUD_NACOS_DISCOVERY_PASSWORD: nacos
       SPRING_CLOUD_NACOS_CONFIG_USERNAME: nacos
       SPRING_CLOUD_NACOS_CONFIG_PASSWORD: nacos
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8073 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   gateway:
     build:
@@ -40,3 +46,9 @@ services:
       SPRING_DATA_REDIS_PORT: 6380
     depends_on:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8001 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

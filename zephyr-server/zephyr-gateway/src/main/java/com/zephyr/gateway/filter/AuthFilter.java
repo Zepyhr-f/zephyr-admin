@@ -11,6 +11,7 @@ import com.zephyr.jwt.util.JwtUtil;
 import com.zephyr.redis.Constant.RedisConstant;
 import com.zephyr.redis.util.RedisUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -68,7 +69,16 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
         String token = authHeader.startsWith(TOKEN_PREFIX) ?
                 authHeader.substring(TOKEN_PREFIX_LENGTH) : authHeader;
-        Claims claims = jwtUtil.extractAllClaims(token);
+
+        Claims claims;
+        try {
+            claims = jwtUtil.extractAllClaims(token);
+        } catch (JwtException e) {
+            log.error("JWT解析异常: {}", e.getMessage());
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return unAuth(response, "Token格式非法或已过期");
+        }
+
         String userKey = RedisConstant.TOKEN_PREFIX + claims.get(USER_NAME);
         String rToken = redisUtil.getString(userKey);
         if (!token.equals(rToken)) {

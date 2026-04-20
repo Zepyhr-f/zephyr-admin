@@ -3,7 +3,7 @@ import apiClient from "../apiClient";
 import type { Menu } from "#/entity";
 
 export enum MenuApi {
-	Menu = "/menu",
+	Menu = "/zephyr-system/menu",
 }
 
 const getMenuList = () => apiClient.get<Menu[]>({ url: `${MenuApi.Menu}/tree` });

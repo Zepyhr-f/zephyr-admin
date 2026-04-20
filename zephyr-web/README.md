@@ -1,100 +1,27 @@
-<div align="center"> 
-<br> 
-<br>
-<img src="./src/assets/icons/ic-logo-badge.svg" height="140" />
-<h3> Slash Admin </h3>
-  <p>
-    <p style="font-size: 14px">
-      Slash Admin is a modern admin dashboard template built with React 19, Vite, shadcn/ui, and TypeScript. It is designed to help developers quickly create powerful admin management systems.
-    </p>
-    <br />
-    <br />
-    <a href="https://admin.slashspaces.com/">Preview</a>
-    ·
-    <a href="https://discord.gg/fXemAXVNDa">Discord</a>
-    ·
-    <a href="https://docs-admin.slashspaces.com/">Document</a>
-    <br />
-    <br />
-    <a href="https://trendshift.io/repositories/6387" target="_blank"><img src="https://trendshift.io/api/badge/repositories/6387" alt="d3george%2Fslash-admin | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</div>
 
-**English** | [中文](./README.zh-CN.md)
 
-##  Sponsor
-<div style="display: flex; gap: 50px"> 
-  <img style="width:300px" src="https://d3george.github.io/github-static/pay/weixin.jpg" >
-  <img style="width:300px" src="https://d3george.github.io/github-static/pay/buymeacoffee.png" />
-</div>
+### 如何新增菜单 (How to Add a New Menu - 数据库驱动)
 
-## Preview
-+ https://admin.slashspaces.com/
+项目现已支持通过数据库 `sys_menu` 表动态配置菜单和路由。这种方式无需修改前端代码，即可实现菜单的增删改查。
 
-|![login.png](https://d3george.github.io/github-static/slash-admin/sa-web-light.jpeg)|![login_dark.png](https://d3george.github.io/github-static/slash-admin/sa-web-dark.jpeg)
-| ----------------------------------------------------------------- | ------------------------------------------------------------------- |
-|![analysis.png](https://d3george.github.io/github-static/slash-admin/sa-mobile-light.jpeg)|![workbench.png](https://d3george.github.io/github-static/slash-admin/sa-mobile-dark.jpeg)
-| | 
+#### 1. 了解 sys_menu 表结构
+在数据库中找到 `sys_menu` 表，其关键字段说明如下：
+- `menu_name`: 菜单名称（支持国际化 Key，如 `sys.nav.user.index`）。
+- `menu_type`: 类型（`M`=目录/分组，`C`=菜单，`F`=按钮）。
+- `path`: 路由地址（如 `/management/user`）。
+- `component`: 组件路径（如 `/pages/management/user/index`）。
+- `icon`: 图标名称（支持 Iconify 图标，如 `solar:user-bold`）。
+- `parent_id`: 父菜单 ID（顶级菜单为 0）。
 
-## Features
+#### 2. SQL 配置示例
+执行以下 SQL 语句即可新增一个菜单项：
 
-- Built using React 19 hooks.
-- Powered by Vite for rapid development and hot module replacement.
-- Integrates shadcn/ui, providing a rich set of UI components and design patterns.
-- Written in TypeScript, offering type safety and an improved development experience.
-- Responsive design, adapting to various screen sizes and devices.
-- Flexible routing configuration, supporting nested routes.
-- Integrated access control based on user roles.
-- Supports internationalization for easy language switching.
-- Includes common admin features like user management, role management, and permission management.
-- Customizable themes and styles to meet your branding needs.
-- Mocking solution based on MSW and Faker.js.
-- State management using Zustand.
-- Data fetching using React-Query.
-
-## Quick Start
-
-### Get the Project Code
-
-```bash
-git clone https://github.com/d3george/slash-admin.git
+```sql
+INSERT INTO `sys_menu` (`id`, `parent_id`, `menu_name`, `menu_type`, `path`, `component`, `icon`, `order_num`)
+VALUES (1000, 0, '示例页面', 'C', '/demo', '/pages/demo/index', 'solar:widget-5-bold-duotone', 1);
 ```
 
-### Install Dependencies
-
-In the project's root directory, run the following command to install project dependencies:
-
-```bash
-pnpm install
-```
-
-### Start the Development Server
-
-Run the following command to start the development server:
-
-```bash
-pnpm dev
-```
-
-Visit [http://localhost:3001](http://localhost:3001) to view your application.
-
-### Build for Production
-
-Run the following command to build the production version:
-
-```bash
-pnpm build
-```
-
-## Git Contribution submission specification
-- `feat` new features
-- `fix`  fix the
-- `docs` documentation or comments
-- `style` code format (changes that do not affect code execution)
-- `refactor` refactor
-- `perf` performance optimization
-- `revert` revert commit
-- `test` test related
-- `chore` changes in the construction process or auxiliary tools
-- `ci` modify CI configuration and scripts
-- `types` type definition file changes
-- `wip` in development
+#### 3. 前端生效机制
+1. **自动渲染**：前端会自动获取后端菜单数据，并通过 `src/routes/sections/dashboard/backend.tsx` 动态生成路由。
+2. **路由模式**：确保 `src/global-config.ts` 中的 `routerMode` 设置为 `backend`。
+3. **国际化**：如果 `menu_name` 使用了 Key（如 `sys.nav.demo`），请在 `src/locales/lang/zh_CN/sys.json` 中添加对应的翻译。

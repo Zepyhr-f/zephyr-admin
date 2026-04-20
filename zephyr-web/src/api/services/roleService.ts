@@ -1,7 +1,7 @@
 import apiClient from "../apiClient";
 
 export enum RoleApi {
-	Role = "/role",
+	Role = "/zephyr-system/role",
 }
 
 const list = (params: any) => apiClient.get<any>({ url: `${RoleApi.Role}/list`, params });

@@ -28,28 +28,49 @@ export function getFrontendDashboardRoutes(): RouteObject[] {
 			],
 		},
 		{
-			path: "management",
+			path: "user",
 			children: [
-				{ index: true, element: <Navigate to="user" replace /> },
-				{
-					path: "user",
-					children: [
-						{ index: true, element: <Navigate to="profile" replace /> },
-						{ path: "profile", element: Component("/pages/management/user/profile") },
-						{ path: "account", element: Component("/pages/management/user/account") },
-					],
-				},
-				{
-					path: "system",
-					children: [
-						{ index: true, element: <Navigate to="permission" replace /> },
-						{ path: "permission", element: Component("/pages/management/system/permission") },
-						{ path: "role", element: Component("/pages/management/system/role") },
-						{ path: "user", element: Component("/pages/management/system/user") },
-						{ path: "user/:id", element: Component("/pages/management/system/user/detail") },
-						{ path: "dept", element: Component("/pages/management/system/dept") },
-					],
-				},
+				{ index: true, element: <Navigate to="profile" replace /> },
+				{ path: "profile", element: Component("/pages/management/user/profile") },
+				{ path: "account", element: Component("/pages/management/user/account") },
+			],
+		},
+		{
+			path: "system",
+			children: [
+				{ index: true, element: <Navigate to="permission" replace /> },
+				{ path: "permission", element: Component("/pages/management/system/permission") },
+				{ path: "role", element: Component("/pages/management/system/role") },
+				{ path: "user", element: Component("/pages/management/system/user") },
+				{ path: "user/:id", element: Component("/pages/management/system/user/detail") },
+				{ path: "dept", element: Component("/pages/management/system/dept") },
+				{ path: "dict", element: Component("/pages/management/system/dict") },
+				{ path: "config", element: Component("/pages/management/system/config") },
+			],
+		},
+		{
+			path: "audit",
+			children: [
+				{ index: true, element: <Navigate to="login" replace /> },
+				{ path: "login", element: Component("/pages/management/system/login-log") },
+				{ path: "oper", element: Component("/pages/management/system/oper-log") },
+				{ path: "online", element: Component("/pages/management/system/online") },
+			],
+		},
+		{
+			path: "monitor",
+			children: [
+				{ index: true, element: <Navigate to="server" replace /> },
+				{ path: "server", element: Component("/pages/monitor/server") },
+				{ path: "cache", element: Component("/pages/monitor/cache") },
+				{ path: "job", element: Component("/pages/monitor/job") },
+			],
+		},
+		{
+			path: "tool",
+			children: [
+				{ index: true, element: <Navigate to="generator" replace /> },
+				{ path: "generator", element: Component("/pages/management/tool/generator") },
 			],
 		},
 		{

@@ -13,16 +13,28 @@ export interface SignUpReq extends SignInReq {
 export type SignInRes = UserToken & { user: UserInfo };
 
 export enum UserApi {
-	SignIn = "/auth/signin",
-	SignUp = "/auth/signup",
-	Logout = "/auth/logout",
-	Refresh = "/auth/refresh",
-	User = "/user",
+	SignIn = "/zephyr-auth/login",
+	Logout = "/zephyr-auth/logout",
+	Info = "/zephyr-auth/info",
+	User = "/zephyr-system/user",
 }
 
-const signin = (data: SignInReq) => apiClient.post<SignInRes>({ url: UserApi.SignIn, data });
-const signup = (data: SignUpReq) => apiClient.post<SignInRes>({ url: UserApi.SignUp, data });
+const signin = async (data: SignInReq) => {
+	const res = await apiClient.post<any>({ url: UserApi.SignIn, data });
+	// 后端返回的是 token，前端需要的是 accessToken
+	return {
+		accessToken: res.token,
+		refreshToken: res.refreshToken || res.token,
+		user: {
+			id: res.userId,
+			username: data.username,
+		},
+	};
+};
+const signup = (data: SignUpReq) => apiClient.post<SignInRes>({ url: "/zephyr-auth/auth/signup", data });
 const logout = () => apiClient.get({ url: UserApi.Logout });
+
+const getUserInfo = () => apiClient.get<UserInfo>({ url: UserApi.Info });
 
 const list = (params: any) => apiClient.get<UserInfo[]>({ url: `${UserApi.User}/list`, params });
 const findById = (id: string) => apiClient.get<UserInfo>({ url: `${UserApi.User}/detail`, params: { id } });

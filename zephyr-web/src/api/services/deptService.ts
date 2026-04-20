@@ -1,7 +1,7 @@
 import apiClient from "../apiClient";
 
 export enum DeptApi {
-	Dept = "/dept",
+	Dept = "/zephyr-system/dept",
 }
 
 const tree = () => apiClient.get<any[]>({ url: `${DeptApi.Dept}/tree` });
