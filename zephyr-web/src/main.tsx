@@ -22,7 +22,9 @@ import { urlJoin } from "./utils";
 
 await registerLocalIcons();
 if (GLOBAL_CONFIG.routerMode === "backend") {
-	await menuService.getMenuList();
+	const menus = await menuService.getMenuList();
+	const { setUserMenus } = useUserStore.getState().actions;
+	setUserMenus(menus);
 }
 
 const router = createBrowserRouter(
