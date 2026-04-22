@@ -15,7 +15,6 @@
 
     <modules>
         <module>zephyr-core</module>
-        <module>zephyr-common-config</module>
         <module>zephyr-starter</module>
     </modules>
 

@@ -37,11 +37,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.zephyr</groupId>
-            <artifactId>zephyr-common-config</artifactId>
-            <version>${revision}</version>
-        </dependency>
     </dependencies>
 
 </project>

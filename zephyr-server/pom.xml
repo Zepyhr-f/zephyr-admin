@@ -8,7 +8,9 @@
     <artifactId>zephyr-parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
+
     <modules>
+        <module>zephyr-bom</module>
         <module>zephyr-base</module>
         <module>zephyr-common</module>
         <module>zephyr-biz</module>
@@ -17,48 +19,20 @@
 
     <properties>
         <revision>0.0.1.RELEASE</revision>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <spring-boot.version>3.3.4</spring-boot.version>
-        <mysql.version>8.0.33</mysql.version>
-        <spring-cloud.version>2023.0.3</spring-cloud.version>
-        <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
-
-        <mybatis-plus.version>3.5.6</mybatis-plus.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- SpringBoot的依赖配置-->
+            <!-- 导入 BOM，统一管理所有依赖版本 -->
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
+                <groupId>com.zephyr</groupId>
+                <artifactId>zephyr-bom</artifactId>
+                <version>${revision}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>${spring-cloud-alibaba.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!-- 自定义管理 MySQL 版本 -->
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -67,7 +41,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -77,7 +50,6 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring-boot.version}</version>
                     <executions>
                         <execution>
                             <goals>
