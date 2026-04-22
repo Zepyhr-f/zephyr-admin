@@ -8,7 +8,7 @@
 
 | 工具 | 版本要求 | 安装方式 |
 |---|---|---|
-| **Node.js** | 20 LTS | 通过 `nvm` 管理：`nvm install 20` |
+| **Node.js** | 22 LTS | 通过 `nvm` 管理：`nvm install 22` |
 | **pnpm** | 10.x | `npm install -g pnpm` |
 | **Git** | 任意新版 | macOS 自带或 Homebrew |
 | **VS Code** | 最新版 | [code.visualstudio.com](https://code.visualstudio.com) |
@@ -27,35 +27,41 @@
 
 ## 2. 版本锁定
 
-**Node 版本**：项目根目录 `.nvmrc` 文件写入 `20`，`nvm use` 自动切换。
+**Node 版本**：项目根目录 `.nvmrc` 文件写入 `22`，`nvm use` 自动切换。
 
 **pnpm 版本**（`package.json`）：
 ```json
 {
   "packageManager": "pnpm@10.8.0",
-  "engines": { "node": "20.*" }
+  "engines": { "node": "22.*" }
 }
 ```
 
 ---
 
-## 3. 项目初始化
+## 3. 前端项目初始化 (从零搭建)
 
 ```bash
-git clone https://github.com/your-org/zephyr-admin.git
-cd zephyr-admin/zephyr-web
+# 1. 使用 Vite 创建项目
+pnpm create vite zephyr-web --template react-ts
+cd zephyr-web
 
-# 切换 Node 版本
+# 2. 锁定环境
+echo "22" > .nvmrc
 nvm use
 
-# 安装依赖（精确还原 pnpm-lock.yaml）
-pnpm install
+# 3. 安装核心依赖
+# UI: antd, tailwindcss v4
+# State: zustand, react-query
+# Tooling: biome, lefthook
+pnpm add antd @ant-design/cssinjs tailwindcss @tailwindcss/vite zustand @tanstack/react-query axios react-router motion
+pnpm add -D @biomejs/biome lefthook
 
-# 配置本地环境变量
-cp .env.example .env.local
-# 编辑 .env.local，设置 VITE_API_BASE_URL 和 VITE_ENABLE_MOCK=true
+# 4. 初始化配置
+pnpm biome init
+pnpm lefthook install
 
-# 启动开发服务器
+# 5. 启动开发服务器
 pnpm dev
 ```
 
