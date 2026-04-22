@@ -1,12 +1,10 @@
 package com.zephyr.redis.util;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +49,8 @@ public class RedisUtil {
     /** 取对象（自动反序列化 JSON） */
     public <T> T getObject(String key, Class<T> clazz) {
         String json = redisTemplate.opsForValue().get(key);
-        if (json == null) return null;
+        if (json == null)
+            return null;
         try {
             return objectMapper.readValue(json, clazz);
         } catch (JsonProcessingException e) {
@@ -79,7 +78,8 @@ public class RedisUtil {
     /** 取 Hash 的单个字段 */
     public <T> T hGet(String key, String field, Class<T> clazz) {
         Object val = redisTemplate.opsForHash().get(key, field);
-        if (val == null) return null;
+        if (val == null)
+            return null;
         try {
             return objectMapper.readValue(val.toString(), clazz);
         } catch (JsonProcessingException e) {

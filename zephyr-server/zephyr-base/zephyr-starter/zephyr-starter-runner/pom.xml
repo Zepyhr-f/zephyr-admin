@@ -73,11 +73,5 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
 
-        <!-- 公共配置 -->
-        <dependency>
-            <groupId>com.zephyr</groupId>
-            <artifactId>zephyr-common-config</artifactId>
-            <version>${revision}</version>
-        </dependency>
     </dependencies>
 </project>

@@ -43,7 +43,6 @@ public class HS256KeyProvider implements JwtKeyProvider{
     }
 
     public SecretKey generateHSKey(){
-        // 生成 HS256 安全密钥
         return Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 }
