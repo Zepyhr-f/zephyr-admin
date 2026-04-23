@@ -158,7 +158,7 @@ export default function LoginPage() {
             // 解构并排除 remember，后端可能不需要它
             const { remember, ...loginPayload } = data;
 
-            const res = await client.post<any, LoginResponse>('auth/login', loginPayload);
+            const res = await client.post<any, LoginResponse>('zephyr-auth/login', loginPayload);
             setTokens(res.token, res.refreshToken);
 
             // 如果用户勾选了记住我，可在此处处理持久化逻辑，如写入 localStorage 标记

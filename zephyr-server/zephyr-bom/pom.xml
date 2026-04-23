@@ -42,7 +42,7 @@
         <redisson.version>3.52.0</redisson.version>
 
         <!-- JWT -->
-        <jjwt.version>0.12.6</jjwt.version>
+        <jjwt.version>0.11.5</jjwt.version>
 
         <!-- 认证/授权 -->
         <spring-security.version>6.5.0</spring-security.version>
