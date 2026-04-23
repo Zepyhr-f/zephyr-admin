@@ -1,3 +1,5 @@
+package com.zephyr;
+
 import com.zephyr.jwt.provider.ES256KeyProvider;
 import com.zephyr.jwt.provider.HS256KeyProvider;
 import org.junit.jupiter.api.Test;
