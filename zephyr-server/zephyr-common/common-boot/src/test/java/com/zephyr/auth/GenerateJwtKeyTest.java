@@ -1,4 +1,4 @@
-package com.zephyr;
+package com.zephyr.auth;
 
 import com.zephyr.jwt.provider.ES256KeyProvider;
 import com.zephyr.jwt.provider.HS256KeyProvider;

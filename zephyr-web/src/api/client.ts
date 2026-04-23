@@ -3,7 +3,7 @@ import {useAuthStore} from "../store/use-auth-store.ts";
 import {message, notification} from "antd";
 
 const client = axios.create({
-    baseURL: import.meta.env.VITE_API_BASEURL,
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 5000,
     headers: {'Content-Type': 'application/json'}
 });
@@ -34,18 +34,23 @@ client.interceptors.response.use(
         const { response } = error;
 
         if (response) {
-            const { status } = response;
+            const { status, data } = response;
+
+            // 优先使用后端返回的错误消息
+            const errorMsg = data?.msg || data?.message || '网络连接异常，请检查网络设置';
 
             if (status === 401) {
                 useAuthStore.getState().logout();
                 window.location.href = '/login';
             } else if (status === 403) {
-                notification.error({ message: '无权访问', description: '您没有操作此功能的权限' });
+                notification.error({ message: '无权访问', description: errorMsg });
             } else if (status === 500) {
                 notification.error({ message: '服务器错误', description: '后台服务开小差了，请稍后再试' });
             } else {
-                message.error('网络连接异常，请检查网络设置');
+                message.error(errorMsg);
             }
+        } else {
+            message.error('网络连接异常，请检查网络设置');
         }
 
         return Promise.reject(error);

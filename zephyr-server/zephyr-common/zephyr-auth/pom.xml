@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>zephyr-auth</artifactId>
-    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <modules>

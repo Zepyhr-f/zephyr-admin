@@ -16,7 +16,7 @@
         <revision>0.0.1.RELEASE</revision>
 
         <!-- Spring Boot -->
-        <spring-boot.version>3.5.13</spring-boot.version>
+        <spring-boot.version>3.4.13</spring-boot.version>
 
         <!-- Spring Cloud -->
         <spring-cloud.version>2024.0.3</spring-cloud.version>
@@ -39,7 +39,6 @@
         <fastjson2.version>2.0.52</fastjson2.version>
 
         <!-- Redis -->
-        <redis.version>7.5.0.RELEASE</redis.version>
         <redisson.version>3.52.0</redisson.version>
 
         <!-- JWT -->
@@ -126,6 +125,11 @@
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-generator</artifactId>
                 <version>${mybatis-plus-generator.version}</version>
             </dependency>
@@ -152,11 +156,9 @@
                 <version>${pagehelper.version}</version>
             </dependency>
 
-            <!-- ==================== Redis ==================== -->
             <dependency>
                 <groupId>io.lettuce</groupId>
                 <artifactId>lettuce-core</artifactId>
-                <version>${redis.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.redisson</groupId>
@@ -310,68 +312,4 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <!-- Spring Boot 打包插件 -->
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring-boot.version}</version>
-                    <configuration>
-                        <excludes>
-                            <exclude>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                            </exclude>
-                        </excludes>
-                    </configuration>
-                </plugin>
-
-                <!-- MapStruct 注解处理器 -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.0</version>
-                    <configuration>
-                        <source>21</source>
-                        <target>21</target>
-                        <annotationProcessorPaths>
-                            <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                                <version>${lombok.version}</version>
-                            </path>
-                            <path>
-                                <groupId>org.mapstruct</groupId>
-                                <artifactId>mapstruct-processor</artifactId>
-                                <version>${mapstruct.version}</version>
-                            </path>
-                            <!-- 解决 Lombok 与 MapStruct 冲突 -->
-                            <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok-mapstruct-binding</artifactId>
-                                <version>0.2.0</version>
-                            </path>
-                        </annotationProcessorPaths>
-                    </configuration>
-                </plugin>
-
-                <!-- Smart-Doc 文档生成 -->
-                <plugin>
-                    <groupId>com.ly.smart-doc</groupId>
-                    <artifactId>smart-doc-maven-plugin</artifactId>
-                    <version>${smart-doc.version}</version>
-                </plugin>
-
-                <!-- Flyway 数据库迁移 -->
-                <plugin>
-                    <groupId>org.flywaydb</groupId>
-                    <artifactId>flyway-maven-plugin</artifactId>
-                    <version>${flyway.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>

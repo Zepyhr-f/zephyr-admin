@@ -9,8 +9,12 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8849
+        username: nacos
+        password: nacos
       config:
         server-addr: localhost:8849
+        username: nacos
+        password: nacos
         file-extension: yml,yaml
         namespace: public
         group: DEFAULT_GROUP

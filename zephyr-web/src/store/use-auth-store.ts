@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist,createJSONStorage } from "zustand/middleware/persist";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 interface AuthState {
     token: string | null;

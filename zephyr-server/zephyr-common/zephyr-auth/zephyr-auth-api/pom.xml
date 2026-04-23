@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>zephyr-auth-api</artifactId>
-    <version>${revision}</version>
 
     <dependencies>
         <dependency>

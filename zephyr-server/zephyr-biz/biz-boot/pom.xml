@@ -18,11 +18,6 @@
             <artifactId>zephyr-starter-runner</artifactId>
             <version>${revision}</version>
         </dependency>
-        <dependency>
-            <groupId>com.zephyr</groupId>
-            <artifactId>zephyr-rule</artifactId>
-            <version>${revision}</version>
-        </dependency>
     </dependencies>
 
     <build>

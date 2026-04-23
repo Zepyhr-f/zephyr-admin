@@ -32,12 +32,6 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>com.zephyr</groupId>-->
-<!--            <artifactId>zephyr-core-tool</artifactId>-->
-<!--            <version>${revision}</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>com.zephyr</groupId>
             <artifactId>zephyr-starter-jwt</artifactId>
@@ -49,27 +43,12 @@
             <artifactId>zephyr-starter-redis</artifactId>
             <version>${revision}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.zephyr</groupId>-->
-<!--            <artifactId>zephyr-service-auth-api</artifactId>-->
-<!--            <version>0.0.1.RELEASE</version>-->
-<!--            <scope>compile</scope>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>com.github.xiaoymin</groupId>-->
-<!--                    <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
-
 
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
             <version>4.5.0</version>
         </dependency>
-
     </dependencies>
 
     <build>
