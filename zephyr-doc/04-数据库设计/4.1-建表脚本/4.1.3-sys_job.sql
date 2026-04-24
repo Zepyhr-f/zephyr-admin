@@ -17,9 +17,9 @@ CREATE TABLE `zephyr_sys_job` (
   
   -- 基础审计与租户字段
   `tenant_code`     VARCHAR(12)   DEFAULT '000000' COMMENT '租户编码',
-  `create_user`     BIGINT        DEFAULT NULL COMMENT '创建者',
+  `create_user`     VARCHAR(64)   DEFAULT NULL COMMENT '创建者编码',
   `create_time`     DATETIME      DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_user`     BIGINT        DEFAULT NULL COMMENT '更新者',
+  `update_user`     VARCHAR(64)   DEFAULT NULL COMMENT '更新者编码',
   `update_time`     DATETIME      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `if_deleted`      TINYINT(1)    NOT NULL DEFAULT 0 COMMENT '删除标志（0=正常 1=已删除）',
   

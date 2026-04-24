@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_file")
+@TableName("zephyr_sys_file")
 @Schema(description = "文件记录")
 public class SysFile extends BaseEntity {
 

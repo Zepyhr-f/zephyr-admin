@@ -14,9 +14,9 @@ CREATE TABLE `zephyr_sys_dict`  (
   
   -- 基础审计与租户字段
   `tenant_code`   VARCHAR(12)  DEFAULT '000000' COMMENT '租户编码',
-  `create_user`   BIGINT       DEFAULT NULL COMMENT '创建人ID',
+  `create_user`   VARCHAR(64)  DEFAULT NULL COMMENT '创建人编码',
   `create_time`   DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_user`   BIGINT       DEFAULT NULL COMMENT '更新人ID',
+  `update_user`   VARCHAR(64)  DEFAULT NULL COMMENT '更新人编码',
   `update_time`   DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `if_deleted`    TINYINT(1)   NOT NULL DEFAULT 0 COMMENT '删除标识（0=正常 1=已删除）',
   
@@ -38,9 +38,9 @@ CREATE TABLE `zephyr_sys_post_bak`  (
 
   -- 基础审计与租户字段
   `tenant_code`   VARCHAR(12)  DEFAULT '000000' COMMENT '租户编码',
-  `create_user`   BIGINT       DEFAULT NULL COMMENT '创建人ID',
+  `create_user`   VARCHAR(64)  DEFAULT NULL COMMENT '创建人编码',
   `create_time`   DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_user`   BIGINT       DEFAULT NULL COMMENT '更新人ID',
+  `update_user`   VARCHAR(64)  DEFAULT NULL COMMENT '更新人编码',
   `update_time`   DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `if_deleted`    TINYINT(1)   NOT NULL DEFAULT 0 COMMENT '删除标识（0=正常 1=已删除）',
 

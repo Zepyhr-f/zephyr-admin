@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_config")
+@TableName("zephyr_sys_config")
 @Schema(description = "参数配置")
 public class SysConfig extends BaseEntity {
 

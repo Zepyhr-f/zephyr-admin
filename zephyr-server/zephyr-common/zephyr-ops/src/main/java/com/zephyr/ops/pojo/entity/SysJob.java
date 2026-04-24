@@ -7,14 +7,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 定时任务调度对象 sys_job
+ * 定时任务调度对象
  *
  * @author zephyr
  * @since 2026-04-16
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_job")
+@TableName("zephyr_sys_job")
 @Schema(description = "定时任务调度对象")
 public class SysJob extends BaseEntity {
 

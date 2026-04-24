@@ -1,6 +1,5 @@
 package com.zephyr.core.tool.constant;
 
-
 /**
  * web 常量
  *
@@ -8,8 +7,9 @@ package com.zephyr.core.tool.constant;
  * @since 2025-09-19
  */
 public interface WebConstants {
-    String USER_ID_HEADER = "X-User-userId";
-    String USER_NAME_HEADER = "X-User-username";
-    String ROLE_ID_HEADER = "X-User-roleId";
+    String USER_CODE_HEADER = "X-User-userCode";
+    String USER_NAME_HEADER = "X-User-userName";
+    String ROLE_CODE_HEADER = "X-User-roleCode";
+    String TENANT_CODE_HEADER = "X-User-tenantCode";
     String REQUEST_ID_HEADER = "X-Request-Id";
 }

@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>zephyr-core-boot</artifactId>
-    <version>${revision}</version>
     <dependencies>
         <!-- web 依赖 -->
         <dependency>

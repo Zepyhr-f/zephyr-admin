@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_notice")
+@TableName("zephyr_sys_notice")
 @Schema(description = "通知公告")
 public class SysNotice extends BaseEntity {
 

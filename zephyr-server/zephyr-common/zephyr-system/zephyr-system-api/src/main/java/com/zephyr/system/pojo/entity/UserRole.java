@@ -11,10 +11,10 @@ import java.io.Serializable;
  * @author zephyr
  */
 @Data
-@TableName("sys_user_role")
+@TableName("zephyr_sys_user_role")
 public class UserRole implements Serializable {
 
-    private Long userId;
+    private String userCode;
 
-    private Long roleId;
+    private String roleCode;
 }

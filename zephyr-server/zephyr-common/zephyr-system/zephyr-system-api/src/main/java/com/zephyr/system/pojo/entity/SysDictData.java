@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_dict_data")
+@TableName("zephyr_sys_dict_data")
 @Schema(description = "字典数据")
 public class SysDictData extends BaseEntity {
 

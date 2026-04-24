@@ -11,8 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.zephyr.jwt.config.JwtConstant.USER_ID;
+import static com.zephyr.jwt.config.JwtConstant.USER_CODE;
 import static com.zephyr.jwt.config.JwtConstant.USER_NAME;
+import static com.zephyr.jwt.config.JwtConstant.TENANT_CODE;
+import static com.zephyr.jwt.config.JwtConstant.ROLE_CODES;
 
 /**
  * jwt 工具类
@@ -58,8 +60,8 @@ public class JwtUtil {
     }
 
     public String generateToken(Map<String, Object> claims) {
-        if (claims == null || !claims.containsKey(USER_ID)) {
-            throw new IllegalArgumentException("Claims must contain userId");
+        if (claims == null || !claims.containsKey(USER_CODE)) {
+            throw new IllegalArgumentException("Claims must contain userCode");
         }
 
         // 确保不会覆盖保留字段

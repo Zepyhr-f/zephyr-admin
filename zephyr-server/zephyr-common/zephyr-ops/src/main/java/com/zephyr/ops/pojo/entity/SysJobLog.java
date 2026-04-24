@@ -10,13 +10,13 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 定时任务调度日志对象 sys_job_log
+ * 定时任务调度日志对象
  *
  * @author zephyr
  * @since 2026-04-16
  */
 @Data
-@TableName("sys_job_log")
+@TableName("zephyr_sys_job_log")
 @Schema(description = "定时任务调度日志对象")
 public class SysJobLog implements Serializable {
 

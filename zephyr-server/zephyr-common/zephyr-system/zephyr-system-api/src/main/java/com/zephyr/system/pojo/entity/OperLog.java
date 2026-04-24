@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "操作日志")
-@TableName("sys_oper_log")
+@TableName("zephyr_sys_oper_log")
 public class OperLog extends BaseEntity {
 
     @Schema(description = "系统模块名称")

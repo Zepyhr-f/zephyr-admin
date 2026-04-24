@@ -14,23 +14,25 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_dept")
+@TableName("zephyr_sys_dept")
 @Schema(description = "部门")
 public class Dept extends BaseEntity {
 
-    /** 父部门ID（0=顶级部门） */
-    @Schema(description = "父部门ID（0=顶级部门）")
-    private Long parentId;
+    @Schema(description = "部门编码")
+    private String deptCode;
 
-    /** 部门名称 */
+    @Schema(description = "父部门编码")
+    private String parentCode;
+
     @Schema(description = "部门名称")
     private String deptName;
 
-    /** 显示顺序 */
+    @Schema(description = "部门全称")
+    private String fullName;
+
     @Schema(description = "显示顺序")
     private Integer orderNum;
 
-    /** 部门状态（1=正常，0=停用） */
-    @Schema(description = "部门状态（1=正常，0=停用）")
+    @Schema(description = "部门状态（1=正常 0=停用）")
     private Integer status;
 }

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "登录日志")
-@TableName("sys_login_log")
+@TableName("zephyr_sys_login_log")
 public class LoginLog extends BaseEntity {
 
     @Schema(description = "用户账号")

@@ -2,6 +2,8 @@ package com.zephyr.core.boot.web;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 用户会话信息
  *
@@ -10,7 +12,8 @@ import lombok.Data;
  */
 @Data
 public class UserSession {
-    private Long userId;
+    private String userCode;
     private String username;
-    private Long roleId;
+    private List<String> roleCodes;
+    private String tenantCode;
 }

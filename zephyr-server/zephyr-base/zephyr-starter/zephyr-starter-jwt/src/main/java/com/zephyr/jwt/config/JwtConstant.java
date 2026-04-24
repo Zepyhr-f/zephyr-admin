@@ -1,6 +1,5 @@
 package com.zephyr.jwt.config;
 
-
 /**
  * jwt常量
  *
@@ -9,17 +8,18 @@ package com.zephyr.jwt.config;
  */
 public interface JwtConstant {
     // 支持的加密算法
-    String  ALGORITHM_HS256= "HS256";
-    String  ALGORITHM_ES256= "ES256";
+    String ALGORITHM_HS256 = "HS256";
+    String ALGORITHM_ES256 = "ES256";
 
     // token相关常量
-    String  TOKEN_PREFIX= "Bearer ";
-    int  TOKEN_PREFIX_LENGTH= 7;
-    String  HEADER_STRING= "Authorization";
+    String TOKEN_PREFIX = "Bearer ";
+    int TOKEN_PREFIX_LENGTH = 7;
+    String HEADER_STRING = "Authorization";
 
     // token存的用户信息
-    String USER_ID = "user_id";
+    String USER_CODE = "user_code";
     String USER_NAME = "user_name";
-    String ROLE_ID = "role_id";
+    String ROLE_CODES = "role_codes";
+    String TENANT_CODE = "tenant_code";
 
 }
