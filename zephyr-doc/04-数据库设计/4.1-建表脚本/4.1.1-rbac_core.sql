@@ -22,7 +22,7 @@ CREATE TABLE `zephyr_sys_dept` (
   `full_name`   VARCHAR(255) NOT NULL COMMENT '部门全称',
   `order_num`   INT          DEFAULT 0 COMMENT '显示顺序',
   `status`      TINYINT(1)   DEFAULT 1 COMMENT '部门状态（1=正常 0=停用）',
-  `tenant_code`   VARCHAR(12)  DEFAULT '000000' COMMENT '租户ID',
+  `tenant_code` VARCHAR(12)  DEFAULT '000000' COMMENT '租户ID',
   `create_user` VARCHAR(64)  DEFAULT NULL COMMENT '创建人编码',
   `create_time` DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_user` VARCHAR(64)  DEFAULT NULL COMMENT '更新人编码',

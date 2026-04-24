@@ -30,7 +30,7 @@ import reactor.core.publisher.Mono;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-//import static com.zephyr.core.tool.constant.WebConstants.*;
+import static com.zephyr.core.tool.constant.WebConstants.*;
 import static com.zephyr.jwt.config.JwtConstant.*;
 
 /**
@@ -96,11 +96,11 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
         // Token 合法，直接放行（已过认证）
 
-//        // 透传用户信息
-//        ServerHttpRequest.Builder mutate = exchange.getRequest().mutate();
-//        addHeader(mutate,USER_ID_HEADER, claims.get(USER_ID));
-//        addHeader(mutate, USER_NAME_HEADER, claims.get(USER_NAME));
-//        addHeader(mutate, ROLE_ID_HEADER, claims.get(ROLE_ID));
+        // 透传用户信息
+        ServerHttpRequest.Builder mutate = exchange.getRequest().mutate();
+        addHeader(mutate,USER_ID_HEADER, claims.get(USER_ID));
+        addHeader(mutate, USER_NAME_HEADER, claims.get(USER_NAME));
+        addHeader(mutate, ROLE_ID_HEADER, claims.get(ROLE_ID));
 
         return chain.filter(exchange);
     }
