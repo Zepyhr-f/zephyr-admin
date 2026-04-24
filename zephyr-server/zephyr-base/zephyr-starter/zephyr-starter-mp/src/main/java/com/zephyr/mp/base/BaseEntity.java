@@ -31,6 +31,9 @@ public class BaseEntity implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
+    @Schema(description = "租户编码", hidden = true)
+    private String tenantCode;
+
     @JsonSerialize(using = ToStringSerializer.class)
     @Schema(description = "创建人", hidden = true)
     @TableField(fill = FieldFill.INSERT)
@@ -54,8 +57,8 @@ public class BaseEntity implements Serializable {
     private Date updateTime;
 
 
-    @TableField("del_flag")
+    @TableField("if_deleted")
     @TableLogic(value = "0", delval = "1")
     @Schema(description = "是否已删除", hidden = true)
-    private Integer isDeleted;
+    private Integer ifDeleted;
 }
