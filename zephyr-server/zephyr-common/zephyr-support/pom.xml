@@ -10,12 +10,10 @@
     </parent>
 
     <artifactId>zephyr-support</artifactId>
-    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>zephyr-generator</module>
-        <module>zephyr-test</module>
     </modules>
 
 </project>

@@ -4,17 +4,12 @@ import com.zephyr.jwt.provider.JwtKeyProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.zephyr.jwt.config.JwtConstant.USER_CODE;
-import static com.zephyr.jwt.config.JwtConstant.USER_NAME;
-import static com.zephyr.jwt.config.JwtConstant.TENANT_CODE;
-import static com.zephyr.jwt.config.JwtConstant.ROLE_CODES;
+import static com.zephyr.jwt.config.JwtConstant.*;
 
 /**
  * jwt 工具类
@@ -34,7 +29,7 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
-    public String extractUsername(String token) {
+    public String extractUserCode(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -72,15 +67,15 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setClaims(safeClaims)
-                .setSubject(claims.get(USER_NAME).toString())
+                .setSubject(claims.get(USER_CODE).toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(keyProvider.getPrivateKey(), algorithm)
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public Boolean validateToken(String token, String userCode) {
+        final String tokenUserCode = extractUserCode(token);
+        return (tokenUserCode.equals(userCode) && !isTokenExpired(token));
     }
 }

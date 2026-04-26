@@ -5,6 +5,8 @@ import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.zephyr.auth.pojo.dto.LoginRequest;
 import com.zephyr.auth.pojo.vo.LoginResponse;
 import com.zephyr.auth.service.ZephyrUser;
+import com.zephyr.core.boot.web.UserContextHolder;
+import com.zephyr.core.boot.web.UserSession;
 import com.zephyr.core.tool.api.R;
 import com.zephyr.jwt.util.JwtUtil;
 import com.zephyr.redis.Constant.RedisConstant;
@@ -25,9 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import com.zephyr.system.feign.IUserClient;
-import com.zephyr.system.pojo.entity.User;
+import com.zephyr.system.pojo.vo.UserVO;
 
 import static com.zephyr.jwt.config.JwtConstant.*;
 
@@ -51,6 +52,13 @@ public class AuthController {
     @Operation(summary = "登录", description = "传入用户信息")
     public R<LoginResponse> login(@RequestBody LoginRequest request) {
         try {
+            // 设置租户上下文，供 UserDetailsService 使用
+            if (StringUtils.isNotBlank(request.getTenantCode())) {
+                UserSession session = new UserSession();
+                session.setTenantCode(request.getTenantCode());
+                UserContextHolder.set(session);
+            }
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getUsername(),
@@ -60,23 +68,29 @@ public class AuthController {
 
             ZephyrUser userDetails = (ZephyrUser) authentication.getPrincipal();
             Map<String, Object> claims = new HashMap<>();
-            claims.put(USER_ID, userDetails.getUserId());
-            claims.put(USER_NAME, userDetails.getUsername());
-            if (userDetails.getRoleIds() != null && !userDetails.getRoleIds().isEmpty()) {
-                Long primaryRoleId = userDetails.getRoleIds().get(0);
-                claims.put("role_id", primaryRoleId);
-                System.out.println("DEBUG: User " + userDetails.getUsername() + " assigned primary role_id: " + primaryRoleId);
-            } else {
-                System.out.println("DEBUG: User " + userDetails.getUsername() + " has NO role_ids assigned!");
+            claims.put(USER_CODE, userDetails.getUserCode());
+            // 存储 role_codes（逗号分隔的字符串格式）供网关透传和后端解析
+            if (userDetails.getRoleCodes() != null && !userDetails.getRoleCodes().isEmpty()) {
+                String roleCodesStr = String.join(",", userDetails.getRoleCodes());
+                claims.put(ROLE_CODES, roleCodesStr);
+            }
+            // 存储租户编码
+            if (StringUtils.isNotBlank(request.getTenantCode())) {
+                claims.put(TENANT_CODE, request.getTenantCode());
             }
 
             String token = jwtUtil.generateToken(claims);
-            redisUtil.setString(RedisConstant.TOKEN_PREFIX + userDetails.getUsername(), token, 1, TimeUnit.HOURS);
+            redisUtil.setString(RedisConstant.TOKEN_PREFIX + userDetails.getUserCode(), token, 1, TimeUnit.HOURS);
+
+            String tenantCode = request.getTenantCode();
+            UserVO userVO = userClient.getUserByUserCode(userDetails.getUserCode(), tenantCode);
 
             return R.data(LoginResponse.builder()
                     .token(token)
                     .refreshToken(token) // 暂时使用同一个token
-                    .userId(userDetails.getUserId().toString())
+                    .user(userVO)
+                    .roles(userDetails.getRoleCodes())
+                    .buttons(userDetails.getPerms())
                     .message("登录成功")
                     .build());
         } catch (BadCredentialsException e) {
@@ -98,27 +112,22 @@ public class AuthController {
                 authHeader.substring(TOKEN_PREFIX_LENGTH) : authHeader;
 
         try {
-            String username = jwtUtil.extractUsername(token);
-            User user = userClient.getUserByUserName(username);
+            String userCode = jwtUtil.extractUserCode(token);
+            String tenantCode = getTenantCode();
+            UserVO user = userClient.getUserByUserCode(userCode, tenantCode);
 
             if (user == null) {
                 return R.fail("用户不存在");
             }
 
             // 从关联表查询真实的多角色列表
-            List<String> roleCodes = userClient.getRolesByUserId(user.getId()).stream()
-                    .map(role -> role.getRoleCode())
-                    .collect(java.util.stream.Collectors.toList());
+            List<String> roleCodes = userClient.getRolesByUserCode(userCode, tenantCode);
 
             // 从关联表查询真实的权限标识列表
-            List<String> perms = userClient.getPermsByUserId(user.getId());
+            List<String> perms = userClient.getPermsByUserCode(userCode, tenantCode);
 
             Map<String, Object> userInfo = new HashMap<>();
-            userInfo.put("userId", user.getId());
-            userInfo.put("userName", user.getUsername());
-            userInfo.put("realName", user.getRealName());
-            userInfo.put("email", user.getEmail());
-            userInfo.put("avatar", "");
+            userInfo.put("user", user);
             userInfo.put("roles", roleCodes);
             userInfo.put("buttons", perms);
 
@@ -135,13 +144,18 @@ public class AuthController {
         try{
             String token = request.getHeader(HEADER_STRING);
             token = token.substring(TOKEN_PREFIX_LENGTH);
-            String username = jwtUtil.extractUsername(token);
+            String userCode = jwtUtil.extractUserCode(token);
 
-            redisUtil.deleteKey(RedisConstant.TOKEN_PREFIX + username);
+            redisUtil.deleteKey(RedisConstant.TOKEN_PREFIX + userCode);
         } catch (Exception e) {
             return R.fail("登出失败: " + e.getMessage());
         }
 
         return R.success("登出成功");
+    }
+
+    private String getTenantCode() {
+        UserSession session = UserContextHolder.get();
+        return session != null ? session.getTenantCode() : null;
     }
 }

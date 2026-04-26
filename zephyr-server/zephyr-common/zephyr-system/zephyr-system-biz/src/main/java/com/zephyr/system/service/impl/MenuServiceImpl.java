@@ -2,7 +2,7 @@ package com.zephyr.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.zephyr.core.tool.util.ZBeanUtils;
+import com.zephyr.system.convert.MenuConvert;
 import com.zephyr.system.mapper.MenuMapper;
 import com.zephyr.system.pojo.entity.Menu;
 import com.zephyr.system.pojo.vo.MenuVO;
@@ -26,8 +26,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
         List<Menu> allMenus = list(new LambdaQueryWrapper<Menu>()
                 .orderByAsc(Menu::getOrderNum));
         List<MenuVO> allVos = allMenus.stream().map(menu -> {
-            MenuVO vo = new MenuVO();
-            ZBeanUtils.copyProperties(menu, vo);
+            MenuVO vo = MenuConvert.INSTANCE.toVo(menu);
             return vo;
         }).collect(Collectors.toList());
         return buildTree(allVos, 0L);

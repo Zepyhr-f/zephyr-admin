@@ -37,10 +37,14 @@
             <artifactId>zephyr-starter-jwt</artifactId>
             <version>${revision}</version>
         </dependency>
-
         <dependency>
             <groupId>com.zephyr</groupId>
             <artifactId>zephyr-starter-redis</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zephyr</groupId>
+            <artifactId>zephyr-core-tool</artifactId>
             <version>${revision}</version>
         </dependency>
 

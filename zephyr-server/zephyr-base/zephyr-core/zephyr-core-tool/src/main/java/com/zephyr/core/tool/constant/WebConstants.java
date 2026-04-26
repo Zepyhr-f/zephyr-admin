@@ -8,7 +8,6 @@ package com.zephyr.core.tool.constant;
  */
 public interface WebConstants {
     String USER_CODE_HEADER = "X-User-userCode";
-    String USER_NAME_HEADER = "X-User-userName";
     String ROLE_CODE_HEADER = "X-User-roleCode";
     String TENANT_CODE_HEADER = "X-User-tenantCode";
     String REQUEST_ID_HEADER = "X-Request-Id";

@@ -2,7 +2,7 @@ package com.zephyr.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.zephyr.core.tool.util.ZBeanUtils;
+import com.zephyr.system.convert.DeptConvert;
 import com.zephyr.system.mapper.DeptMapper;
 import com.zephyr.system.pojo.entity.Dept;
 import com.zephyr.system.pojo.vo.DeptVO;
@@ -28,8 +28,7 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements ID
                 .orderByAsc(Dept::getOrderNum));
         // 转为 VO
         List<DeptVO> allVos = allDepts.stream().map(dept -> {
-            DeptVO vo = new DeptVO();
-            ZBeanUtils.copyProperties(dept, vo);
+            DeptVO vo = DeptConvert.INSTANCE.toVo(dept);
             return vo;
         }).collect(Collectors.toList());
         // 构建树形

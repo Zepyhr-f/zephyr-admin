@@ -14,11 +14,11 @@ import java.util.List;
  */
 public interface IUserService extends IService<User> {
 
-    User getUserByUserName(String username);
+    UserVO getUserByUserCode(String userCode, String tenantCode);
 
-    List<Role> getRolesByUserId(Long userId);
+    List<String> getRolesByUserCode(String userCode, String tenantCode);
 
-    List<String> getPermsByUserId(Long userId);
+    List<String> getPermsByUserCode(String userCode, String tenantCode);
 
     /**
      * 分页查询用户，携带部门名称
@@ -26,17 +26,17 @@ public interface IUserService extends IService<User> {
      * @param username 用户名（模糊）
      * @param phone    手机号（精确）
      * @param status   状态
-     * @param deptId   部门ID
+     * @param deptCode 部门Code
      */
-    List<UserVO> listWithDept(String username, String phone, Integer status, Long deptId);
+    List<UserVO> listWithDept(String username, String phone, Integer status, String deptCode);
 
-    /**
-     * 分配角色
-     *
-     * @param userId  用户ID
-     * @param roleIds 角色ID列表
-     */
-    boolean assignRoles(Long userId, List<Long> roleIds);
+//    /**
+//     * 分配角色
+//     *
+//     * @param userId  用户ID
+//     * @param roleIds 角色ID列表
+//     */
+//    boolean assignRoles(Long userId, List<Long> roleIds);
 
     /**
      * 重置密码为默认密码（123456 BCrypt加密）

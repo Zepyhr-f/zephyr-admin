@@ -17,6 +17,11 @@
             <artifactId>zephyr-starter-api</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>com.zephyr</groupId>
+            <artifactId>zephyr-system-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
     </dependencies>
 
 </project>

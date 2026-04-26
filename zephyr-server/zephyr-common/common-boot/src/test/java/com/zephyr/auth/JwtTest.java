@@ -26,13 +26,12 @@ public class JwtTest {
     public void tokenTest() {
         ZephyrUser userDetails = ZephyrUser.builder()
                 .username("zephyr")
-                .userId(1L)
+                .userCode("U001")
                 .roleCodes(List.of("ROLE_ADMIN"))
                 .build();
         Map<String, Object> claims = Map.of(
-                "user_id", userDetails.getUserId(),
-                "roleCodes", userDetails.getRoleCodes(),
-                "user_name", userDetails.getUsername()
+                "user_code", userDetails.getUserCode(),
+                "role_codes", String.join(",", userDetails.getRoleCodes())
         );
         String s = jwtUtil.generateToken(claims);
         System.out.println(s);

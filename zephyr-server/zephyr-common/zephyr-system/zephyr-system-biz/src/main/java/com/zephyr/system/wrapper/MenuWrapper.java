@@ -1,7 +1,7 @@
 package com.zephyr.system.wrapper;
 
-import com.zephyr.core.tool.util.ZBeanUtils;
 import com.zephyr.mp.base.BaseEntityWrapper;
+import com.zephyr.system.convert.MenuConvert;
 import com.zephyr.system.pojo.entity.Menu;
 import com.zephyr.system.pojo.vo.MenuVO;
 
@@ -13,14 +13,14 @@ import com.zephyr.system.pojo.vo.MenuVO;
 */
 public class MenuWrapper extends BaseEntityWrapper<Menu, MenuVO>  {
 
+    private final MenuConvert menuConvert = MenuConvert.INSTANCE;
+
     public static MenuWrapper build() {
         return new MenuWrapper();
     }
 
     @Override
     public MenuVO entityVO(Menu menu){
-        MenuVO menuVO = new MenuVO();
-        ZBeanUtils.copyProperties(menu, menuVO);
-        return menuVO;
+        return menuConvert.toVo(menu);
     }
 }

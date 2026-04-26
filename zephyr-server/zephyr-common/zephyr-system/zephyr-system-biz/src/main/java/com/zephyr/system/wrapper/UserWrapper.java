@@ -1,7 +1,7 @@
 package com.zephyr.system.wrapper;
 
-import com.zephyr.core.tool.util.ZBeanUtils;
 import com.zephyr.mp.base.BaseEntityWrapper;
+import com.zephyr.system.convert.UserConvert;
 import com.zephyr.system.pojo.entity.User;
 import com.zephyr.system.pojo.vo.UserVO;
 
@@ -13,14 +13,14 @@ import com.zephyr.system.pojo.vo.UserVO;
 */
 public class UserWrapper extends BaseEntityWrapper<User, UserVO>  {
 
+    private final UserConvert userConvert = UserConvert.INSTANCE;
+
     public static UserWrapper build() {
         return new UserWrapper();
     }
 
     @Override
     public UserVO entityVO(User user){
-        UserVO userVO = new UserVO();
-        ZBeanUtils.copyProperties(user, userVO);
-        return userVO;
+        return userConvert.toVo(user);
     }
 }

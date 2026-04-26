@@ -1,7 +1,7 @@
 package ${packageName}.wrapper;
 
-import com.zephyr.core.tool.util.ZBeanUtils;
 import com.zephyr.mp.base.BaseEntityWrapper;
+import ${packageName}.convert.${className}Convert;
 import ${packageName}.pojo.entity.${className};
 import ${packageName}.pojo.vo.${className}VO;
 
@@ -13,14 +13,14 @@ import ${packageName}.pojo.vo.${className}VO;
 */
 public class ${className}Wrapper extends BaseEntityWrapper<${className}, ${className}VO>  {
 
+    private final ${className}Convert ${className?lower_case}Convert = ${className}Convert.INSTANCE;
+
     public static ${className}Wrapper build() {
         return new ${className}Wrapper();
     }
 
     @Override
     public ${className}VO entityVO(${className} ${className?lower_case}){
-        ${className}VO ${className?lower_case}VO = new ${className}VO();
-        ZBeanUtils.copyProperties(${className?lower_case}, ${className?lower_case}VO);
-        return ${className?lower_case}VO;
+        return ${className?lower_case}Convert.toVo(${className?lower_case});
     }
 }

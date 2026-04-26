@@ -1,8 +1,8 @@
 package com.zephyr.auth.service;
 
+import com.zephyr.core.boot.web.UserContextHolder;
 import com.zephyr.system.feign.IUserClient;
-import com.zephyr.system.pojo.entity.Role;
-import com.zephyr.system.pojo.entity.User;
+import com.zephyr.system.pojo.vo.UserVO;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,24 +26,31 @@ public class ZephyrUserDetailsService implements UserDetailsService {
     private final IUserClient userClient;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userClient.getUserByUserName(username);
+    public UserDetails loadUserByUsername(String userCode) throws UsernameNotFoundException {
+        String tenantCode = getTenantCode();
+        UserVO userVO = userClient.getUserByUserCode(userCode, tenantCode);
+        return buildZephyrUser(userVO, userCode, tenantCode);
+    }
 
-        if (user == null) {
-            throw new UsernameNotFoundException("用户不存在: " + username);
+    public UserDetails loadUserByUserCode(String userCode) throws UsernameNotFoundException {
+        return loadUserByUsername(userCode);
+    }
+
+    private String getTenantCode() {
+        var session = UserContextHolder.get();
+        return session != null ? session.getTenantCode() : null;
+    }
+
+    private ZephyrUser buildZephyrUser(UserVO userVO, String userCode, String tenantCode) {
+        if (userVO == null) {
+            throw new UsernameNotFoundException("用户不存在");
         }
 
         // 从关联表查询该用户的所有角色
-        List<Role> roles = userClient.getRolesByUserId(user.getId());
-        List<Long> roleIds = roles.stream()
-                .map(Role::getId)
-                .collect(Collectors.toList());
-        List<String> roleCodes = roles.stream()
-                .map(Role::getRoleCode)
-                .collect(Collectors.toList());
+        List<String> roleCodes = userClient.getRolesByUserCode(userCode, tenantCode);
 
         // 从关联表查询该用户的所有权限标识
-        List<String> perms = userClient.getPermsByUserId(user.getId());
+        List<String> perms = userClient.getPermsByUserCode(userCode, tenantCode);
 
         // 构建 Spring Security 的 GrantedAuthority（角色+权限合并）
         List<SimpleGrantedAuthority> authorities = roleCodes.stream()
@@ -51,14 +58,16 @@ public class ZephyrUserDetailsService implements UserDetailsService {
                 .collect(Collectors.toList());
 
         return ZephyrUser.builder()
-                .userId(user.getId())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .roleIds(roleIds)
+                .userCode(userVO.getUserCode())
+                .username(userVO.getUsername())
+                .realName(userVO.getRealName())
+                .email(userVO.getEmail())
+                .avatar(userVO.getAvatar())
+                .password(userVO.getPassword())
                 .roleCodes(roleCodes)
                 .perms(perms)
                 .authorities(authorities)
-                .enabled(user.getStatus() == null || user.getStatus() == 1)
+                .enabled(userVO.getStatus() == null || userVO.getStatus() == 1)
                 .build();
     }
 }

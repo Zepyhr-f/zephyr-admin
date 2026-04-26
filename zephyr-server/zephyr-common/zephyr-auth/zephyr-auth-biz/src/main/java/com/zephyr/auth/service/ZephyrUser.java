@@ -15,11 +15,13 @@ import java.util.List;
  * @since 2025-09-07
  */
 public class ZephyrUser implements UserDetails, CredentialsContainer {
-    private final Long userId;
-    private final List<Long> roleIds;       // 角色 ID 列表
+    private final String userCode;
     private final List<String> roleCodes;   // 角色 Code 列表（如 ROLE_ADMIN）
     private final List<String> perms;       // 权限标识列表（如 sys:user:list）
     private final String username;
+    private final String realName;
+    private final String email;
+    private final String avatar;
     private String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -29,10 +31,12 @@ public class ZephyrUser implements UserDetails, CredentialsContainer {
     private final boolean enabled;
 
     private ZephyrUser(Builder builder) {
-        this.userId = builder.userId;
+        this.userCode = builder.userCode;
         this.username = builder.username;
+        this.realName = builder.realName;
+        this.email = builder.email;
+        this.avatar = builder.avatar;
         this.password = builder.password;
-        this.roleIds = builder.roleIds != null ? builder.roleIds : new ArrayList<>();
         this.roleCodes = builder.roleCodes != null ? builder.roleCodes : new ArrayList<>();
         this.perms = builder.perms != null ? builder.perms : new ArrayList<>();
         this.authorities = builder.authorities != null ? builder.authorities : new ArrayList<>();
@@ -47,8 +51,11 @@ public class ZephyrUser implements UserDetails, CredentialsContainer {
     }
 
     public static class Builder {
-        private Long userId;
+        private String userCode;
         private String username;
+        private String realName;
+        private String email;
+        private String avatar;
         private String password;
         private List<Long> roleIds;
         private List<String> roleCodes;
@@ -59,8 +66,11 @@ public class ZephyrUser implements UserDetails, CredentialsContainer {
         private boolean credentialsNonExpired = true;
         private boolean enabled = true;
 
-        public Builder userId(Long userId) { this.userId = userId; return this; }
+        public Builder userCode(String userCode) { this.userCode = userCode; return this; }
         public Builder username(String username) { this.username = username; return this; }
+        public Builder realName(String realName) { this.realName = realName; return this; }
+        public Builder email(String email) { this.email = email; return this; }
+        public Builder avatar(String avatar) { this.avatar = avatar; return this; }
         public Builder password(String password) { this.password = password; return this; }
         public Builder roleIds(List<Long> roleIds) { this.roleIds = roleIds; return this; }
         public Builder roleCodes(List<String> roleCodes) { this.roleCodes = roleCodes; return this; }
@@ -103,11 +113,15 @@ public class ZephyrUser implements UserDetails, CredentialsContainer {
     @Override
     public void eraseCredentials() { this.password = null; }
 
-    public Long getUserId() { return userId; }
-
-    public List<Long> getRoleIds() { return roleIds; }
+    public String getUserCode() { return userCode; }
 
     public List<String> getRoleCodes() { return roleCodes; }
 
     public List<String> getPerms() { return perms; }
+
+    public String getRealName() { return realName; }
+
+    public String getEmail() { return email; }
+
+    public String getAvatar() { return avatar; }
 }

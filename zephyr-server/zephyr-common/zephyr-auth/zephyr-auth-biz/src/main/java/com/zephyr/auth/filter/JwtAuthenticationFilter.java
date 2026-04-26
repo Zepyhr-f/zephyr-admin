@@ -1,5 +1,9 @@
 package com.zephyr.auth.filter;
 
+import com.zephyr.auth.service.ZephyrUser;
+import com.zephyr.auth.service.ZephyrUserDetailsService;
+import com.zephyr.core.boot.web.UserContextHolder;
+import com.zephyr.core.boot.web.UserSession;
 import com.zephyr.jwt.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -7,16 +11,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
+import static com.zephyr.jwt.config.JwtConstant.TENANT_CODE;
+
 
 @Slf4j
 @Component
@@ -24,7 +29,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
+    private final ZephyrUserDetailsService userDetailsService;
 
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -42,20 +47,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = header.substring(BEARER_PREFIX.length()).trim();
-        String username;
+        String userCode;
 
         try {
-            username = jwtUtil.extractUsername(token);
+            userCode = jwtUtil.extractUserCode(token);
         } catch (Exception e) {
             log.warn("无效或过期的Token: {}", token);
             chain.doFilter(request, response);
             return;
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        if (userCode != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // 从token中提取租户编码并设置到上下文
+            String tenantCode = jwtUtil.extractClaim(token, claims -> claims.get(TENANT_CODE, String.class));
+            if (tenantCode != null) {
+                UserSession session = new UserSession();
+                session.setTenantCode(tenantCode);
+                UserContextHolder.set(session);
+            }
 
-            if (jwtUtil.validateToken(token, userDetails)) {
+            UserDetails userDetails = userDetailsService.loadUserByUserCode(userCode);
+
+            if (jwtUtil.validateToken(token, ((ZephyrUser) userDetails).getUserCode())) {
                 var auth = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -68,9 +81,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    private void sendError(HttpServletResponse response, HttpStatus status, String message) throws IOException {
-        response.setStatus(status.value());
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write(String.format("{\"error\": \"%s\"}", message));
-    }
+
 }

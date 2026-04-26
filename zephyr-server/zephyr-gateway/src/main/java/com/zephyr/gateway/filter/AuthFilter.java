@@ -3,7 +3,6 @@ package com.zephyr.gateway.filter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.zephyr.core.tool.api.R;
 import com.zephyr.gateway.config.properties.DefaultSkipProp;
 import com.zephyr.gateway.config.properties.AuthProperties;
 import com.zephyr.gateway.util.RequestUtils;
@@ -79,7 +78,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
             return unAuth(response, "Token格式非法或已过期");
         }
 
-        String userKey = RedisConstant.TOKEN_PREFIX + claims.get(USER_NAME);
+        String userKey = RedisConstant.TOKEN_PREFIX + claims.get(USER_CODE);
         String rToken = redisUtil.getString(userKey);
         if (!token.equals(rToken)) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -89,8 +88,8 @@ public class AuthFilter implements GlobalFilter, Ordered {
         // 权限校验：网关只做 Token 有效性验证（路径级细粒度权限由后端服务自行控制）
         // 注：rolePermissions 中存储的是 perms 标识（如 sys:user:list），与 URL 路径格式不同，
         //     不在网关层做路径比对，避免误拦截合法请求。
-        Object roleIdObj = claims.get(ROLE_ID);
-        if (roleIdObj == null) {
+        Object roleCodesObj = claims.get(ROLE_CODES);
+        if (roleCodesObj == null) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return unAuth(response, "Token中缺少角色信息，请重新登录");
         }
@@ -98,9 +97,9 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
         // 透传用户信息
         ServerHttpRequest.Builder mutate = exchange.getRequest().mutate();
-        addHeader(mutate,USER_ID_HEADER, claims.get(USER_ID));
-        addHeader(mutate, USER_NAME_HEADER, claims.get(USER_NAME));
-        addHeader(mutate, ROLE_ID_HEADER, claims.get(ROLE_ID));
+        addHeader(mutate, USER_CODE_HEADER, claims.get(USER_CODE));
+        addHeader(mutate, ROLE_CODE_HEADER, claims.get(ROLE_CODES));
+        addHeader(mutate, TENANT_CODE_HEADER, claims.get(TENANT_CODE));
 
         return chain.filter(exchange);
     }

@@ -46,8 +46,8 @@ public class UserController {
             @RequestParam(name = "username", required = false) String username,
             @RequestParam(name = "phone", required = false) String phone,
             @RequestParam(name = "status", required = false) Integer status,
-            @RequestParam(name = "deptId", required = false) Long deptId) {
-        return R.data(service.listWithDept(username, phone, status, deptId));
+            @RequestParam(name = "deptCode", required = false) String deptCode) {
+        return R.data(service.listWithDept(username, phone, status, deptCode));
     }
 
     @PostMapping("/save")
@@ -88,16 +88,16 @@ public class UserController {
         return R.status(service.resetPassword(userId));
     }
 
-    @PostMapping("/assignRoles")
-    @ApiOperationSupport(order = 8)
-    @Operation(summary = "分配角色", description = "传入userId和roleIds列表")
-    public R<Boolean> assignRoles(@RequestBody Map<String, Object> params) {
-        Long userId = Long.valueOf(params.get("userId").toString());
-        @SuppressWarnings("unchecked")
-        List<Integer> rawIds = (List<Integer>) params.get("roleIds");
-        List<Long> roleIds = rawIds.stream().map(Long::valueOf).collect(java.util.stream.Collectors.toList());
-        return R.status(service.assignRoles(userId, roleIds));
-    }
+//    @PostMapping("/assignRoles")
+//    @ApiOperationSupport(order = 8)
+//    @Operation(summary = "分配角色", description = "传入userId和roleIds列表")
+//    public R<Boolean> assignRoles(@RequestBody Map<String, Object> params) {
+//        Long userId = Long.valueOf(params.get("userId").toString());
+//        @SuppressWarnings("unchecked")
+//        List<Integer> rawIds = (List<Integer>) params.get("roleIds");
+//        List<Long> roleIds = rawIds.stream().map(Long::valueOf).collect(java.util.stream.Collectors.toList());
+//        return R.status(service.assignRoles(userId, roleIds));
+//    }
 
     @PostMapping("/remove")
     @ApiOperationSupport(order = 9)

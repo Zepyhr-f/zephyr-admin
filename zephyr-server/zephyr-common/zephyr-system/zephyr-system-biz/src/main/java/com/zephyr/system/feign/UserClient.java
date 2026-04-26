@@ -2,6 +2,7 @@ package com.zephyr.system.feign;
 
 import com.zephyr.system.pojo.entity.Role;
 import com.zephyr.system.pojo.entity.User;
+import com.zephyr.system.pojo.vo.UserVO;
 import com.zephyr.system.service.IUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,20 +24,20 @@ public class UserClient implements IUserClient {
     private final IUserService userService;
 
     @Override
-    @GetMapping(IUserClient.GET_USER)
-    public User getUserByUserName(@RequestParam("username") String username) {
-        return userService.getUserByUserName(username);
+    @GetMapping(IUserClient.GET_USER_BY_CODE)
+    public UserVO getUserByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode) {
+        return userService.getUserByUserCode(userCode, tenantCode);
     }
 
     @Override
-    @GetMapping(IUserClient.GET_ROLES)
-    public List<Role> getRolesByUserId(@RequestParam("userId") Long userId) {
-        return userService.getRolesByUserId(userId);
+    @GetMapping(IUserClient.GET_ROLES_BY_USER_CODE)
+    public List<String> getRolesByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode) {
+        return userService.getRolesByUserCode(userCode, tenantCode);
     }
 
     @Override
-    @GetMapping(IUserClient.GET_PERMS)
-    public List<String> getPermsByUserId(@RequestParam("userId") Long userId) {
-        return userService.getPermsByUserId(userId);
+    @GetMapping(IUserClient.GET_PERMS_BU_USER_CODE)
+    public List<String> getPermsByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode) {
+        return userService.getPermsByUserCode(userCode, tenantCode);
     }
 }

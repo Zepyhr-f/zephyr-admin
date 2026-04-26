@@ -24,7 +24,7 @@ public class User extends BaseEntity {
     private String userCode;
 
     @Schema(description = "昵称")
-    private String userName;
+    private String username;
 
     @Schema(description = "真实姓名")
     private String realName;

@@ -16,4 +16,6 @@ public class LoginRequest {
     private String username;
     @Schema(description = "用户密码")
     private String password;
+    @Schema(description = "租户编码")
+    private String tenantCode;
 }

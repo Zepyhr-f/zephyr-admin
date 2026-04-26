@@ -42,6 +42,12 @@
             <artifactId>zephyr-starter-jwt</artifactId>
             <version>${revision}</version>
         </dependency>
+
+        <!-- MapStruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
