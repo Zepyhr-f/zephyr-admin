@@ -29,19 +29,24 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     public List<Role> listAllEnabled() {
         return list(new LambdaQueryWrapper<Role>()
                 .eq(Role::getStatus, 1)
-                .orderByAsc(Role::getRoleSort));
+                .orderByAsc(Role::getOrderNum));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean assignMenus(Long roleId, List<Long> menuIds) {
+    public boolean assignMenus(String roleCode, List<String> menuCodes) {
         // 先清空旧关系
         roleMenuMapper.delete(new LambdaQueryWrapper<RoleMenu>()
-                .eq(RoleMenu::getRoleId, roleId));
+                .eq(RoleMenu::getRoleCode, roleCode));
         // 批量插入新关系
-        if (menuIds != null && !menuIds.isEmpty()) {
-            List<RoleMenu> records = menuIds.stream()
-                    .map(menuId -> new RoleMenu(roleId, menuId))
+        if (menuCodes != null && !menuCodes.isEmpty()) {
+            List<RoleMenu> records = menuCodes.stream()
+                    .map(menuCode -> {
+                        RoleMenu rm = new RoleMenu();
+                        rm.setRoleCode(roleCode);
+                        rm.setMenuCode(menuCode);
+                        return rm;
+                    })
                     .collect(Collectors.toList());
             records.forEach(roleMenuMapper::insert);
         }
@@ -49,11 +54,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     }
 
     @Override
-    public List<Long> getMenuIdsByRoleId(Long roleId) {
+    public List<String> getMenuCodesByRoleCode(String roleCode) {
         return roleMenuMapper.selectList(new LambdaQueryWrapper<RoleMenu>()
-                        .eq(RoleMenu::getRoleId, roleId))
+                        .eq(RoleMenu::getRoleCode, roleCode))
                 .stream()
-                .map(RoleMenu::getMenuId)
+                .map(RoleMenu::getMenuCode)
                 .collect(Collectors.toList());
     }
 

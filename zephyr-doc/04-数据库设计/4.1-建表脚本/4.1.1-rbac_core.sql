@@ -1,15 +1,15 @@
 -- ----------------------------
 -- 删除表（按依赖关系逆序）
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_role_dept`;
-DROP TABLE IF EXISTS `sys_role_menu`;
-DROP TABLE IF EXISTS `sys_user_post`;
-DROP TABLE IF EXISTS `sys_user_role`;
-DROP TABLE IF EXISTS `sys_menu`;
-DROP TABLE IF EXISTS `sys_post`;
-DROP TABLE IF EXISTS `sys_role`;
-DROP TABLE IF EXISTS `sys_user`;
-DROP TABLE IF EXISTS `sys_dept`;
+DROP TABLE IF EXISTS `zephyr_sys_role_dept`;
+DROP TABLE IF EXISTS `zephyr_sys_role_menu`;
+DROP TABLE IF EXISTS `zephyr_sys_user_post`;
+DROP TABLE IF EXISTS `zephyr_sys_user_role`;
+DROP TABLE IF EXISTS `zephyr_sys_menu`;
+DROP TABLE IF EXISTS `zephyr_sys_post`;
+DROP TABLE IF EXISTS `zephyr_sys_role`;
+DROP TABLE IF EXISTS `zephyr_sys_user`;
+DROP TABLE IF EXISTS `zephyr_sys_dept`;
 
 -- ----------------------------
 -- 1. 部门表
@@ -82,7 +82,7 @@ CREATE TABLE `zephyr_sys_user` (
 -- ----------------------------
 -- 4. 角色表
 -- ----------------------------
-CREATE TABLE `sys_role` (
+CREATE TABLE `zephyr_sys_role` (
   `id`          BIGINT       NOT NULL COMMENT '角色ID',
   `role_code`   VARCHAR(64)  NOT NULL COMMENT '角色编码',
   `role_name`   VARCHAR(30)  NOT NULL COMMENT '角色名称',
@@ -101,7 +101,7 @@ CREATE TABLE `sys_role` (
 -- ----------------------------
 -- 5. 菜单表
 -- ----------------------------
-CREATE TABLE `sys_menu` (
+CREATE TABLE `zephyr_sys_menu` (
   `id`          BIGINT       NOT NULL COMMENT '菜单ID',
   `menu_code`   VARCHAR(64)  NOT NULL COMMENT '菜单编码',
   `parent_code` VARCHAR(64)  DEFAULT '-1' COMMENT '父菜单编码',
@@ -148,28 +148,28 @@ CREATE TABLE `zephyr_sys_tenant` (
 -- ----------------------------
 -- 7. 关联关系表 (增加索引，无物理外键)
 -- ----------------------------
-CREATE TABLE `sys_user_role` (
+CREATE TABLE `zephyr_sys_user_role` (
   `user_code` VARCHAR(64) NOT NULL COMMENT '用户编码',
   `role_code` VARCHAR(64) NOT NULL COMMENT '角色编码',
   PRIMARY KEY (`user_code`, `role_code`),
   INDEX `idx_role_code` (`role_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户和角色关联表';
 
-CREATE TABLE `sys_user_post` (
+CREATE TABLE `zephyr_sys_user_post` (
   `user_code` VARCHAR(64) NOT NULL COMMENT '用户编码',
   `post_code` VARCHAR(64) NOT NULL COMMENT '岗位编码',
   PRIMARY KEY (`user_code`, `post_code`),
   INDEX `idx_post_code` (`post_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户与岗位关联表';
 
-CREATE TABLE `sys_role_menu` (
+CREATE TABLE `zephyr_sys_role_menu` (
   `role_code` VARCHAR(64) NOT NULL COMMENT '角色编码',
   `menu_code` VARCHAR(64) NOT NULL COMMENT '菜单编码',
   PRIMARY KEY (`role_code`, `menu_code`),
   INDEX `idx_menu_code` (`menu_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色和菜单关联表';
 
-CREATE TABLE `sys_role_dept` (
+CREATE TABLE `zephyr_sys_role_dept` (
   `role_code` VARCHAR(64) NOT NULL COMMENT '角色编码',
   `dept_code` VARCHAR(64) NOT NULL COMMENT '部门编码',
   PRIMARY KEY (`role_code`, `dept_code`),

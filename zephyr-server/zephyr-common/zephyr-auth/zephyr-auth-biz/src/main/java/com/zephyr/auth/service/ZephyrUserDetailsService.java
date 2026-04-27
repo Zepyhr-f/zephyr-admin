@@ -2,6 +2,7 @@ package com.zephyr.auth.service;
 
 import com.zephyr.core.boot.web.UserContextHolder;
 import com.zephyr.system.feign.IUserClient;
+import com.zephyr.system.pojo.entity.User;
 import com.zephyr.system.pojo.vo.UserVO;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,8 +29,8 @@ public class ZephyrUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userCode) throws UsernameNotFoundException {
         String tenantCode = getTenantCode();
-        UserVO userVO = userClient.getUserByUserCode(userCode, tenantCode);
-        return buildZephyrUser(userVO, userCode, tenantCode);
+        User user = userClient.getUserByUserCode(userCode, tenantCode);
+        return buildZephyrUser(user, userCode, tenantCode);
     }
 
     public UserDetails loadUserByUserCode(String userCode) throws UsernameNotFoundException {
@@ -41,8 +42,8 @@ public class ZephyrUserDetailsService implements UserDetailsService {
         return session != null ? session.getTenantCode() : null;
     }
 
-    private ZephyrUser buildZephyrUser(UserVO userVO, String userCode, String tenantCode) {
-        if (userVO == null) {
+    private ZephyrUser buildZephyrUser(User user, String userCode, String tenantCode) {
+        if (user == null) {
             throw new UsernameNotFoundException("用户不存在");
         }
 
@@ -58,16 +59,16 @@ public class ZephyrUserDetailsService implements UserDetailsService {
                 .collect(Collectors.toList());
 
         return ZephyrUser.builder()
-                .userCode(userVO.getUserCode())
-                .username(userVO.getUsername())
-                .realName(userVO.getRealName())
-                .email(userVO.getEmail())
-                .avatar(userVO.getAvatar())
-                .password(userVO.getPassword())
+                .userCode(user.getUserCode())
+                .username(user.getUserName())
+                .realName(user.getRealName())
+                .email(user.getEmail())
+                .avatar(user.getAvatar())
+                .password(user.getPassword())
                 .roleCodes(roleCodes)
                 .perms(perms)
                 .authorities(authorities)
-                .enabled(userVO.getStatus() == null || userVO.getStatus() == 1)
+                .enabled(user.getStatus() == null || user.getStatus() == 1)
                 .build();
     }
 }

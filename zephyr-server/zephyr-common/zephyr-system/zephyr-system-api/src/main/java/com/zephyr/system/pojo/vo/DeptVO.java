@@ -27,9 +27,11 @@ public class DeptVO implements Serializable {
     @Schema(description = "主键ID")
     private Long id;
 
-    @JsonSerialize(using = ToStringSerializer.class)
-    @Schema(description = "父部门ID")
-    private Long parentId;
+    @Schema(description = "部门编码")
+    private String deptCode;
+
+    @Schema(description = "父部门编码")
+    private String parentCode;
 
     @Schema(description = "部门名称")
     private String deptName;

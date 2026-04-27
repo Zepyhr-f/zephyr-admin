@@ -19,8 +19,8 @@ public class OperLogServiceImpl extends ServiceImpl<OperLogMapper, OperLog> impl
     @Override
     public void cleanOperLog() {
         LambdaUpdateWrapper<OperLog> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(OperLog::getIsDeleted, 0)
-               .set(OperLog::getIsDeleted, 1);
+        wrapper.eq(OperLog::getIfDeleted, 0)
+               .set(OperLog::getIfDeleted, 1);
         this.update(wrapper);
     }
 }

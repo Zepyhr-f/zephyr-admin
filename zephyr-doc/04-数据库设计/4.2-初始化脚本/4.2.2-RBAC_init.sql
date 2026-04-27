@@ -6,11 +6,11 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- 清空数据（按依赖关系逆序删除）
 -- ----------------------------
-DELETE FROM `sys_role_dept`;
-DELETE FROM `sys_role_menu`;
-DELETE FROM `sys_user_role`;
-DELETE FROM `sys_menu`;
-DELETE FROM `sys_role`;
+DELETE FROM `zephyr_sys_role_dept`;
+DELETE FROM `zephyr_sys_role_menu`;
+DELETE FROM `zephyr_sys_user_role`;
+DELETE FROM `zephyr_sys_menu`;
+DELETE FROM `zephyr_sys_role`;
 DELETE FROM `zephyr_sys_user`;
 DELETE FROM `zephyr_sys_dept`;
 DELETE FROM `zephyr_sys_tenant`;
@@ -45,21 +45,21 @@ INSERT INTO `zephyr_sys_user` (id, user_code, user_name, real_name, password, em
 -- ===============================
 -- 3. 角色
 -- ===============================
-INSERT INTO `sys_role` (id, role_code, role_name, order_num, status, tenant_code, create_user) VALUES
+INSERT INTO `zephyr_sys_role` (id, role_code, role_name, order_num, status, tenant_code, create_user) VALUES
 (1, 'admin', '超级管理员', 1, 1, '000000', 1),
 (2, 'common', '普通角色', 2, 1, '000000', 1);
 
 -- ===============================
 -- 4. 用户-角色关联 (使用编码关联)
 -- ===============================
-INSERT INTO `sys_user_role` (user_code, role_code) VALUES
+INSERT INTO `zephyr_sys_user_role` (user_code, role_code) VALUES
 ('admin', 'admin'),
 ('ry', 'common');
 
 -- ===============================
 -- 5. 菜单/权限
 -- ===============================
-INSERT INTO `sys_menu` (id, menu_code, parent_code, menu_name, menu_type, path, perms, order_num, status, tenant_code, create_user) VALUES
+INSERT INTO `zephyr_sys_menu` (id, menu_code, parent_code, menu_name, menu_type, path, perms, order_num, status, tenant_code, create_user) VALUES
 (1, 'system', '-1', '系统管理', 'M', 'system', NULL, 1, 1, '000000', 1),
 (2, 'user', 'system', '用户管理', 'C', 'user', 'sys:user:list', 1, 1, '000000', 1),
 (3, 'role', 'system', '角色管理', 'C', 'role', 'sys:role:list', 2, 1, '000000', 1),
@@ -70,6 +70,6 @@ INSERT INTO `sys_menu` (id, menu_code, parent_code, menu_name, menu_type, path, 
 -- ===============================
 -- 6. 角色-菜单关联 (使用编码关联)
 -- ===============================
-INSERT INTO `sys_role_menu` (role_code, menu_code) VALUES
+INSERT INTO `zephyr_sys_role_menu` (role_code, menu_code) VALUES
 ('admin', 'system'), ('admin', 'user'), ('admin', 'role'), ('admin', 'user_query'), ('admin', 'user_add'), ('admin', 'user_edit'),
 ('common', 'system'), ('common', 'user'), ('common', 'user_query');

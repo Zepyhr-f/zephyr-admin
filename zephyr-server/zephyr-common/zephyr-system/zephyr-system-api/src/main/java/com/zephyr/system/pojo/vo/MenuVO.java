@@ -31,9 +31,11 @@ public class MenuVO implements Serializable{
     @Schema(description = "主键id")
     private Long id;
 
-    @JsonSerialize(using = ToStringSerializer.class)
-    @Schema(description = "父菜单ID")
-    private Long parentId;
+    @Schema(description = "菜单编码")
+    private String menuCode;
+
+    @Schema(description = "父菜单编码")
+    private String parentCode;
 
     @Schema(description = "菜单名称")
     private String menuName;

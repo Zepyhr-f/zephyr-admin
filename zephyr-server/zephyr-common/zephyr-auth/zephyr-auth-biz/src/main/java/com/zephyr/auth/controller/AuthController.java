@@ -11,6 +11,7 @@ import com.zephyr.core.tool.api.R;
 import com.zephyr.jwt.util.JwtUtil;
 import com.zephyr.redis.Constant.RedisConstant;
 import com.zephyr.redis.util.RedisUtil;
+import com.zephyr.system.pojo.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import com.zephyr.system.feign.IUserClient;
-import com.zephyr.system.pojo.vo.UserVO;
 
 import static com.zephyr.jwt.config.JwtConstant.*;
 
@@ -82,16 +82,9 @@ public class AuthController {
             String token = jwtUtil.generateToken(claims);
             redisUtil.setString(RedisConstant.TOKEN_PREFIX + userDetails.getUserCode(), token, 1, TimeUnit.HOURS);
 
-            String tenantCode = request.getTenantCode();
-            UserVO userVO = userClient.getUserByUserCode(userDetails.getUserCode(), tenantCode);
-
             return R.data(LoginResponse.builder()
                     .token(token)
                     .refreshToken(token) // 暂时使用同一个token
-                    .user(userVO)
-                    .roles(userDetails.getRoleCodes())
-                    .buttons(userDetails.getPerms())
-                    .message("登录成功")
                     .build());
         } catch (BadCredentialsException e) {
             return R.fail("用户名或密码错误");
@@ -114,7 +107,7 @@ public class AuthController {
         try {
             String userCode = jwtUtil.extractUserCode(token);
             String tenantCode = getTenantCode();
-            UserVO user = userClient.getUserByUserCode(userCode, tenantCode);
+            User user = userClient.getUserByUserCode(userCode, tenantCode);
 
             if (user == null) {
                 return R.fail("用户不存在");

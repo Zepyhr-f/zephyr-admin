@@ -50,7 +50,7 @@ public class RoleController {
                 new LambdaQueryWrapper<Role>()
                         .like(role.getRoleName() != null, Role::getRoleName, role.getRoleName())
                         .eq(role.getStatus() != null, Role::getStatus, role.getStatus())
-                        .orderByAsc(Role::getRoleSort));
+                        .orderByAsc(Role::getOrderNum));
         return R.data(RoleWrapper.build().pageVO(pages));
     }
 
@@ -93,20 +93,19 @@ public class RoleController {
 
     @PostMapping("/assignMenus")
     @ApiOperationSupport(order = 8)
-    @Operation(summary = "权限授权", description = "传入roleId和menuIds列表")
+    @Operation(summary = "权限授权", description = "传入roleCode和menuCodes列表")
     public R<Boolean> assignMenus(@RequestBody Map<String, Object> params) {
-        Long roleId = Long.valueOf(params.get("roleId").toString());
+        String roleCode = params.get("roleCode").toString();
         @SuppressWarnings("unchecked")
-        List<Integer> rawIds = (List<Integer>) params.get("menuIds");
-        List<Long> menuIds = rawIds.stream().map(Long::valueOf).collect(java.util.stream.Collectors.toList());
-        return R.status(service.assignMenus(roleId, menuIds));
+        List<String> menuCodes = (List<String>) params.get("menuCodes");
+        return R.status(service.assignMenus(roleCode, menuCodes));
     }
 
-    @GetMapping("/menuIds/{roleId}")
+    @GetMapping("/menuCodes/{roleCode}")
     @ApiOperationSupport(order = 9)
-    @Operation(summary = "角色已有菜单ID", description = "传入roleId")
-    public R<List<Long>> menuIds(@PathVariable Long roleId) {
-        return R.data(service.getMenuIdsByRoleId(roleId));
+    @Operation(summary = "角色已有菜单编码", description = "传入roleCode")
+    public R<List<String>> menuCodes(@PathVariable String roleCode) {
+        return R.data(service.getMenuCodesByRoleCode(roleCode));
     }
 
     @PostMapping("/remove")

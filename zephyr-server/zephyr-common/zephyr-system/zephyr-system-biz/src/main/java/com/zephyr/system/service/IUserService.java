@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface IUserService extends IService<User> {
 
-    UserVO getUserByUserCode(String userCode, String tenantCode);
+    User getUserByUserCode(String userCode, String tenantCode);
 
     List<String> getRolesByUserCode(String userCode, String tenantCode);
 

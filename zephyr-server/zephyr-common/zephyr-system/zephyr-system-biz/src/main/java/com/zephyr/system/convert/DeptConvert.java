@@ -21,7 +21,6 @@ public interface DeptConvert {
      * Dept -> DeptVO
      */
     @Mappings({
-            @Mapping(target = "parentId", ignore = true),
             @Mapping(target = "children", ignore = true)
     })
     DeptVO toVo(Dept dept);

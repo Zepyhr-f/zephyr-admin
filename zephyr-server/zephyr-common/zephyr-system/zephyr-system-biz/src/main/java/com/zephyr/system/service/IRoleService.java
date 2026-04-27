@@ -19,15 +19,15 @@ public interface IRoleService extends IService<Role> {
 
     /**
      * 权限授权：保存角色与菜单的关系
-     * @param roleId 角色ID
-     * @param menuIds 菜单ID列表
+     * @param roleCode 角色编码
+     * @param menuCodes 菜单编码列表
      */
-    boolean assignMenus(Long roleId, List<Long> menuIds);
+    boolean assignMenus(String roleCode, List<String> menuCodes);
 
     /**
-     * 查询角色已分配的菜单ID列表
+     * 查询角色已分配的菜单编码列表
      */
-    List<Long> getMenuIdsByRoleId(Long roleId);
+    List<String> getMenuCodesByRoleCode(String roleCode);
 
     /**
      * 更新角色状态

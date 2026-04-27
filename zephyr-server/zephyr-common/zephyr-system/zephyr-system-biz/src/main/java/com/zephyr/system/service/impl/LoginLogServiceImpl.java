@@ -20,8 +20,8 @@ public class LoginLogServiceImpl extends ServiceImpl<LoginLogMapper, LoginLog> i
     public void cleanLoginLog() {
         // 逻辑清理：将所有正常数据的 isDeleted 设置为 1
         LambdaUpdateWrapper<LoginLog> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(LoginLog::getIsDeleted, 0)
-               .set(LoginLog::getIsDeleted, 1);
+        wrapper.eq(LoginLog::getIfDeleted, 0)
+               .set(LoginLog::getIfDeleted, 1);
         this.update(wrapper);
     }
 }

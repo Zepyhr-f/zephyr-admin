@@ -15,7 +15,6 @@ import com.zephyr.system.service.IUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -34,11 +33,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private final DeptMapper deptMapper;
 
     @Override
-    public UserVO getUserByUserCode(String userCode, String tenantCode) {
-        User user = baseMapper.selectOne(new LambdaQueryWrapper<User>()
+    public User getUserByUserCode(String userCode, String tenantCode) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUserCode, userCode)
                 .eq(User::getTenantCode, tenantCode));
-        return UserConvert.INSTANCE.toVo(user);
     }
 
     public List<String> getRolesByUserCode(String userCode, String tenantCode){
@@ -55,7 +53,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public List<UserVO> listWithDept(String username, String phone, Integer status, String deptCode) {
         // 查询用户
         List<User> users = list(new LambdaQueryWrapper<User>()
-                .like(username != null && !username.isEmpty(), User::getUsername, username)
+                .like(username != null && !username.isEmpty(), User::getUserName, username)
                 .eq(phone != null && !phone.isEmpty(), User::getPhone, phone)
                 .eq(status != null, User::getStatus, status)
                 .eq(deptCode != null, User::getDeptCode, deptCode)
@@ -63,17 +61,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         if (users.isEmpty()) return List.of();
 
-        // 获取部门ID集合
+        // 获取部门编码集合
         List<String> deptCodes = users.stream()
                 .filter(u -> u.getDeptCode() != null)
                 .map(User::getDeptCode)
                 .distinct()
                 .collect(Collectors.toList());
 
-        // 批量查询部门名称
-        Map<Long, String> deptNameMap = deptCodes.isEmpty() ? Map.of() :
-                deptMapper.selectBatchIds(deptCodes).stream()
-                        .collect(Collectors.toMap(Dept::getId, Dept::getDeptName));
+        // 批量查询部门信息（使用 deptCode 查询）
+        Map<String, String> deptNameMap = deptCodes.isEmpty() ? Map.of() :
+                deptMapper.selectList(new LambdaQueryWrapper<Dept>().in(Dept::getDeptCode, deptCodes)).stream()
+                        .collect(Collectors.toMap(Dept::getDeptCode, Dept::getDeptName));
 
         // 组装 VO
         return users.stream().map(user -> {
@@ -81,9 +79,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if (user.getDeptCode() != null) {
                 vo.setDeptName(deptNameMap.getOrDefault(user.getDeptCode(), ""));
             }
-            // 查当前用户的角色ID
+            // 查当前用户的角色编码
             List<String> roleCodes = userRoleMapper.selectList(
-                    new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserCode, user.getId()))
+                    new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserCode, user.getUserCode()))
                     .stream().map(UserRole::getRoleCode).collect(Collectors.toList());
             vo.setRoleCodes(roleCodes);
             return vo;

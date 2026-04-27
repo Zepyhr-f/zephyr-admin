@@ -1,6 +1,5 @@
 package com.zephyr.system.feign;
 
-import com.zephyr.system.pojo.entity.Role;
 import com.zephyr.system.pojo.entity.User;
 import com.zephyr.system.pojo.vo.UserVO;
 import com.zephyr.system.service.IUserService;
@@ -25,7 +24,7 @@ public class UserClient implements IUserClient {
 
     @Override
     @GetMapping(IUserClient.GET_USER_BY_CODE)
-    public UserVO getUserByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode) {
+    public User getUserByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode) {
         return userService.getUserByUserCode(userCode, tenantCode);
     }
 
@@ -36,7 +35,7 @@ public class UserClient implements IUserClient {
     }
 
     @Override
-    @GetMapping(IUserClient.GET_PERMS_BU_USER_CODE)
+    @GetMapping(IUserClient.GET_PERMS_BY_USER_CODE)
     public List<String> getPermsByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode) {
         return userService.getPermsByUserCode(userCode, tenantCode);
     }

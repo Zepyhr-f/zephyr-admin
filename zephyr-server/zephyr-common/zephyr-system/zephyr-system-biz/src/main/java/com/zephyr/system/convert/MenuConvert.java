@@ -21,7 +21,6 @@ public interface MenuConvert {
      * Menu -> MenuVO
      */
     @Mappings({
-            @Mapping(target = "parentId", ignore = true),
             @Mapping(target = "children", ignore = true)
     })
     MenuVO toVo(Menu menu);
