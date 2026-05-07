@@ -1,4 +1,6 @@
 package com.zephyr.mp.mapper;
 
-public interface ZBaseMapper {
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+public interface ZBaseMapper<T> extends BaseMapper<T> {
 }

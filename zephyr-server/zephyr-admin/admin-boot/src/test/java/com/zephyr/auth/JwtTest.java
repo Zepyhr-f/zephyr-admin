@@ -1,7 +1,7 @@
 package com.zephyr.auth;
 
 import com.zephyr.auth.service.ZephyrUser;
-import com.zephyr.common.CommonApplication;
+import com.zephyr.common.AdminApplication;
 import com.zephyr.jwt.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import java.util.Map;
  * @author Zephyr
  * @since 2025-09-13
  */
-@SpringBootTest(classes = CommonApplication.class)
+@SpringBootTest(classes = AdminApplication.class)
 public class JwtTest {
 
     @Autowired

@@ -53,7 +53,7 @@
 
         <!-- 容器/中间件 -->
         <druid.version>1.2.25</druid.version>
-        <transmittable-thread-local.version>2.15.0</transmittable-thread-local.version>
+        <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
 
         <!-- 监视/健康检查 -->
         <spring-boot-actuator.version>3.4.6</spring-boot-actuator.version>

@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>common-boot</module>
+        <module>admin-boot</module>
         <module>zephyr-auth</module>
         <module>zephyr-system</module>
         <module>zephyr-ops</module>

@@ -2,6 +2,7 @@ package com.zephyr.core.boot.web;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,6 +14,9 @@ import java.util.Set;
 @Data
 public class UserSession {
     private String userCode;
+    private String username;
     private Set<String> roleCodes;
+    private List<String> roles;
+    private List<String> permissions;
     private String tenantCode;
 }

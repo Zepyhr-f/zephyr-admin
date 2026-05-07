@@ -27,8 +27,8 @@ import org.springframework.context.annotation.ComponentScan;
         "com.zephyr.ops.mapper",
         "com.zephyr.generator.mapper"
 })
-public class CommonApplication {
+public class AdminApplication {
     public static void main(String[] args) {
-        SpringApplication.run(CommonApplication.class, args);
+        SpringApplication.run(AdminApplication.class, args);
     }
 }

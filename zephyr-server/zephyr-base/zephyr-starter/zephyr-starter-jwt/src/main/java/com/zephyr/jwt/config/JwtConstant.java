@@ -16,9 +16,11 @@ public interface JwtConstant {
     int TOKEN_PREFIX_LENGTH = 7;
     String HEADER_STRING = "Authorization";
 
-    // token存的用户信息（仅保留用户编码、角色列表和租户编码，保持token最小化）
+    // token存的用户信息（仅保留用户编码、租户编码，保持token最小化）
     String USER_CODE = "user_code";
-    String ROLE_CODES = "role_codes";
-    String TENANT_CODE = "tenant_code";
+
+    // 设计规范：sub = userCode, tid = tenantCode, jti = 唯一ID
+    String TENANT_CODE = "tid";
+    String JTI = "jti";
 
 }

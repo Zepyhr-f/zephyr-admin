@@ -1,7 +1,9 @@
 package com.zephyr.core.boot.web;
 
+import com.alibaba.ttl.TransmittableThreadLocal;
+
 public class UserContextHolder {
-    private static final ThreadLocal<UserSession> CONTEXT = new ThreadLocal<>();
+    private static final TransmittableThreadLocal<UserSession> CONTEXT = new TransmittableThreadLocal<>();
 
     public static void set(UserSession userSession) {
         CONTEXT.set(userSession);

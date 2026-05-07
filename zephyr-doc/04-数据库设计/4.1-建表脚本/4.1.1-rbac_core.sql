@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS `zephyr_sys_dept`;
 -- ----------------------------
 CREATE TABLE `zephyr_sys_dept` (
   `id`          BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `dept_code`   VARCHAR(64)  NOT NULL COMMENT '部门编码',
+  `code`        VARCHAR(64)  NOT NULL COMMENT '部门编码',
   `parent_code` VARCHAR(64)  DEFAULT '0' COMMENT '父部门编码',
   `dept_name`   VARCHAR(50)  NOT NULL COMMENT '部门名称',
   `full_name`   VARCHAR(255) NOT NULL COMMENT '部门全称',
@@ -37,7 +37,7 @@ CREATE TABLE `zephyr_sys_dept` (
 -- ----------------------------
 CREATE TABLE `zephyr_sys_post` (
   `id`          BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `post_code`   VARCHAR(64)  NOT NULL COMMENT '岗位编码',
+  `code`        VARCHAR(64)  NOT NULL COMMENT '岗位编码',
   `post_name`   VARCHAR(50)  NOT NULL COMMENT '岗位名称',
   `order_num`   INT          NOT NULL COMMENT '显示顺序',
   `status`      TINYINT(1)   NOT NULL DEFAULT 1 COMMENT '状态（1=正常 0=停用）',
@@ -56,8 +56,8 @@ CREATE TABLE `zephyr_sys_post` (
 -- ----------------------------
 CREATE TABLE `zephyr_sys_user` (
   `id`          BIGINT       NOT NULL COMMENT '主键ID',
-  `user_code`   VARCHAR(64)  NOT NULL COMMENT '员工编码',
-  `user_name`   VARCHAR(50)  NOT NULL COMMENT '昵称',
+  `code`        VARCHAR(64)  NOT NULL COMMENT '员工编码',
+  `nick_name`   VARCHAR(50)  NOT NULL COMMENT '昵称',
   `real_name`   VARCHAR(50)  DEFAULT NULL COMMENT '真实姓名',
   `password`    VARCHAR(100) NOT NULL COMMENT '密码',
   `avatar`      VARCHAR(255) DEFAULT NULL COMMENT '头像',
@@ -84,7 +84,7 @@ CREATE TABLE `zephyr_sys_user` (
 -- ----------------------------
 CREATE TABLE `zephyr_sys_role` (
   `id`          BIGINT       NOT NULL COMMENT '角色ID',
-  `role_code`   VARCHAR(64)  NOT NULL COMMENT '角色编码',
+  `code`        VARCHAR(64)  NOT NULL COMMENT '角色编码',
   `role_name`   VARCHAR(30)  NOT NULL COMMENT '角色名称',
   `order_num`   INT          NOT NULL COMMENT '显示顺序',
   `status`      TINYINT(1)   NOT NULL DEFAULT 1 COMMENT '角色状态（1=正常 0=停用）',
@@ -103,7 +103,7 @@ CREATE TABLE `zephyr_sys_role` (
 -- ----------------------------
 CREATE TABLE `zephyr_sys_menu` (
   `id`          BIGINT       NOT NULL COMMENT '菜单ID',
-  `menu_code`   VARCHAR(64)  NOT NULL COMMENT '菜单编码',
+  `code`        VARCHAR(64)  NOT NULL COMMENT '菜单编码',
   `parent_code` VARCHAR(64)  DEFAULT '-1' COMMENT '父菜单编码',
   `menu_name`   VARCHAR(30)  NOT NULL COMMENT '菜单名称',
   `menu_type`   CHAR(1)      DEFAULT 'M' COMMENT '菜单类型（M=目录 C=菜单 F=按钮/API）',
@@ -128,7 +128,7 @@ CREATE TABLE `zephyr_sys_menu` (
 -- ----------------------------
 CREATE TABLE `zephyr_sys_tenant` (
   `id`              BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `tenant_code`       VARCHAR(12)  NOT NULL COMMENT '租户编号 (业务唯一标识)',
+  `code`            VARCHAR(12)  NOT NULL COMMENT '租户编号 (业务唯一标识)',
   `tenant_name`     VARCHAR(100) NOT NULL COMMENT '租户名称/公司名称',
   `contact_user`    VARCHAR(50)  DEFAULT NULL COMMENT '联系人',
   `contact_phone`   VARCHAR(20)  DEFAULT NULL COMMENT '联系电话',

@@ -61,6 +61,7 @@ zephyr:
   auth:
     white-api:
       - /zephyr-auth/login
+      - /zephyr-auth/auth/refresh
       - /zephyr-auth/logout
       - /zephyr-auth/info
       - /get
@@ -69,6 +70,8 @@ zephyr:
       - /v3/api-docs/**
       - /favicon.ico
       - /webjars/**
+  gateway:
+    secret: zephyr-gateway-secret-key-2026 # 网关签名密钥，下游服务需保持一致
 
 jwt:
   algorithm: ES256 # HS256 || ES256

@@ -20,43 +20,74 @@ import {
   BellOutlined,
   MoonOutlined,
   SunOutlined,
+  FolderOutlined,
+  FileOutlined,
 } from "@ant-design/icons";
-import { useAuthStore } from "@/store/use-auth-store";
+import { useAuthStore, type MenuItem } from "@/store/use-auth-store";
 import { useThemeStore } from "@/store/use-theme-store";
 import Logo from "@/components/logo";
 import { GLOBAL_CONFIG } from "@/global-config";
+import client from "@/api/client";
 
 const { Header, Sider, Content } = Layout;
 
-const menuItems = [
-  {
-    key: "/",
-    icon: <HomeOutlined />,
-    label: "首页",
-  },
-  {
-    key: "/dashboard",
-    icon: <DashboardOutlined />,
-    label: "数据看板",
-  },
-  {
-    key: "/system",
-    icon: <SettingOutlined />,
-    label: "系统管理",
-    children: [
-      { key: "/system/users", label: "用户管理" },
-      { key: "/system/roles", label: "角色管理" },
-    ],
-  },
-];
+// 图标映射表（简化版，可根据需要扩展）
+const iconMap: Record<string, React.ReactNode> = {
+  home: <HomeOutlined />,
+  dashboard: <DashboardOutlined />,
+  setting: <SettingOutlined />,
+  user: <UserOutlined />,
+  folder: <FolderOutlined />,
+  file: <FileOutlined />,
+};
 
-function breadcrumbFromPath(pathname: string) {
+function getIcon(icon?: string): React.ReactNode {
+  if (!icon) return null;
+  return iconMap[icon] || <FolderOutlined />;
+}
+
+// 递归转换后端菜单为 Ant Design Menu 格式
+function convertMenus(menus?: MenuItem[], parentPath = ""): any[] {
+  if (!menus) return [];
+  return menus.map((menu) => {
+    const fullPath = parentPath + (menu.path.startsWith("/") ? menu.path : `/${menu.path}`);
+    const item: any = {
+      key: fullPath,
+      icon: getIcon(menu.meta?.icon),
+      label: menu.meta?.title || menu.name || menu.path,
+    };
+    if (menu.children && menu.children.length > 0) {
+      item.children = convertMenus(menu.children, fullPath);
+    }
+    return item;
+  });
+}
+
+function breadcrumbFromPath(pathname: string, menus?: MenuItem[]): any[] {
   if (pathname === "/") return [{ title: "首页" }];
   if (pathname === "/dashboard") return [{ title: "数据看板" }];
-  if (pathname.startsWith("/system/users"))
-    return [{ title: "系统管理" }, { title: "用户管理" }];
-  if (pathname.startsWith("/system/roles"))
-    return [{ title: "系统管理" }, { title: "角色管理" }];
+
+  // 尝试从菜单中匹配
+  if (menus) {
+    for (const menu of menus) {
+      const parentTitle = menu.meta?.title || menu.name;
+      if (menu.children) {
+        for (const child of menu.children) {
+          const childPath = (menu.path + (child.path.startsWith("/") ? child.path : `/${child.path}`)).replace(/\/+/g, "/");
+          if (pathname === childPath || pathname.startsWith(childPath + "/")) {
+            return [
+              { title: parentTitle || "系统管理" },
+              { title: child.meta?.title || child.name || child.path },
+            ];
+          }
+        }
+      }
+      if (pathname === menu.path || pathname.startsWith(menu.path + "/")) {
+        return [{ title: parentTitle || menu.path }];
+      }
+    }
+  }
+
   return [{ title: "首页" }];
 }
 
@@ -64,8 +95,22 @@ export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuthStore();
+  const { logout, user, menus } = useAuthStore();
   const { isDark, toggleTheme } = useThemeStore();
+
+  const menuItems = [
+    {
+      key: "/",
+      icon: <HomeOutlined />,
+      label: "首页",
+    },
+    {
+      key: "/dashboard",
+      icon: <DashboardOutlined />,
+      label: "数据看板",
+    },
+    ...convertMenus(menus),
+  ];
 
   const userMenuItems = [
     {
@@ -86,6 +131,17 @@ export default function AdminLayout() {
       danger: true,
     },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await client.post('zephyr-auth/logout');
+    } catch (e) {
+      console.error('Logout request failed:', e);
+    } finally {
+      logout();
+      window.location.href = '/login';
+    }
+  };
 
   return (
     <Layout className="min-h-screen">
@@ -113,7 +169,7 @@ export default function AdminLayout() {
         <Menu
           mode="inline"
           selectedKeys={[location.pathname]}
-          defaultOpenKeys={["/system"]}
+          defaultOpenKeys={menus?.map((m) => m.path) || ["/system"]}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
           className="!border-r-0"
@@ -134,7 +190,7 @@ export default function AdminLayout() {
               className="text-[var(--color-text-secondary)]"
             />
             <Breadcrumb
-              items={breadcrumbFromPath(location.pathname)}
+              items={breadcrumbFromPath(location.pathname, menus)}
               className="hidden sm:flex"
             />
           </div>
@@ -158,7 +214,7 @@ export default function AdminLayout() {
               menu={{
                 items: userMenuItems,
                 onClick: ({ key }) => {
-                  if (key === "logout") logout();
+                  if (key === "logout") handleLogout();
                 },
               }}
               placement="bottomRight"
@@ -166,7 +222,7 @@ export default function AdminLayout() {
               <div className="flex items-center gap-2 cursor-pointer hover:bg-[var(--color-bg-layout)] px-2 py-1 rounded-lg transition-colors">
                 <Avatar size="small" icon={<UserOutlined />} />
                 <span className="text-sm text-[var(--color-text-primary)] hidden md:inline">
-                  Admin
+                  {user?.username || "Admin"}
                 </span>
               </div>
             </Dropdown>

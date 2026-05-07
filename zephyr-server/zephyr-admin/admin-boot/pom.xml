@@ -9,7 +9,7 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>common-boot</artifactId>
+    <artifactId>admin-boot</artifactId>
     <version>${revision}</version>
 
     <dependencies>

@@ -20,7 +20,6 @@ type LoginForm = z.infer<typeof loginSchema>;
 // 定义接口，移除 any
 interface LoginResponse {
     token: string;
-    refreshToken: string;
 }
 
 // 2. 将静态数据提取到组件外部，避免重复渲染时重新分配内存
@@ -139,7 +138,7 @@ function TrendLine() {
 export default function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const setTokens = useAuthStore((state) => state.setToken);
+    const setToken = useAuthStore((state) => state.setToken);
 
     // 更安全的路由解构
     const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
@@ -159,7 +158,7 @@ export default function LoginPage() {
             const { remember, ...loginPayload } = data;
 
             const res = await client.post<any, LoginResponse>('zephyr-auth/login', loginPayload);
-            setTokens(res.token, res.refreshToken);
+            setToken(res.token);
 
             // 如果用户勾选了记住我，可在此处处理持久化逻辑，如写入 localStorage 标记
             if (remember) {

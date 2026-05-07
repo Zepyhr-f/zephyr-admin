@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: zephyr-common/common-boot/Dockerfile
+      dockerfile: zephyr-admin/admin-boot/Dockerfile
     container_name: zephyr-backend
     restart: always
     ports:

@@ -11,8 +11,9 @@ import com.zephyr.redis.Constant.RedisConstant;
 import com.zephyr.redis.util.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -26,8 +27,11 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import static com.zephyr.core.tool.constant.WebConstants.*;
 import static com.zephyr.jwt.config.JwtConstant.*;
@@ -40,7 +44,7 @@ import static com.zephyr.jwt.config.JwtConstant.*;
  */
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthFilter implements GlobalFilter, Ordered {
 
     private final AuthProperties authProperties;
@@ -48,6 +52,9 @@ public class AuthFilter implements GlobalFilter, Ordered {
     private final RedisUtil redisUtil;
     private final JwtUtil jwtUtil;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
+
+    @Value("${zephyr.gateway.secret:zephyr-default-secret}")
+    private String gatewaySecret;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -78,28 +85,35 @@ public class AuthFilter implements GlobalFilter, Ordered {
             return unAuth(response, "Token格式非法或已过期");
         }
 
-        String userKey = RedisConstant.TOKEN_PREFIX + claims.get(USER_CODE);
-        String rToken = redisUtil.getString(userKey);
-        if (!token.equals(rToken)) {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return unAuth(response, "Token无效或已过期");
+        // 校验 jti 黑名单（可选）
+        String jti = claims.get(JTI, String.class);
+        if (jti != null) {
+            String blacklisted = redisUtil.getString(RedisConstant.BLACKLIST_PREFIX + jti);
+            if (blacklisted != null) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return unAuth(response, "Token已被注销");
+            }
         }
 
-        // 权限校验：网关只做 Token 有效性验证（路径级细粒度权限由后端服务自行控制）
-        // 注：rolePermissions 中存储的是 perms 标识（如 sys:user:list），与 URL 路径格式不同，
-        //     不在网关层做路径比对，避免误拦截合法请求。
-        Object roleCodesObj = claims.get(ROLE_CODES);
-        if (roleCodesObj == null) {
+        // 校验过期（extractAllClaims 已经校验签名，但显式再校验一次 exp 更安全）
+        if (jwtUtil.isTokenExpired(token)) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return unAuth(response, "Token中缺少角色信息，请重新登录");
+            return unAuth(response, "Token已过期");
         }
-        // Token 合法，直接放行（已过认证）
 
-        // 透传用户信息
+        String userCode = claims.getSubject();
+        String tenantCode = claims.get(TENANT_CODE, String.class);
+
+        // 生成签名
+        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
+        String sign = generateGatewaySign(userCode, tenantCode, timestamp);
+
+        // 透传用户信息（新规范）
         ServerHttpRequest.Builder mutate = exchange.getRequest().mutate();
-        addHeader(mutate, USER_CODE_HEADER, claims.get(USER_CODE));
-        addHeader(mutate, ROLE_CODE_HEADER, claims.get(ROLE_CODES));
-        addHeader(mutate, TENANT_CODE_HEADER, claims.get(TENANT_CODE));
+        addHeader(mutate, USER_CODE_HEADER, userCode);
+        addHeader(mutate, TENANT_CODE_HEADER, tenantCode);
+        addHeader(mutate, TIMESTAMP_HEADER, timestamp);
+        addHeader(mutate, GATEWAY_SIGN_HEADER, sign);
 
         return chain.filter(exchange);
     }
@@ -129,6 +143,19 @@ public class AuthFilter implements GlobalFilter, Ordered {
         String valueStr = value.toString();
         String valueEncode = URLEncoder.encode(valueStr, StandardCharsets.UTF_8);
         mutate.header(name, valueEncode);
+    }
+
+    private String generateGatewaySign(String userCode, String tenantCode, String timestamp) {
+        try {
+            String data = String.valueOf(userCode) + String.valueOf(tenantCode) + timestamp;
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(gatewaySecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            byte[] signBytes = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(signBytes);
+        } catch (Exception e) {
+            log.error("网关签名生成失败", e);
+            throw new RuntimeException("网关签名生成失败", e);
+        }
     }
 
     @Override

@@ -5,8 +5,22 @@ import {message, notification} from "antd";
 const client = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 5000,
-    headers: {'Content-Type': 'application/json'}
+    headers: {'Content-Type': 'application/json'},
+    withCredentials: true, // 允许携带 Cookie（Refresh Token）
 });
+
+// 刷新锁机制
+let isRefreshing = false;
+let refreshSubscribers: Array<(token: string) => void> = [];
+
+function onRefreshed(token: string) {
+    refreshSubscribers.forEach((cb) => cb(token));
+    refreshSubscribers = [];
+}
+
+function addRefreshSubscriber(cb: (token: string) => void) {
+    refreshSubscribers.push(cb);
+}
 
 client.interceptors.request.use(
     (config: InternalAxiosRequestConfig)=> {
@@ -14,6 +28,9 @@ client.interceptors.request.use(
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        // 添加规范请求头
+        config.headers['X-Request-Id'] = crypto.randomUUID();
+        config.headers['X-Client-Type'] = 'web';
         return config;
     },
     (error) => Promise.reject(error),
@@ -31,17 +48,58 @@ client.interceptors.response.use(
         return Promise.reject(new Error(msg || 'Error'));
     },
     async (error) => {
-        const { response } = error;
+        const { response, config: originalConfig } = error;
 
         if (response) {
             const { status, data } = response;
-
-            // 优先使用后端返回的错误消息
             const errorMsg = data?.msg || data?.message || '网络连接异常，请检查网络设置';
 
             if (status === 401) {
-                useAuthStore.getState().logout();
-                window.location.href = '/login';
+                // 刷新接口本身返回 401，直接退出
+                if (originalConfig.url?.includes('/auth/refresh')) {
+                    useAuthStore.getState().clearAuth();
+                    window.location.href = '/login';
+                    return Promise.reject(error);
+                }
+
+                if (!isRefreshing) {
+                    isRefreshing = true;
+                    try {
+                        const refreshRes = await axios.post(
+                            `${import.meta.env.VITE_API_BASE_URL}zephyr-auth/auth/refresh`,
+                            {},
+                            { withCredentials: true }
+                        );
+                        const newToken = refreshRes.data?.data?.token;
+                        if (newToken) {
+                            useAuthStore.getState().setToken(newToken);
+                            onRefreshed(newToken);
+                            isRefreshing = false;
+
+                            // 重放原请求
+                            if (originalConfig.headers) {
+                                originalConfig.headers.Authorization = `Bearer ${newToken}`;
+                            }
+                            return client(originalConfig);
+                        }
+                    } catch (refreshError) {
+                        isRefreshing = false;
+                        refreshSubscribers = [];
+                        useAuthStore.getState().clearAuth();
+                        window.location.href = '/login';
+                        return Promise.reject(refreshError);
+                    }
+                }
+
+                // 正在刷新中，加入队列等待
+                return new Promise((resolve) => {
+                    addRefreshSubscriber((newToken: string) => {
+                        if (originalConfig.headers) {
+                            originalConfig.headers.Authorization = `Bearer ${newToken}`;
+                        }
+                        resolve(client(originalConfig));
+                    });
+                });
             } else if (status === 403) {
                 notification.error({ message: '无权访问', description: errorMsg });
             } else if (status === 500) {

@@ -1,52 +1,76 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+
+interface UserInfo {
+    userCode: string;
+    username: string;
+}
 
 interface AuthState {
     token: string | null;
-    refreshToken: string | null;
     isAuthenticated: boolean;
+    user: UserInfo | null;
+    roles: string[];
+    permissions: string[];
+    menus: MenuItem[] | null;
 
-    setToken: (accessToken: string, refreshToken: string ) => void;
+    setToken: (token: string) => void;
+    setUserInfo: (user: UserInfo, roles: string[], permissions: string[]) => void;
+    setMenus: (menus: MenuItem[]) => void;
     clearAuth: () => void;
     logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-    persist(
-        (set) => ({
+export interface MenuItem {
+    path: string;
+    component?: string;
+    name?: string;
+    meta?: {
+        title?: string;
+        icon?: string;
+    };
+    children?: MenuItem[];
+}
+
+export const useAuthStore = create<AuthState>()((set) => ({
+    token: null,
+    isAuthenticated: false,
+    user: null,
+    roles: [],
+    permissions: [],
+    menus: null,
+
+    setToken: (token: string) => set({
+        token,
+        isAuthenticated: true,
+    }),
+
+    setUserInfo: (user: UserInfo, roles: string[], permissions: string[]) => set({
+        user,
+        roles,
+        permissions,
+    }),
+
+    setMenus: (menus: MenuItem[]) => set({
+        menus,
+    }),
+
+    clearAuth: () => set({
+        token: null,
+        isAuthenticated: false,
+        user: null,
+        roles: [],
+        permissions: [],
+        menus: null,
+    }),
+
+    logout: () => {
+        set({
             token: null,
-            refreshToken: null,
             isAuthenticated: false,
-
-            setToken: (token: string, refreshToken: string ) => set({
-                token,
-                refreshToken,
-                isAuthenticated: true,
-            }),
-
-            clearAuth: () => set({
-                    token: null,
-                    refreshToken: null,
-                    isAuthenticated: false
-            }),
-
-            logout: () => {
-                set({
-                    token: null,
-                    refreshToken: null,
-                    isAuthenticated: false
-                });
-                localStorage.removeItem("zephyr-auth-storage");
-            },
-        }),
-        {
-            name: "zephyr-auth-storage",
-            storage: createJSONStorage(() => localStorage),
-            partialize: (state: AuthState) => ({
-                token: state.token,
-                refreshToken: state.refreshToken,
-                isAuthenticated: state.isAuthenticated,
-            }),
-        }
-    )
-);
+            user: null,
+            roles: [],
+            permissions: [],
+            menus: null,
+        });
+    },
+}));
