@@ -93,19 +93,19 @@ public class RoleController {
 
     @PostMapping("/assignMenus")
     @ApiOperationSupport(order = 8)
-    @Operation(summary = "权限授权", description = "传入roleCode和menuCodes列表")
+    @Operation(summary = "权限授权", description = "传入code和menuCodeList列表")
     public R<Boolean> assignMenus(@RequestBody Map<String, Object> params) {
-        String roleCode = params.get("roleCode").toString();
+        String code = params.get("code").toString();
         @SuppressWarnings("unchecked")
-        List<String> menuCodes = (List<String>) params.get("menuCodes");
-        return R.status(service.assignMenus(roleCode, menuCodes));
+        List<String> menuCodeList = (List<String>) params.get("menuCodeList");
+        return R.status(service.assignMenus(code, menuCodeList));
     }
 
-    @GetMapping("/menuCodes/{roleCode}")
+    @GetMapping("/menuCodes/{code}")
     @ApiOperationSupport(order = 9)
-    @Operation(summary = "角色已有菜单编码", description = "传入roleCode")
-    public R<List<String>> menuCodes(@PathVariable String roleCode) {
-        return R.data(service.getMenuCodesByRoleCode(roleCode));
+    @Operation(summary = "角色已有菜单编码", description = "传入code")
+    public R<List<String>> menuCodes(@PathVariable String code) {
+        return R.data(service.getMenuCodesByRoleCode(code));
     }
 
     @PostMapping("/remove")

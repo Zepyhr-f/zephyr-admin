@@ -1,6 +1,6 @@
 package com.zephyr.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zephyr.mp.mapper.ZTreeMapper;
 import com.zephyr.system.pojo.entity.Dept;
 
 /**
@@ -8,6 +8,6 @@ import com.zephyr.system.pojo.entity.Dept;
  *
  * @author zephyr
  */
-public interface DeptMapper extends BaseMapper<Dept> {
+public interface DeptMapper extends ZTreeMapper<Dept> {
 
 }

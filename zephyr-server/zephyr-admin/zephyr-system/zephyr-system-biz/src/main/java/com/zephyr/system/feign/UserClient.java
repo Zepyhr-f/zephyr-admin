@@ -1,7 +1,6 @@
 package com.zephyr.system.feign;
 
 import com.zephyr.system.pojo.entity.User;
-import com.zephyr.system.pojo.vo.UserVO;
 import com.zephyr.system.service.IUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +23,8 @@ public class UserClient implements IUserClient {
 
     @Override
     @GetMapping(IUserClient.GET_USER_BY_CODE)
-    public User getUserByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode) {
-        return userService.getUserByUserCode(userCode, tenantCode);
+    public User getUserByCode(@RequestParam("code") String code, @RequestParam("tenantCode")String tenantCode) {
+        return userService.getUserByCode(code, tenantCode);
     }
 
     @Override

@@ -33,15 +33,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private final DeptMapper deptMapper;
 
     @Override
-    public User getUserByUserCode(String userCode, String tenantCode) {
+    public User getUserByCode(String code, String tenantCode) {
         return baseMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUserCode, userCode)
+                .eq(User::getCode, code)
                 .eq(User::getTenantCode, tenantCode));
     }
 
     public List<String> getRolesByUserCode(String userCode, String tenantCode){
         List<Role> roles = baseMapper.selectRolesByUserCode(userCode, tenantCode);
-        return roles.stream().map(Role::getRoleCode).collect(Collectors.toList());
+        return roles.stream().map(Role::getCode).collect(Collectors.toList());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public List<UserVO> listWithDept(String username, String phone, Integer status, String deptCode) {
         // 查询用户
         List<User> users = list(new LambdaQueryWrapper<User>()
-                .like(username != null && !username.isEmpty(), User::getUserName, username)
+                .like(username != null && !username.isEmpty(), User::getNickName, username)
                 .eq(phone != null && !phone.isEmpty(), User::getPhone, phone)
                 .eq(status != null, User::getStatus, status)
                 .eq(deptCode != null, User::getDeptCode, deptCode)
@@ -70,8 +70,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 批量查询部门信息（使用 deptCode 查询）
         Map<String, String> deptNameMap = deptCodes.isEmpty() ? Map.of() :
-                deptMapper.selectList(new LambdaQueryWrapper<Dept>().in(Dept::getDeptCode, deptCodes)).stream()
-                        .collect(Collectors.toMap(Dept::getDeptCode, Dept::getDeptName));
+                deptMapper.selectList(new LambdaQueryWrapper<Dept>().in(Dept::getCode, deptCodes)).stream()
+                        .collect(Collectors.toMap(Dept::getCode, Dept::getDeptName));
 
         // 组装 VO
         return users.stream().map(user -> {
@@ -81,7 +81,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
             // 查当前用户的角色编码
             List<String> roleCodes = userRoleMapper.selectList(
-                    new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserCode, user.getUserCode()))
+                            new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserCode, user.getCode()))
                     .stream().map(UserRole::getRoleCode).collect(Collectors.toList());
             vo.setRoleCodes(roleCodes);
             return vo;

@@ -1,7 +1,7 @@
 package com.zephyr.system.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.zephyr.mp.base.BaseEntity;
+import com.zephyr.mp.base.TreeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,15 +14,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_menu")
+@TableName("zephyr_sys_menu")
 @Schema(description = "菜单/权限")
-public class Menu extends BaseEntity {
-
-    @Schema(description = "菜单编码")
-    private String menuCode;
-
-    @Schema(description = "父菜单编码")
-    private String parentCode;
+public class Menu extends TreeEntity {
 
     @Schema(description = "菜单名称")
     private String menuName;

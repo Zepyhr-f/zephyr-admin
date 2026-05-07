@@ -1,7 +1,7 @@
 package com.zephyr.system.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.zephyr.mp.base.BaseEntity;
+import com.zephyr.mp.base.CodeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,13 +18,10 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "用户")
 @TableName("zephyr_sys_user")
-public class User extends BaseEntity {
-
-    @Schema(description = "员工编码")
-    private String userCode;
+public class User extends CodeEntity {
 
     @Schema(description = "昵称")
-    private String userName;
+    private String nickName;
 
     @Schema(description = "真实姓名")
     private String realName;

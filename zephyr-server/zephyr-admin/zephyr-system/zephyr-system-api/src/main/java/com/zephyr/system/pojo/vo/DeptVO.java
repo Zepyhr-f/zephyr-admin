@@ -28,10 +28,13 @@ public class DeptVO implements Serializable {
     private Long id;
 
     @Schema(description = "部门编码")
-    private String deptCode;
+    private String code;
 
     @Schema(description = "父部门编码")
     private String parentCode;
+
+    @Schema(description = "是否叶子节点 (1=是 0=否)")
+    private Integer leaf;
 
     @Schema(description = "部门名称")
     private String deptName;

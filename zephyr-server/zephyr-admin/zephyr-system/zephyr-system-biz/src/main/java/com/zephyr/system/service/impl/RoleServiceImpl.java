@@ -34,16 +34,16 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean assignMenus(String roleCode, List<String> menuCodes) {
+    public boolean assignMenus(String code, List<String> menuCodeList) {
         // 先清空旧关系
         roleMenuMapper.delete(new LambdaQueryWrapper<RoleMenu>()
-                .eq(RoleMenu::getRoleCode, roleCode));
+                .eq(RoleMenu::getRoleCode, code));
         // 批量插入新关系
-        if (menuCodes != null && !menuCodes.isEmpty()) {
-            List<RoleMenu> records = menuCodes.stream()
+        if (menuCodeList != null && !menuCodeList.isEmpty()) {
+            List<RoleMenu> records = menuCodeList.stream()
                     .map(menuCode -> {
                         RoleMenu rm = new RoleMenu();
-                        rm.setRoleCode(roleCode);
+                        rm.setRoleCode(code);
                         rm.setMenuCode(menuCode);
                         return rm;
                     })
@@ -54,9 +54,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     }
 
     @Override
-    public List<String> getMenuCodesByRoleCode(String roleCode) {
+    public List<String> getMenuCodesByRoleCode(String code) {
         return roleMenuMapper.selectList(new LambdaQueryWrapper<RoleMenu>()
-                        .eq(RoleMenu::getRoleCode, roleCode))
+                        .eq(RoleMenu::getRoleCode, code))
                 .stream()
                 .map(RoleMenu::getMenuCode)
                 .collect(Collectors.toList());

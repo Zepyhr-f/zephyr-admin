@@ -1,7 +1,7 @@
 package com.zephyr.system.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.zephyr.mp.base.BaseEntity;
+import com.zephyr.mp.base.CodeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,12 +14,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_role")
+@TableName("zephyr_sys_role")
 @Schema(description = "角色")
-public class Role extends BaseEntity {
-
-    @Schema(description = "角色编码")
-    private String roleCode;
+public class Role extends CodeEntity {
 
     @Schema(description = "角色名称")
     private String roleName;

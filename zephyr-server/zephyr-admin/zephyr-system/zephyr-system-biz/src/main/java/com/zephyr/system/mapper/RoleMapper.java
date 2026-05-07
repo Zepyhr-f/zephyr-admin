@@ -1,17 +1,13 @@
 package com.zephyr.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zephyr.mp.mapper.ZCodeMapper;
 import com.zephyr.system.pojo.entity.Role;
 
-
 /**
- * <p>
- *  Mapper 接口
- * </p>
+ * 角色 Mapper 接口
  *
  * @author zephyr
- * @since 2025-09-01
  */
-public interface RoleMapper extends BaseMapper<Role> {
+public interface RoleMapper extends ZCodeMapper<Role> {
 
 }

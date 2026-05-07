@@ -29,15 +29,15 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
             MenuVO vo = MenuConvert.INSTANCE.toVo(menu);
             return vo;
         }).collect(Collectors.toList());
-        return buildTree(allVos, "-1");
+        return buildTree(allVos, null);
     }
 
     private List<MenuVO> buildTree(List<MenuVO> all, String parentCode) {
         List<MenuVO> children = new ArrayList<>();
         for (MenuVO vo : all) {
-            String pCode = vo.getParentCode() != null ? vo.getParentCode() : "-1";
-            if (pCode.equals(parentCode)) {
-                vo.setChildren(buildTree(all, vo.getMenuCode()));
+            String pCode = vo.getParentCode();
+            if ((pCode == null && parentCode == null) || (pCode != null && pCode.equals(parentCode))) {
+                vo.setChildren(buildTree(all, vo.getCode()));
                 children.add(vo);
             }
         }

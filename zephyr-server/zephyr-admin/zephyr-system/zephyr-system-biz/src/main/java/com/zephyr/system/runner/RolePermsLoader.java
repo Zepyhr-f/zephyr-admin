@@ -40,12 +40,12 @@ public class RolePermsLoader implements ApplicationRunner {
 
         for (Role role : roleList) {
             // 通过 sys_role_menu + sys_menu.perms 查出该角色所有权限标识
-            List<String> permsList = userMapper.selectPermsByRoleCode(role.getRoleCode(), role.getTenantCode());
+            List<String> permsList = userMapper.selectPermsByRoleCode(role.getCode(), role.getTenantCode());
             Set<String> perms = permsList.stream()
                     .filter(p -> p != null && !p.isEmpty())
                     .collect(Collectors.toSet());
 
-            String redisKey = ROLE_PREFIX + role.getRoleCode();
+            String redisKey = ROLE_PREFIX + role.getCode();
             redisUtil.deleteKey(redisKey);
             if (!perms.isEmpty()) {
                 redisUtil.addSet(redisKey, perms);

@@ -30,7 +30,7 @@ public class UserVO implements Serializable {
     private Long id;
 
     @Schema(description = "员工编码")
-    private String userCode;
+    private String code;
 
     @JsonSerialize(using = ToStringSerializer.class)
     @Schema(description = "部门ID")
@@ -63,7 +63,7 @@ public class UserVO implements Serializable {
     @Schema(description = "密码", hidden = true)
     private String password;
 
-    @Schema(description = "已分配角色ID列表")
+    @Schema(description = "已分配角色编码列表")
     private List<String> roleCodes;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -32,15 +32,15 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements ID
             return vo;
         }).collect(Collectors.toList());
         // 构建树形
-        return buildTree(allVos, "0");
+        return buildTree(allVos, null);
     }
 
     private List<DeptVO> buildTree(List<DeptVO> all, String parentCode) {
         List<DeptVO> children = new ArrayList<>();
         for (DeptVO vo : all) {
-            String pCode = vo.getParentCode() != null ? vo.getParentCode() : "0";
-            if (pCode.equals(parentCode)) {
-                vo.setChildren(buildTree(all, vo.getDeptCode()));
+            String pCode = vo.getParentCode();
+            if ((pCode == null && parentCode == null) || (pCode != null && pCode.equals(parentCode))) {
+                vo.setChildren(buildTree(all, vo.getCode()));
                 children.add(vo);
             }
         }

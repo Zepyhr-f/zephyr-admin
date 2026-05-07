@@ -29,7 +29,7 @@ public class ZephyrUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userCode) throws UsernameNotFoundException {
         String tenantCode = getTenantCode();
-        User user = userClient.getUserByUserCode(userCode, tenantCode);
+        User user = userClient.getUserByCode(userCode, tenantCode);
         return buildZephyrUser(user, userCode, tenantCode);
     }
 
@@ -63,9 +63,9 @@ public class ZephyrUserDetailsService implements UserDetailsService {
                 .collect(Collectors.toList()));
 
         return ZephyrUser.builder()
-                .userCode(user.getUserCode())
+                .userCode(user.getCode())
                 .tenantCode(user.getTenantCode())
-                .username(user.getUserName())
+                .username(user.getNickName())
                 .realName(user.getRealName())
                 .email(user.getEmail())
                 .avatar(user.getAvatar())

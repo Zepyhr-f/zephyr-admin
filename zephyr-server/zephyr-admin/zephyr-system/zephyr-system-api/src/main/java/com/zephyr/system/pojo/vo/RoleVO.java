@@ -22,8 +22,8 @@ public class RoleVO implements Serializable {
     @Schema(description = "主键ID")
     private Long id;
 
-    @Schema(description = "角色权限字符串")
-    private String roleCode;
+    @Schema(description = "角色编码")
+    private String code;
 
     @Schema(description = "角色名称")
     private String roleName;

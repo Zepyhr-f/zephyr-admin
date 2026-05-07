@@ -1,7 +1,6 @@
 package com.zephyr.system.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
+import com.zephyr.mp.mapper.ZTreeMapper;
 import com.zephyr.system.pojo.entity.Menu;
 
 /**
@@ -10,6 +9,6 @@ import com.zephyr.system.pojo.entity.Menu;
 * @author zephyr
 * @since 2025-09-24
 */
-public interface MenuMapper extends BaseMapper<Menu> {
+public interface MenuMapper extends ZTreeMapper<Menu> {
 
 }

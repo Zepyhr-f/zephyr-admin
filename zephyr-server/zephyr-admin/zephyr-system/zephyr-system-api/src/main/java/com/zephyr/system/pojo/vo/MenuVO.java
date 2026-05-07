@@ -32,10 +32,13 @@ public class MenuVO implements Serializable{
     private Long id;
 
     @Schema(description = "菜单编码")
-    private String menuCode;
+    private String code;
 
     @Schema(description = "父菜单编码")
     private String parentCode;
+
+    @Schema(description = "是否叶子节点 (1=是 0=否)")
+    private Integer leaf;
 
     @Schema(description = "菜单名称")
     private String menuName;

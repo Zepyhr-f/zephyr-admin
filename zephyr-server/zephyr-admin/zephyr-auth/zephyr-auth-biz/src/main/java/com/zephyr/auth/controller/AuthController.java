@@ -182,7 +182,7 @@ public class AuthController {
         try {
             String userCode = jwtUtil.extractUserCode(token);
             String tenantCode = getTenantCode();
-            User user = userClient.getUserByUserCode(userCode, tenantCode);
+            User user = userClient.getUserByCode(userCode, tenantCode);
 
             if (user == null) {
                 return R.fail("用户不存在");
@@ -196,8 +196,8 @@ public class AuthController {
 
             Map<String, Object> userInfo = new LinkedHashMap<>();
             Map<String, Object> userMap = new LinkedHashMap<>();
-            userMap.put("userCode", user.getUserCode());
-            userMap.put("username", user.getUserName());
+            userMap.put("userCode", user.getCode());
+            userMap.put("username", user.getNickName());
             userInfo.put("user", userMap);
             userInfo.put("roles", roleCodes);
             userInfo.put("permissions", perms);

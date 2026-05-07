@@ -21,6 +21,7 @@ public interface UserConvert {
      * User -> UserVO
      */
     @Mappings({
+            @Mapping(source = "nickName", target = "username"),
             @Mapping(target = "deptName", ignore = true),
             @Mapping(target = "roleCodes", ignore = true)
     })

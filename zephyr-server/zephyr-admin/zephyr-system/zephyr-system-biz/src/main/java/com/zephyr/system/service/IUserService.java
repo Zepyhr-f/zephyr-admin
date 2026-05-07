@@ -1,7 +1,6 @@
 package com.zephyr.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.zephyr.system.pojo.entity.Role;
 import com.zephyr.system.pojo.entity.User;
 import com.zephyr.system.pojo.vo.UserVO;
 
@@ -14,7 +13,7 @@ import java.util.List;
  */
 public interface IUserService extends IService<User> {
 
-    User getUserByUserCode(String userCode, String tenantCode);
+    User getUserByCode(String code, String tenantCode);
 
     List<String> getRolesByUserCode(String userCode, String tenantCode);
 
@@ -26,7 +25,7 @@ public interface IUserService extends IService<User> {
      * @param username 用户名（模糊）
      * @param phone    手机号（精确）
      * @param status   状态
-     * @param deptCode 部门Code
+     * @param deptCode 部门编码
      */
     List<UserVO> listWithDept(String username, String phone, Integer status, String deptCode);
 

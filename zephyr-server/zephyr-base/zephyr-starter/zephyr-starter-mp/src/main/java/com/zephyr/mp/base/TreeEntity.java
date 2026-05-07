@@ -18,4 +18,7 @@ public class TreeEntity extends CodeEntity {
     @Schema(description = "父编码", hidden = true)
     private String parentCode;
 
+    @Schema(description = "是否叶子节点 (1=是 0=否)", hidden = true)
+    private Integer leaf;
+
 }
