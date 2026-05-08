@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,13 +24,12 @@ public class JwtTest {
     @Test
     public void tokenTest() {
         ZephyrUser userDetails = ZephyrUser.builder()
-                .username("zephyr")
                 .userCode("U001")
-                .roleCodes(List.of("ROLE_ADMIN"))
+                .tenantCode("000000")
                 .build();
         Map<String, Object> claims = Map.of(
                 "user_code", userDetails.getUserCode(),
-                "role_codes", String.join(",", userDetails.getRoleCodes())
+                "tenant_code", userDetails.getTenantCode()
         );
         String s = jwtUtil.generateToken(claims);
         System.out.println(s);

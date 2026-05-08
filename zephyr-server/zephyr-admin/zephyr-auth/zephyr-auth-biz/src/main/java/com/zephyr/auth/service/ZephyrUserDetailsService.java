@@ -65,13 +65,7 @@ public class ZephyrUserDetailsService implements UserDetailsService {
         return ZephyrUser.builder()
                 .userCode(user.getCode())
                 .tenantCode(user.getTenantCode())
-                .username(user.getNickName())
-                .realName(user.getRealName())
-                .email(user.getEmail())
-                .avatar(user.getAvatar())
                 .password(user.getPassword())
-                .roleCodes(roleCodes)
-                .perms(perms)
                 .authorities(authorities)
                 .enabled(user.getStatus() == null || user.getStatus() == 1)
                 .build();

@@ -6,23 +6,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
- * 用户信息（支持多角色授权）
+ * 认证用户信息
+ * <p>
+ * 仅保留核心认证信息（userCode、tenantCode），不承载业务属性。
+ * 角色、权限、姓名、邮箱等业务数据通过服务层实时查询，避免认证对象臃肿。
  *
  * @author Zephyr
  * @since 2025-09-07
  */
 public class ZephyrUser implements UserDetails, CredentialsContainer {
+
     private final String userCode;
     private final String tenantCode;
-    private final List<String> roleCodes;   // 角色 Code 列表（如 ROLE_ADMIN）
-    private final List<String> perms;       // 权限标识列表（如 sys:user:list）
-    private final String username;
-    private final String realName;
-    private final String email;
-    private final String avatar;
     private String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -34,13 +31,7 @@ public class ZephyrUser implements UserDetails, CredentialsContainer {
     private ZephyrUser(Builder builder) {
         this.userCode = builder.userCode;
         this.tenantCode = builder.tenantCode;
-        this.username = builder.username;
-        this.realName = builder.realName;
-        this.email = builder.email;
-        this.avatar = builder.avatar;
         this.password = builder.password;
-        this.roleCodes = builder.roleCodes != null ? builder.roleCodes : new ArrayList<>();
-        this.perms = builder.perms != null ? builder.perms : new ArrayList<>();
         this.authorities = builder.authorities != null ? builder.authorities : new ArrayList<>();
         this.accountNonExpired = builder.accountNonExpired;
         this.accountNonLocked = builder.accountNonLocked;
@@ -55,14 +46,7 @@ public class ZephyrUser implements UserDetails, CredentialsContainer {
     public static class Builder {
         private String userCode;
         private String tenantCode;
-        private String username;
-        private String realName;
-        private String email;
-        private String avatar;
         private String password;
-        private List<Long> roleIds;
-        private List<String> roleCodes;
-        private List<String> perms;
         private Collection<? extends GrantedAuthority> authorities;
         private boolean accountNonExpired = true;
         private boolean accountNonLocked = true;
@@ -71,14 +55,7 @@ public class ZephyrUser implements UserDetails, CredentialsContainer {
 
         public Builder userCode(String userCode) { this.userCode = userCode; return this; }
         public Builder tenantCode(String tenantCode) { this.tenantCode = tenantCode; return this; }
-        public Builder username(String username) { this.username = username; return this; }
-        public Builder realName(String realName) { this.realName = realName; return this; }
-        public Builder email(String email) { this.email = email; return this; }
-        public Builder avatar(String avatar) { this.avatar = avatar; return this; }
         public Builder password(String password) { this.password = password; return this; }
-        public Builder roleIds(List<Long> roleIds) { this.roleIds = roleIds; return this; }
-        public Builder roleCodes(List<String> roleCodes) { this.roleCodes = roleCodes; return this; }
-        public Builder perms(List<String> perms) { this.perms = perms; return this; }
         public Builder authorities(Collection<? extends GrantedAuthority> authorities) {
             this.authorities = authorities;
             return this;
@@ -98,8 +75,11 @@ public class ZephyrUser implements UserDetails, CredentialsContainer {
     @Override
     public String getPassword() { return password; }
 
+    /**
+     * Spring Security 的 username 直接返回 userCode
+     */
     @Override
-    public String getUsername() { return username; }
+    public String getUsername() { return userCode; }
 
     @Override
     public boolean isAccountNonExpired() { return accountNonExpired; }
@@ -117,17 +97,8 @@ public class ZephyrUser implements UserDetails, CredentialsContainer {
     @Override
     public void eraseCredentials() { this.password = null; }
 
+    // ======== 核心认证字段 ========
     public String getUserCode() { return userCode; }
 
     public String getTenantCode() { return tenantCode; }
-
-    public List<String> getRoleCodes() { return roleCodes; }
-
-    public List<String> getPerms() { return perms; }
-
-    public String getRealName() { return realName; }
-
-    public String getEmail() { return email; }
-
-    public String getAvatar() { return avatar; }
 }
