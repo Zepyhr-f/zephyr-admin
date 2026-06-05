@@ -8,6 +8,6 @@ public class GeneratePasswordKeyTest {
     @Test
     public void testGeneratePasswordKey() {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        System.out.println(encoder.encode("123456"));
+        System.out.println("HASH MATCH: " + encoder.matches("123456", "$2a$10$7JB720yubVSZvUIV7EqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2"));
     }
 }

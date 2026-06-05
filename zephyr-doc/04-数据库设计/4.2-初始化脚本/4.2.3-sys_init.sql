@@ -6,12 +6,12 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- 清空数据
 -- ----------------------------
-DELETE FROM `sys_user_role`;
-DELETE FROM `sys_user_post`;
+DELETE FROM `zephyr_sys_user_role`;
+DELETE FROM `zephyr_sys_user_post`;
 DELETE FROM `zephyr_sys_dict`;
 DELETE FROM `zephyr_sys_user`;
 DELETE FROM `zephyr_sys_dept`;
-DELETE FROM `sys_role`;
+DELETE FROM `zephyr_sys_role`;
 DELETE FROM `zephyr_sys_post`;
 
 -- ----------------------------
@@ -31,7 +31,7 @@ INSERT INTO `zephyr_sys_dict` (`id`, `parent_id`, `code`, `dict_key`, `dict_valu
 -- ----------------------------
 -- 2. 部门数据
 -- ----------------------------
-INSERT INTO `zephyr_sys_dept` (`id`, `dept_code`, `parent_code`, `dept_name`, `full_name`, `order_num`, `status`, `tenant_code`, `create_user`) VALUES
+INSERT INTO `zephyr_sys_dept` (`id`, `code`, `parent_code`, `dept_name`, `full_name`, `order_num`, `status`, `tenant_code`, `create_user`) VALUES
 (1, 'ZEPHYR', '0', '总公司', '科技有限公司总公司', 1, 1, '000000', 1),
 (2, 'RD', 'ZEPHYR', '技术部', '科技有限公司技术部', 1, 1, '000000', 1),
 (3, 'MKT', 'ZEPHYR', '市场部', '科技有限公司市场部', 2, 1, '000000', 1);
@@ -39,7 +39,7 @@ INSERT INTO `zephyr_sys_dept` (`id`, `dept_code`, `parent_code`, `dept_name`, `f
 -- ----------------------------
 -- 3. 角色数据
 -- ----------------------------
-INSERT INTO `sys_role` (`id`, `role_code`, `role_name`, `order_num`, `status`, `tenant_code`, `create_user`) VALUES
+INSERT INTO `zephyr_sys_role` (`id`, `code`, `role_name`, `order_num`, `status`, `tenant_code`, `create_user`) VALUES
 (1, 'admin', '超级管理员', 1, 1, '000000', 1),
 (2, 'manager', '部门经理', 2, 1, '000000', 1),
 (3, 'employee', '普通员工', 3, 1, '000000', 1);
@@ -47,7 +47,7 @@ INSERT INTO `sys_role` (`id`, `role_code`, `role_name`, `order_num`, `status`, `
 -- ----------------------------
 -- 4. 岗位数据
 -- ----------------------------
-INSERT INTO `zephyr_sys_post` (`id`, `post_code`, `post_name`, `order_num`, `status`, `tenant_code`, `create_user`) VALUES
+INSERT INTO `zephyr_sys_post` (`id`, `code`, `post_name`, `order_num`, `status`, `tenant_code`, `create_user`) VALUES
 (1, 'CEO', '首席执行官', 1, 1, '000000', 1),
 (2, 'CTO', '技术总监', 2, 1, '000000', 1),
 (3, 'DEV', '开发工程师', 3, 1, '000000', 1);
@@ -55,7 +55,7 @@ INSERT INTO `zephyr_sys_post` (`id`, `post_code`, `post_name`, `order_num`, `sta
 -- ----------------------------
 -- 5. 用户数据
 -- ----------------------------
-INSERT INTO `zephyr_sys_user` (`id`, `user_code`, `user_name`, `real_name`, `password`, `email`, `phone`, `sex`, `dept_code`, `post_code`, `status`, `tenant_code`, `create_user`) VALUES
+INSERT INTO `zephyr_sys_user` (`id`, `code`, `nick_name`, `real_name`, `password`, `email`, `phone`, `sex`, `dept_code`, `post_code`, `status`, `tenant_code`, `create_user`) VALUES
 (1, 'U10001', 'admin', '张管理员', '$2a$10$7JB720yubVSZvUIV7EqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', 'admin@company.com', '13800138001', 0, 'ZEPHYR', 'CEO', 1, '000000', 1),
 (2, 'U10002', 'zhangsan', '张三', '$2a$10$7JB720yubVSZvUIV7EqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', 'zhangsan@company.com', '13800138002', 0, 'RD', 'CTO', 1, '000000', 1),
 (3, 'U10003', 'lisi', '李四', '$2a$10$7JB720yubVSZvUIV7EqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', 'lisi@company.com', '13800138003', 0, 'RD', 'DEV', 1, '000000', 1);
@@ -63,12 +63,12 @@ INSERT INTO `zephyr_sys_user` (`id`, `user_code`, `user_name`, `real_name`, `pas
 -- ----------------------------
 -- 6. 关联数据
 -- ----------------------------
-INSERT INTO `sys_user_role` (`user_code`, `role_code`) VALUES
+INSERT INTO `zephyr_sys_user_role` (`user_code`, `role_code`) VALUES
 ('U10001', 'admin'),
 ('U10002', 'manager'),
 ('U10003', 'employee');
 
-INSERT INTO `sys_user_post` (`user_code`, `post_code`) VALUES
+INSERT INTO `zephyr_sys_user_post` (`user_code`, `post_code`) VALUES
 ('U10001', 'CEO'),
 ('U10002', 'CTO'),
 ('U10003', 'DEV');

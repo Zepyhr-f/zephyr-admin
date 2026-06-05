@@ -23,13 +23,13 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ===============================
 -- 0. 租户信息
 -- ===============================
-INSERT INTO `zephyr_sys_tenant` (id, tenant_code, tenant_name, status, create_user) VALUES
+INSERT INTO `zephyr_sys_tenant` (id, code, tenant_name, status, create_user) VALUES
 (1, '000000', '默认租户', 1, 1);
 
 -- ===============================
 -- 1. 部门
 -- ===============================
-INSERT INTO `zephyr_sys_dept` (id, dept_code, parent_code, dept_name, full_name, order_num, status, tenant_code, create_user) VALUES
+INSERT INTO `zephyr_sys_dept` (id, code, parent_code, dept_name, full_name, order_num, status, tenant_code, create_user) VALUES
 (100, 'ZEPHYR', '0', 'Zephyr集团', 'Zephyr集团总部', 1, 1, '000000', 1),
 (101, 'ZEPHYR_CEO', 'ZEPHYR', '总经办', 'Zephyr集团总经办', 1, 1, '000000', 1),
 (102, 'ZEPHYR_RD', 'ZEPHYR', '研发部', 'Zephyr集团研发部', 2, 1, '000000', 1);
@@ -38,14 +38,14 @@ INSERT INTO `zephyr_sys_dept` (id, dept_code, parent_code, dept_name, full_name,
 -- 2. 用户
 -- ===============================
 -- 密码均为: 123456 (BCrypt加密)
-INSERT INTO `zephyr_sys_user` (id, user_code, user_name, real_name, password, email, phone, sex, status, dept_code, tenant_code, create_user) VALUES
+INSERT INTO `zephyr_sys_user` (id, code, nick_name, real_name, password, email, phone, sex, status, dept_code, tenant_code, create_user) VALUES
 (1, 'admin', 'admin', '超级管理员', '$2a$10$7JB720yubVSZvUIV7EqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', 'admin@zephyr.com', '15800000000', 0, 1, 'ZEPHYR_CEO', '000000', 1),
 (2, 'ry', 'ry', '若依', '$2a$10$7JB720yubVSZvUIV7EqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', 'ry@zephyr.com', '15800000001', 1, 1, 'ZEPHYR_RD', '000000', 1);
 
 -- ===============================
 -- 3. 角色
 -- ===============================
-INSERT INTO `zephyr_sys_role` (id, role_code, role_name, order_num, status, tenant_code, create_user) VALUES
+INSERT INTO `zephyr_sys_role` (id, code, role_name, order_num, status, tenant_code, create_user) VALUES
 (1, 'admin', '超级管理员', 1, 1, '000000', 1),
 (2, 'common', '普通角色', 2, 1, '000000', 1);
 
@@ -59,7 +59,7 @@ INSERT INTO `zephyr_sys_user_role` (user_code, role_code) VALUES
 -- ===============================
 -- 5. 菜单/权限
 -- ===============================
-INSERT INTO `zephyr_sys_menu` (id, menu_code, parent_code, menu_name, menu_type, path, perms, order_num, status, tenant_code, create_user) VALUES
+INSERT INTO `zephyr_sys_menu` (id, code, parent_code, menu_name, menu_type, path, perms, order_num, status, tenant_code, create_user) VALUES
 (1, 'system', '-1', '系统管理', 'M', 'system', NULL, 1, 1, '000000', 1),
 (2, 'user', 'system', '用户管理', 'C', 'user', 'sys:user:list', 1, 1, '000000', 1),
 (3, 'role', 'system', '角色管理', 'C', 'role', 'sys:role:list', 2, 1, '000000', 1),

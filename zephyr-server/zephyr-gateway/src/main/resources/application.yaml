@@ -8,11 +8,11 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8849
+        server-addr: 81.70.160.181:8849
         username: nacos
         password: nacos
       config:
-        server-addr: localhost:8849
+        server-addr: 81.70.160.181:8849
         username: nacos
         password: nacos
         file-extension: yml,yaml
@@ -22,14 +22,14 @@ spring:
     gateway:
       routes:
         - id: auth-service
-          uri: lb://zephyr-system
+          uri: lb://zephyr-common
           predicates:
             - Path=/zephyr-auth/**
           filters:
             - StripPrefix=1
 
         - id: system-service
-          uri: lb://zephyr-system
+          uri: lb://zephyr-common
           predicates:
             - Path=/zephyr-system/**
           filters:
@@ -43,7 +43,7 @@ spring:
             - StripPrefix=1
 
         - id: ops-service
-          uri: lb://zephyr-system
+          uri: lb://zephyr-common
           predicates:
             - Path=/zephyr-ops/**
           filters:
@@ -90,7 +90,7 @@ knife4j:
     routes:
       - name: 系统管理
         url: /zephyr-system/v3/api-docs
-        service-name: zephyr-system
+        service-name: zephyr-common
       - name: 代码生成
         url: /zephyr-generator/v3/api-docs
         service-name: zephyr-generator

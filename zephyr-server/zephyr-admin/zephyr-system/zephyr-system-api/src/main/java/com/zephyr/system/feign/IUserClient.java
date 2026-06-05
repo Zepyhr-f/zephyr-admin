@@ -15,11 +15,11 @@ public interface IUserClient {
     String GET_PERMS_BY_USER_CODE = API_PREFIX + "/role/getPerms";
 
     @GetMapping(GET_USER_BY_CODE)
-    User getUserByCode(@RequestParam("code") String code, @RequestParam("tenantCode")String tenantCode);
+    User getUserByCode(@RequestParam("code") String code, @RequestParam(value = "tenantCode", required = false) String tenantCode);
 
     @GetMapping(GET_ROLES_BY_USER_CODE)
-    List<String> getRolesByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode);
+    List<String> getRolesByUserCode(@RequestParam("userCode") String userCode, @RequestParam(value = "tenantCode", required = false) String tenantCode);
 
     @GetMapping(GET_PERMS_BY_USER_CODE)
-    List<String> getPermsByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode);
+    List<String> getPermsByUserCode(@RequestParam("userCode") String userCode, @RequestParam(value = "tenantCode", required = false) String tenantCode);
 }

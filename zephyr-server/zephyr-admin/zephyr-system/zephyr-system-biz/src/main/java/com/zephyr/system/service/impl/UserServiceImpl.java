@@ -34,18 +34,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public User getUserByCode(String code, String tenantCode) {
+        tenantCode = (tenantCode == null || tenantCode.trim().isEmpty()) ? "000000" : tenantCode;
         return baseMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getCode, code)
                 .eq(User::getTenantCode, tenantCode));
     }
 
     public List<String> getRolesByUserCode(String userCode, String tenantCode){
+        tenantCode = (tenantCode == null || tenantCode.trim().isEmpty()) ? "000000" : tenantCode;
         List<Role> roles = baseMapper.selectRolesByUserCode(userCode, tenantCode);
         return roles.stream().map(Role::getCode).collect(Collectors.toList());
     }
 
     @Override
     public List<String> getPermsByUserCode(String userCode, String tenantCode) {
+        tenantCode = (tenantCode == null || tenantCode.trim().isEmpty()) ? "000000" : tenantCode;
         return baseMapper.selectPermsByUserCode(userCode, tenantCode);
     }
 

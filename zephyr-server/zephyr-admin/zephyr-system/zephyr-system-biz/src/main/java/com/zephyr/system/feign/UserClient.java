@@ -23,19 +23,19 @@ public class UserClient implements IUserClient {
 
     @Override
     @GetMapping(IUserClient.GET_USER_BY_CODE)
-    public User getUserByCode(@RequestParam("code") String code, @RequestParam("tenantCode")String tenantCode) {
+    public User getUserByCode(@RequestParam("code") String code, @RequestParam(value = "tenantCode", required = false) String tenantCode) {
         return userService.getUserByCode(code, tenantCode);
     }
 
     @Override
     @GetMapping(IUserClient.GET_ROLES_BY_USER_CODE)
-    public List<String> getRolesByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode) {
+    public List<String> getRolesByUserCode(@RequestParam("userCode") String userCode, @RequestParam(value = "tenantCode", required = false) String tenantCode) {
         return userService.getRolesByUserCode(userCode, tenantCode);
     }
 
     @Override
     @GetMapping(IUserClient.GET_PERMS_BY_USER_CODE)
-    public List<String> getPermsByUserCode(@RequestParam("userCode") String userCode, @RequestParam("tenantCode")String tenantCode) {
+    public List<String> getPermsByUserCode(@RequestParam("userCode") String userCode, @RequestParam(value = "tenantCode", required = false) String tenantCode) {
         return userService.getPermsByUserCode(userCode, tenantCode);
     }
 }
