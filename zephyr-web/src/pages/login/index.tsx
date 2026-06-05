@@ -1,14 +1,14 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, Input, Checkbox, message } from 'antd';
+import { Input, Checkbox, message } from 'antd';
 import { useNavigate, useLocation } from 'react-router';
-import { useAuthStore } from "@/store/use-auth-store";
-import client from "@/api/client";
-import { GLOBAL_CONFIG } from "@/global-config.ts";
-import Logo from "@/components/logo";
+import axios from 'axios';
+import { useAuthStore } from '@/store/use-auth-store';
+import client from '@/api/client';
+import { GLOBAL_CONFIG } from '@/global-config.ts';
+import './login.css';
 
-// 1. 扩展 Schema，加入记住我功能
 const loginSchema = z.object({
     username: z.string().min(2, '用户名至少2位'),
     password: z.string().min(6, '密码至少6位'),
@@ -17,120 +17,34 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>;
 
-// 定义接口，移除 any
 interface LoginResponse {
     token: string;
 }
 
-// 2. 将静态数据提取到组件外部，避免重复渲染时重新分配内存
-const BARS_DATA = [
-    { height: "60%", delay: 0 },
-    { height: "80%", delay: 0.1 },
-    { height: "45%", delay: 0.2 },
-    { height: "90%", delay: 0.3 },
-    { height: "70%", delay: 0.4 },
-    { height: "55%", delay: 0.5 },
-    { height: "85%", delay: 0.6 },
-];
-
-const POINTS_DATA = [
-    { left: "10%", top: "20%", size: 6, delay: 0 },
-    { left: "25%", top: "60%", size: 4, delay: 0.2 },
-    { left: "40%", top: "35%", size: 8, delay: 0.4 },
-    { left: "60%", top: "70%", size: 5, delay: 0.6 },
-    { left: "75%", top: "25%", size: 6, delay: 0.8 },
-    { left: "85%", top: "55%", size: 4, delay: 1 },
-];
-
-// 装饰性柱状图组件
-function BarChart({ className = "" }: { className?: string }) {
+function BoltIcon() {
     return (
-        <div className={`flex items-end justify-center gap-2 ${className}`}>
-            {BARS_DATA.map((bar, i) => (
-                <div
-                    key={i}
-                    className="w-3 rounded-sm animate-pulse"
-                    style={{
-                        height: bar.height,
-                        background: `linear-gradient(180deg, rgba(56, 189, 248, 0.8) 0%, rgba(56, 189, 248, 0.2) 100%)`,
-                        animationDelay: `${bar.delay}s`,
-                        boxShadow: "0 0 20px rgba(56, 189, 248, 0.3)",
-                    }}
-                />
-            ))}
-        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
     );
 }
 
-// 装饰性圆形元素
-function CircleOrb({ className = "" }: { className?: string }) {
-    return <div className={`absolute rounded-full blur-3xl ${className}`} />;
-}
-
-// 装饰性网格线
-function GridPattern() {
+function GoogleIcon() {
     return (
-        <div
-            className="absolute inset-0 opacity-10"
-            style={{
-                backgroundImage: `
-                    linear-gradient(rgba(56, 189, 248, 0.3) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(56, 189, 248, 0.3) 1px, transparent 1px)
-                `,
-                backgroundSize: '60px 60px',
-            }}
-        />
+        <svg viewBox="0 0 24 24" fill="none">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+        </svg>
     );
 }
 
-// 数据点装饰
-function DataPoints() {
+function WechatIcon() {
     return (
-        <>
-            {POINTS_DATA.map((point, i) => (
-                <div
-                    key={i}
-                    className="absolute rounded-full bg-sky-400 animate-pulse"
-                    style={{
-                        left: point.left,
-                        top: point.top,
-                        width: point.size,
-                        height: point.size,
-                        animationDelay: `${point.delay}s`,
-                        boxShadow: "0 0 10px rgba(56, 189, 248, 0.6)",
-                    }}
-                />
-            ))}
-        </>
-    );
-}
-
-// 装饰性折线
-function TrendLine() {
-    return (
-        <svg
-            className="absolute inset-0 w-full h-full opacity-30 pointer-events-none"
-            viewBox="0 0 400 200"
-            preserveAspectRatio="none"
-        >
-            <defs>
-                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="rgba(56, 189, 248, 0)" />
-                    <stop offset="50%" stopColor="rgba(56, 189, 248, 1)" />
-                    <stop offset="100%" stopColor="rgba(56, 189, 248, 0)" />
-                </linearGradient>
-            </defs>
-            <path
-                d="M 0 150 Q 80 100, 120 120 T 200 80 T 280 100 T 360 60 L 400 40 L 400 200 L 0 200 Z"
-                fill="url(#lineGradient)"
-                className="animate-pulse"
-            />
-            <path
-                d="M 0 150 Q 80 100, 120 120 T 200 80 T 280 100 T 360 60"
-                fill="none"
-                stroke="rgba(56, 189, 248, 0.8)"
-                strokeWidth="2"
-            />
+        <svg viewBox="0 0 24 24" fill="#07C160">
+            <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c4.801 0 8.692-3.287 8.692-7.342 0-4.054-3.89-7.34-8.692-7.34zm-2.3 6.442c.67 0 1.212.543 1.212 1.214 0 .67-.542 1.213-1.211 1.213-.67 0-1.213-.542-1.213-1.213 0-.671.543-1.214 1.213-1.214zm5.596 0c.67 0 1.213.543 1.213 1.214 0 .67-.542 1.213-1.213 1.213-.67 0-1.212-.542-1.212-1.213 0-.671.542-1.214 1.212-1.214z" />
+            <path d="M23.705 14.543c0-3.578-3.124-6.48-7.074-6.674.255.553.398 1.17.398 1.824 0 2.505-2.185 4.537-4.88 4.537-.504 0-.99-.073-1.45-.203 1.148 2.573 3.922 4.39 7.136 4.39.65 0 1.28-.088 1.882-.25l1.47.86a.26.26 0 0 0 .13.034c.128 0 .232-.104.232-.232a.55.55 0 0 0-.037-.17l-.3-1.14a.46.46 0 0 1 .166-.51c1.52-1.1 2.55-2.7 2.55-4.52z" />
         </svg>
     );
 }
@@ -139,28 +53,40 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const setToken = useAuthStore((state) => state.setToken);
+    const setUserInfo = useAuthStore((state) => state.setUserInfo);
+    const setMenus = useAuthStore((state) => state.setMenus);
 
-    // 更安全的路由解构
     const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
     const { control, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
         resolver: zodResolver(loginSchema),
-        defaultValues: {
-            username: '',
-            password: '',
-            remember: false,
-        }
+        defaultValues: { username: '', password: '', remember: false },
     });
 
     const onSubmit = async (data: LoginForm) => {
         try {
-            // 解构并排除 remember，后端可能不需要它
             const { remember, ...loginPayload } = data;
-
             const res = await client.post<any, LoginResponse>('zephyr-auth/login', loginPayload);
-            setToken(res.token);
+            const token = res.token;
 
-            // 如果用户勾选了记住我，可在此处处理持久化逻辑，如写入 localStorage 标记
+            // 1. 保存 token，设置 isAuthenticated = true
+            setToken(token);
+
+            // 2. 立即拉取用户信息 & 菜单，确保 AuthGuard 放行
+            const headers = { Authorization: `Bearer ${token}` };
+            const baseURL = import.meta.env.VITE_API_BASE_URL;
+            const [infoRes, menuRes] = await Promise.all([
+                axios.get(`${baseURL}zephyr-auth/info`, { headers, withCredentials: true }),
+                axios.get(`${baseURL}zephyr-system/menu/tree`, { headers, withCredentials: true }),
+            ]);
+            const infoData = infoRes.data?.data;
+            const menuData = menuRes.data?.data;
+            if (infoData) {
+                setUserInfo(infoData.user, infoData.roles, infoData.permissions);
+            }
+            setMenus(menuData || []);
+
+            // 3. 持久化"记住我"
             if (remember) {
                 localStorage.setItem('remember_user', data.username);
             } else {
@@ -170,162 +96,157 @@ export default function LoginPage() {
             message.success('登录成功！');
             navigate(from, { replace: true });
         } catch (error) {
-            // 拦截器已经处理了大部分错误提示，react-hook-form 会自动解除 isSubmitting 状态
-            console.error("Login failed:", error);
+            console.error('Login failed:', error);
+            message.error('登录失败，请检查用户名或密码');
         }
     };
 
-    // 统一定义输入框的基础暗黑系样式
-    const inputClasses = "h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-sky-400 focus:border-sky-400 focus:bg-white/10 rounded-xl transition-colors";
 
     return (
-        <div className="relative grid grid-cols-1 lg:grid-cols-2 min-h-svh bg-[#0a0f1a] overflow-hidden">
-            {/* 左侧装饰区域 - 商务数据科技风背景 */}
-            <div className="relative hidden lg:flex flex-col items-center justify-center overflow-hidden">
-                {/* 背景渐变 */}
-                <div className="absolute inset-0 bg-gradient-to-br from-sky-900/40 via-transparent to-cyan-900/30" />
+        <div className="login-page">
+            {/* Animated background orbs */}
+            <div className="login-orb login-orb-1" />
+            <div className="login-orb login-orb-2" />
+            <div className="login-orb login-orb-3" />
+            <div className="login-orb login-orb-4" />
 
-                {/* 模糊圆形装饰 */}
-                <CircleOrb className="w-[500px] h-[500px] -top-48 -left-48 bg-gradient-to-br from-sky-500/30 to-cyan-400/20" />
-                <CircleOrb className="w-[400px] h-[400px] top-1/2 -right-32 bg-gradient-to-br from-cyan-500/25 to-sky-400/15" />
-                <CircleOrb className="w-[300px] h-[300px] -bottom-32 left-1/4 bg-gradient-to-br from-blue-500/20 to-sky-300/10" />
-
-                {/* 背景元素 */}
-                <GridPattern />
-                <DataPoints />
-                <TrendLine />
-
-                {/* 柱状图 */}
-                <div className="absolute bottom-20 left-10 right-10">
-                    <BarChart />
-                </div>
-
-                {/* 底部装饰遮罩 */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a0f1a] to-transparent" />
-
-                {/* Logo 和标题 */}
-                <div className="relative z-10 flex flex-col items-center gap-4 animate-fade-in">
-                    <div className="flex items-center gap-3">
-                        <Logo size={48} />
-                        <span className="text-3xl font-semibold text-white/90 tracking-wide">
-                            {GLOBAL_CONFIG.appName}
-                        </span>
+            <div className="login-card">
+                {/* ── Left: Brand Panel ── */}
+                <div className="login-brand">
+                    <div className="login-logo">
+                        <div className="login-logo-icon">
+                            <BoltIcon />
+                        </div>
+                        <span className="login-logo-name">{GLOBAL_CONFIG.appName}</span>
                     </div>
-                    <p className="text-sky-400/70 text-sm tracking-widest uppercase">
-                        Business Intelligence Platform
-                    </p>
+
+                    <div className="login-brand-body">
+                        <p className="login-brand-tagline">数据管理平台</p>
+                        <h1 className="login-brand-title">
+                            掌控您的<br />
+                            <span>核心数据</span>
+                        </h1>
+                        <p className="login-brand-desc">
+                            为现代团队打造的企业级管理平台，安全、极速、赏心悦目。
+                        </p>
+                        <div className="login-brand-stats">
+                            <div className="login-stat">
+                                <div className="login-stat-value">2.4k+</div>
+                                <div className="login-stat-label">活跃用户</div>
+                            </div>
+                            <div className="login-stat">
+                                <div className="login-stat-value">99.9%</div>
+                                <div className="login-stat-label">系统稳定性</div>
+                            </div>
+                            <div className="login-stat">
+                                <div className="login-stat-value">168ms</div>
+                                <div className="login-stat-label">平均响应</div>
+                            </div>
+                            <div className="login-stat">
+                                <div className="login-stat-value">256位</div>
+                                <div className="login-stat-label">数据加密</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="login-brand-footer">
+                        <div className="login-user-avatars">
+                            <div className="login-user-count">+99</div>
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jocelyn" alt="user" />
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" alt="user" />
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="user" />
+                        </div>
+                        <p>全球数千名开发者的共同选择</p>
+                    </div>
                 </div>
-            </div>
 
-            {/* 右侧登录表单区域 */}
-            <div className="relative flex flex-col items-center justify-center px-6 md:px-16 py-12">
-                {/* 背景虚化效果 */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1a]/50 via-transparent to-sky-900/20 lg:hidden" />
-                <CircleOrb className="w-[300px] h-[300px] top-0 right-0 bg-sky-500/10 lg:hidden" />
-
-                {/* 移动端 Logo */}
-                <div className="lg:hidden relative z-10 flex flex-col items-center gap-3 mb-8">
-                    <Logo size={40} />
-                    <span className="text-xl font-medium text-white/80">
-                        {GLOBAL_CONFIG.appName}
-                    </span>
-                </div>
-
-                {/* 登录卡片 */}
-                <div className="relative z-10 w-full max-w-md">
-                    <div className="absolute inset-0 bg-gradient-to-b from-sky-500/10 to-cyan-500/5 rounded-3xl blur-xl" />
-                    <div className="relative bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
-                        {/* 标题 */}
-                        <div className="mb-8 text-center">
-                            <h2 className="text-2xl font-semibold text-white mb-2">欢迎回来</h2>
-                            <p className="text-white/50 text-sm">请登录您的账户以继续</p>
+                {/* ── Right: Form Panel ── */}
+                <div className="login-form-panel">
+                    <div className="login-form-inner">
+                        <div className="login-form-header">
+                            <h2 className="login-form-title">欢迎回来</h2>
+                            <p className="login-form-subtitle">请登录您的账户以继续使用</p>
                         </div>
 
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                            <div>
-                                <label className="block text-sm text-white/70 mb-2">用户名</label>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <div className="login-field">
+                                <label className="login-label" htmlFor="login-username">用户名</label>
                                 <Controller
                                     name="username"
                                     control={control}
                                     render={({ field }) => (
                                         <Input
+                                            id="login-username"
                                             {...field}
                                             placeholder="请输入用户名"
-                                            className={inputClasses}
                                             autoComplete="username"
                                         />
                                     )}
                                 />
                                 {errors.username && (
-                                    <p className="mt-1 text-sm text-red-400 animate-fade-in">{errors.username.message}</p>
+                                    <p className="login-field-error">{errors.username.message}</p>
                                 )}
                             </div>
 
-                            <div>
-                                <label className="block text-sm text-white/70 mb-2">密码</label>
+                            <div className="login-field">
+                                <label className="login-label" htmlFor="login-password">密码</label>
                                 <Controller
                                     name="password"
                                     control={control}
                                     render={({ field }) => (
                                         <Input.Password
+                                            id="login-password"
                                             {...field}
                                             placeholder="请输入密码"
-                                            className={`!bg-white/5 !border-white/10 hover:!border-sky-400 focus-within:!border-sky-400 focus-within:!bg-white/10 rounded-xl h-12 [&>input]:!bg-transparent [&>input]:!text-white [&>input::placeholder]:!text-white/30 [&_.ant-input-password-icon]:!text-white/50 hover:[&_.ant-input-password-icon]:!text-white transition-colors`}
                                             autoComplete="current-password"
                                         />
                                     )}
                                 />
                                 {errors.password && (
-                                    <p className="mt-1 text-sm text-red-400 animate-fade-in">{errors.password.message}</p>
+                                    <p className="login-field-error">{errors.password.message}</p>
                                 )}
                             </div>
 
-                            <div className="flex items-center justify-between text-sm">
+                            <div className="login-field-row">
                                 <Controller
                                     name="remember"
                                     control={control}
                                     render={({ field }) => (
-                                        <Checkbox
-                                            checked={field.value}
-                                            onChange={field.onChange}
-                                            className="text-white/50 hover:text-white/70 [&_.ant-checkbox-inner]:bg-white/5 [&_.ant-checkbox-inner]:border-white/20"
-                                        >
+                                        <Checkbox checked={field.value} onChange={field.onChange}>
                                             记住我
                                         </Checkbox>
                                     )}
                                 />
-                                <a href="#" className="text-sky-400 hover:text-sky-300 transition-colors">
-                                    忘记密码？
-                                </a>
+                                <a href="#" className="login-forgot">忘记密码？</a>
                             </div>
 
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                loading={isSubmitting}
-                                className="w-full h-12 mt-2 !bg-gradient-to-r from-sky-500 to-cyan-400 !border-none !text-white font-medium rounded-xl shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 hover:!from-sky-400 hover:!to-cyan-300 transition-all duration-300"
+                            <button
+                                type="submit"
+                                className="login-btn-primary"
+                                disabled={isSubmitting}
                             >
-                                登 录
-                            </Button>
+                                {isSubmitting ? '登录中...' : '登 录'}
+                            </button>
                         </form>
 
-                        {/* 底部提示 */}
-                        <p className="mt-6 text-center text-white/30 text-xs">
-                            登录即表示您同意我们的服务条款和隐私政策
-                        </p>
+                        <div className="login-divider">
+                            <div className="login-divider-line" />
+                            <span className="login-divider-text">其他登录方式</span>
+                            <div className="login-divider-line" />
+                        </div>
+
+                        <div className="login-social-grid">
+                            <button type="button" className="login-social-btn">
+                                <GoogleIcon />
+                                Google
+                            </button>
+                            <button type="button" className="login-social-btn">
+                                <WechatIcon />
+                                微信
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                {/* 底部版权 */}
-                <p className="relative z-10 mt-8 text-white/30 text-xs">
-                    © {new Date().getFullYear()} {GLOBAL_CONFIG.appName}. All rights reserved.
-                </p>
-            </div>
-
-            {/* 全局装饰 - 边角虚化 */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-sky-500/20 to-transparent blur-3xl" />
-                <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-cyan-500/20 to-transparent blur-3xl" />
             </div>
         </div>
     );
