@@ -154,3 +154,43 @@ code, kbd, samp, pre {
   opacity: 0;
   transition: opacity 200ms ease;
 }
+
+/* ===== 6. Zephyr Design Tokens ===== */
+:root {
+  color-scheme: light;
+  --z-primary: #1E40AF;
+  --z-accent: #D97706;
+  --z-bg: #F8FAFC;
+  --z-surface: #FFFFFF;
+  --z-text: #0F172A;
+  --z-text-muted: #475569;
+  --z-border: #E2E8F0;
+}
+
+.z-app {
+  height: 100vh;
+}
+
+.z-page {
+  padding: 16px 16px 24px;
+}
+
+.z-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.z-page__title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.z-page__desc {
+  margin: 6px 0 0;
+  color: var(--z-text-muted);
+  font-size: 12px;
+}

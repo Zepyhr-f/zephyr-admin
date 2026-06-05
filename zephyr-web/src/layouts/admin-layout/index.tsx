@@ -1,236 +1,218 @@
-import { useState } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router";
+import { useMemo, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import {
+  Breadcrumb,
+  Dropdown,
   Layout,
   Menu,
+  Space,
+  Typography,
   Button,
-  Avatar,
-  Dropdown,
-  Badge,
-  Breadcrumb,
 } from "antd";
+import type { MenuProps } from "antd";
 import {
+  LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  HomeOutlined,
-  DashboardOutlined,
-  SettingOutlined,
-  UserOutlined,
-  LogoutOutlined,
-  BellOutlined,
   MoonOutlined,
   SunOutlined,
-  FolderOutlined,
-  FileOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
-import { useAuthStore, type MenuItem } from "@/store/use-auth-store";
+import { useAuthStore } from "@/store/use-auth-store";
 import { useThemeStore } from "@/store/use-theme-store";
-import Logo from "@/components/logo";
-import { GLOBAL_CONFIG } from "@/global-config";
+import { routes, type AppRoute } from "@/routes/route-config";
 import client from "@/api/client";
 
 const { Header, Sider, Content } = Layout;
 
-// 图标映射表（简化版，可根据需要扩展）
-const iconMap: Record<string, React.ReactNode> = {
-  home: <HomeOutlined />,
-  dashboard: <DashboardOutlined />,
-  setting: <SettingOutlined />,
-  user: <UserOutlined />,
-  folder: <FolderOutlined />,
-  file: <FileOutlined />,
-};
+/* ── helpers ─────────────────────────────────────────────── */
 
-function getIcon(icon?: string): React.ReactNode {
-  if (!icon) return null;
-  return iconMap[icon] || <FolderOutlined />;
-}
-
-// 递归转换后端菜单为 Ant Design Menu 格式
-function convertMenus(menus?: MenuItem[], parentPath = ""): any[] {
-  if (!menus) return [];
-  return menus.map((menu) => {
-    const fullPath = parentPath + (menu.path.startsWith("/") ? menu.path : `/${menu.path}`);
-    const item: any = {
-      key: fullPath,
-      icon: getIcon(menu.meta?.icon),
-      label: menu.meta?.title || menu.name || menu.path,
-    };
-    if (menu.children && menu.children.length > 0) {
-      item.children = convertMenus(menu.children, fullPath);
-    }
-    return item;
-  });
-}
-
-function breadcrumbFromPath(pathname: string, menus?: MenuItem[]): any[] {
-  if (pathname === "/") return [{ title: "首页" }];
-  if (pathname === "/dashboard") return [{ title: "数据看板" }];
-
-  // 尝试从菜单中匹配
-  if (menus) {
-    for (const menu of menus) {
-      const parentTitle = menu.meta?.title || menu.name;
-      if (menu.children) {
-        for (const child of menu.children) {
-          const childPath = (menu.path + (child.path.startsWith("/") ? child.path : `/${child.path}`)).replace(/\/+/g, "/");
-          if (pathname === childPath || pathname.startsWith(childPath + "/")) {
-            return [
-              { title: parentTitle || "系统管理" },
-              { title: child.meta?.title || child.name || child.path },
-            ];
-          }
-        }
-      }
-      if (pathname === menu.path || pathname.startsWith(menu.path + "/")) {
-        return [{ title: parentTitle || menu.path }];
-      }
-    }
+function flattenRoutes(rs: AppRoute[]): AppRoute[] {
+  const out: AppRoute[] = [];
+  for (const r of rs) {
+    out.push(r);
+    if (r.children) out.push(...flattenRoutes(r.children));
   }
-
-  return [{ title: "首页" }];
+  return out;
 }
+
+function buildMenuItems(rs: AppRoute[]): MenuProps["items"] {
+  return rs
+    .filter((r) => r.children?.length || r.element)
+    .map((r) => {
+      if (r.children?.length) {
+        return {
+          key: r.path,
+          icon: r.icon,
+          label: r.label,
+          children: r.children.map((c) => ({
+            key: c.path,
+            icon: c.icon,
+            label: c.label,
+          })),
+        };
+      }
+      return { key: r.path, icon: r.icon, label: r.label };
+    });
+}
+
+function calcOpenKeys(pathname: string) {
+  const seg = pathname.split("/").filter(Boolean)[0];
+  return seg ? [`/${seg}`] : [];
+}
+
+/* ── component ───────────────────────────────────────────── */
 
 export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
-  const { logout, user, menus } = useAuthStore();
+  const navigate = useNavigate();
+  const { logout, user } = useAuthStore();
   const { isDark, toggleTheme } = useThemeStore();
 
-  const menuItems = [
-    {
-      key: "/",
-      icon: <HomeOutlined />,
-      label: "首页",
-    },
-    {
-      key: "/dashboard",
-      icon: <DashboardOutlined />,
-      label: "数据看板",
-    },
-    ...convertMenus(menus),
-  ];
+  const all = useMemo(() => flattenRoutes(routes), []);
+  const menuItems = useMemo(() => buildMenuItems(routes), []);
 
-  const userMenuItems = [
-    {
-      key: "profile",
-      icon: <UserOutlined />,
-      label: "个人中心",
-    },
-    {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "账号设置",
-    },
-    { type: "divider" as const },
-    {
-      key: "logout",
-      icon: <LogoutOutlined />,
-      label: "退出登录",
-      danger: true,
-    },
-  ];
+  const selectedKeys = useMemo(
+    () => [location.pathname === "/" ? "/" : location.pathname],
+    [location.pathname]
+  );
+
+  const openKeys = useMemo(
+    () => calcOpenKeys(location.pathname),
+    [location.pathname]
+  );
+
+  const breadcrumbItems = useMemo(() => {
+    const hit = all.find(
+      (r) => r.path === location.pathname || (location.pathname === "/" && r.path === "/")
+    );
+    if (!hit) return [{ title: "Zephyr" }];
+    const seg = location.pathname.split("/").filter(Boolean)[0];
+    const group = seg ? routes.find((r) => r.path === `/${seg}`) : undefined;
+    const list: { title: React.ReactNode }[] = [{ title: <Link to="/">概览</Link> }];
+    if (group && group.path !== "/") list.push({ title: group.label });
+    if (hit.path !== "/" && hit.label) list.push({ title: hit.label });
+    return list;
+  }, [all, location.pathname]);
 
   const handleLogout = async () => {
     try {
-      await client.post('zephyr-auth/logout');
-    } catch (e) {
-      console.error('Logout request failed:', e);
+      await client.post("zephyr-auth/logout");
+    } catch {
+      // ignore
     } finally {
       logout();
-      window.location.href = '/login';
+      window.location.href = "/login";
     }
   };
 
+  const userMenu: MenuProps = {
+    items: [
+      { key: "profile", label: "个人信息", icon: <UserOutlined /> },
+      { type: "divider" },
+      { key: "logout",  label: "退出登录", icon: <LogoutOutlined />, danger: true },
+    ],
+    onClick: ({ key }) => {
+      if (key === "logout") handleLogout();
+    },
+  };
+
   return (
-    <Layout className="min-h-screen">
-      {/* 侧边栏 */}
+    <Layout className="z-app">
+      {/* ── 侧边栏 ─────────────────────────────── */}
       <Sider
-        trigger={null}
+        width={260}
         collapsible
         collapsed={collapsed}
-        theme="light"
-        className="!bg-[var(--color-bg-container)] border-r border-[var(--color-border-secondary)]"
+        trigger={null}
         style={{
-          boxShadow: "var(--shadow-sidebar)",
+          borderRight: "1px solid var(--z-border)",
+          background: "var(--z-surface)",
         }}
       >
-        <div className="h-16 flex items-center justify-center border-b border-[var(--color-border-secondary)]">
-          <div className="flex items-center gap-2">
-            <Logo size={collapsed ? 32 : 28} />
-            {!collapsed && (
-              <span className="text-lg font-semibold text-[var(--color-text-primary)] truncate">
-                {GLOBAL_CONFIG.appName}
-              </span>
-            )}
-          </div>
+        {/* Logo */}
+        <div style={{ padding: 16, display: "flex", alignItems: "center", gap: 10 }}>
+          <div
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 10,
+              background: "linear-gradient(135deg, var(--z-primary), #3B82F6)",
+              boxShadow: "0 8px 18px rgba(30,64,175,.18)",
+              flexShrink: 0,
+            }}
+          />
+          {!collapsed && (
+            <div style={{ minWidth: 0 }}>
+              <Typography.Text strong style={{ display: "block" }}>
+                Zephyr Admin
+              </Typography.Text>
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                后台管理平台
+              </Typography.Text>
+            </div>
+          )}
         </div>
+
+        {/* 菜单 */}
         <Menu
           mode="inline"
-          selectedKeys={[location.pathname]}
-          defaultOpenKeys={menus?.map((m) => m.path) || ["/system"]}
           items={menuItems}
-          onClick={({ key }) => navigate(key)}
-          className="!border-r-0"
+          selectedKeys={selectedKeys}
+          defaultOpenKeys={openKeys}
+          onClick={({ key }) => navigate(String(key))}
+          style={{
+            background: "transparent",
+            borderInlineEnd: "none",
+            padding: "0 8px 12px",
+          }}
         />
       </Sider>
 
       <Layout>
-        {/* 顶栏 */}
+        {/* ── 顶栏 ───────────────────────────────── */}
         <Header
-          className="!bg-[var(--color-bg-container)] !px-6 flex items-center justify-between border-b border-[var(--color-border-secondary)]"
-          style={{ height: 64 }}
+          style={{
+            padding: "0 16px",
+            background: "var(--z-surface)",
+            borderBottom: "1px solid var(--z-border)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
-          <div className="flex items-center gap-4">
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              className="text-[var(--color-text-secondary)]"
-            />
-            <Breadcrumb
-              items={breadcrumbFromPath(location.pathname, menus)}
-              className="hidden sm:flex"
-            />
-          </div>
+          <Space size={12}>
+            <Typography.Link
+              onClick={() => setCollapsed((v) => !v)}
+              style={{ fontSize: 16 }}
+              aria-label={collapsed ? "展开侧边栏" : "收起侧边栏"}
+            >
+              {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            </Typography.Link>
+            <Breadcrumb items={breadcrumbItems} />
+          </Space>
 
-          <div className="flex items-center gap-3">
+          <Space size={8}>
             <Button
               type="text"
               icon={isDark ? <SunOutlined /> : <MoonOutlined />}
               onClick={toggleTheme}
-              className="text-[var(--color-text-secondary)]"
               title={isDark ? "切换亮色" : "切换暗色"}
             />
-            <Badge count={5} size="small">
-              <Button
-                type="text"
-                icon={<BellOutlined />}
-                className="text-[var(--color-text-secondary)]"
-              />
-            </Badge>
-            <Dropdown
-              menu={{
-                items: userMenuItems,
-                onClick: ({ key }) => {
-                  if (key === "logout") handleLogout();
-                },
-              }}
-              placement="bottomRight"
-            >
-              <div className="flex items-center gap-2 cursor-pointer hover:bg-[var(--color-bg-layout)] px-2 py-1 rounded-lg transition-colors">
-                <Avatar size="small" icon={<UserOutlined />} />
-                <span className="text-sm text-[var(--color-text-primary)] hidden md:inline">
-                  {user?.username || "Admin"}
-                </span>
-              </div>
+            <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
+              <Typography.Link>
+                <Space>
+                  <UserOutlined />
+                  {user?.username || "admin"}
+                </Space>
+              </Typography.Link>
             </Dropdown>
-          </div>
+          </Space>
         </Header>
 
-        {/* 内容区 */}
-        <Content className="m-4 p-6 bg-[var(--color-bg-container)] rounded-xl shadow-[var(--shadow-card)] min-h-[calc(100vh-112px)]">
+        {/* ── 内容区 ─────────────────────────────── */}
+        <Content style={{ overflow: "auto" }}>
           <Outlet />
         </Content>
       </Layout>
