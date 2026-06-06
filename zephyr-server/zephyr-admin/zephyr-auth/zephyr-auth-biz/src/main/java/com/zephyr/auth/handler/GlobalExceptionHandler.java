@@ -40,6 +40,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+        ex.printStackTrace(); // 打印完整堆栈，方便调试排错
         Map<String, String> response = new HashMap<>();
         response.put("error", "服务器错误");
         response.put("message", ex.getMessage());
