@@ -21,6 +21,7 @@ import {
   SunOutlined,
   UserOutlined,
   CloseOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useThemeStore } from "@/store/use-theme-store";
@@ -155,7 +156,7 @@ export default function AdminLayout() {
     if (!hit) return [{ title: "Zephyr" }];
     const seg = location.pathname.split("/").filter(Boolean)[0];
     const group = seg ? routes.find((r) => r.path === `/${seg}`) : undefined;
-    const list: { title: React.ReactNode }[] = [{ title: <Link to="/">概览</Link> }];
+    const list: { title: React.ReactNode }[] = [];
     if (group && group.path !== "/") list.push({ title: group.label });
     if (hit.path !== "/" && hit.label) list.push({ title: hit.label });
     return list;
@@ -239,6 +240,8 @@ export default function AdminLayout() {
         {/* ── 顶栏 ───────────────────────────────── */}
         <Header
           style={{
+            height: 48,
+            lineHeight: "48px",
             padding: "0 16px",
             background: "transparent",
             display: "flex",
@@ -246,43 +249,50 @@ export default function AdminLayout() {
             justifyContent: "space-between",
           }}
         >
-          <Space size={12}>
-            <Typography.Link
-              onClick={() => setCollapsed((v) => !v)}
-              style={{ fontSize: 16 }}
-              aria-label={collapsed ? "展开侧边栏" : "收起侧边栏"}
-            >
-              {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            </Typography.Link>
+          <Space size={16} align="center">
             <Button
               type="text"
-              icon={<ReloadOutlined />}
+              icon={collapsed ? <MenuUnfoldOutlined style={{ fontSize: 18 }} /> : <MenuFoldOutlined style={{ fontSize: 18 }} />}
+              onClick={() => setCollapsed((v) => !v)}
+              aria-label={collapsed ? "展开侧边栏" : "收起侧边栏"}
+            />
+            <Button
+              type="text"
+              icon={<ReloadOutlined style={{ fontSize: 18 }} />}
               title="刷新当前页面"
               onClick={() => window.location.reload()}
             />
-            <Breadcrumb items={breadcrumbItems} />
-          </Space>
-
-          <Space size={8}>
             <Button
               type="text"
-              icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+              icon={<AppstoreOutlined style={{ fontSize: 18 }} />}
+              title="概览"
+              onClick={() => navigate("/")}
+            />
+            {breadcrumbItems.length > 0 && (
+              <Breadcrumb items={breadcrumbItems} style={{ marginLeft: 4 }} />
+            )}
+          </Space>
+
+          <Space size={16} align="center">
+            <Button
+              type="text"
+              icon={isDark ? <SunOutlined style={{ fontSize: 18 }} /> : <MoonOutlined style={{ fontSize: 18 }} />}
               onClick={toggleTheme}
               title={isDark ? "切换亮色" : "切换暗色"}
             />
             <Button
               type="text"
-              icon={<SettingOutlined />}
+              icon={<SettingOutlined style={{ fontSize: 18 }} />}
               title="系统设置"
               onClick={() => navigate('/todo')}
             />
             <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
-              <Typography.Link>
-                <Space>
-                  <UserOutlined />
-                  {user?.username || "admin"}
+              <Button type="text" style={{ padding: "0 8px" }}>
+                <Space size={8} align="center">
+                  <UserOutlined style={{ fontSize: 18 }} />
+                  <span style={{ fontSize: 14 }}>{user?.username || "admin"}</span>
                 </Space>
-              </Typography.Link>
+              </Button>
             </Dropdown>
           </Space>
         </Header>
@@ -291,7 +301,7 @@ export default function AdminLayout() {
         <div
           style={{
             background: "transparent",
-            padding: "8px 16px",
+            padding: "0px 16px 8px", // 缩小顶部间距
             display: "flex",
             alignItems: "center",
             gap: "8px",
@@ -300,46 +310,52 @@ export default function AdminLayout() {
         >
           {tabs.map((tab) => {
             const isActive = tab.key === activeTabKey;
+
+            const handleClose = (e: React.MouseEvent) => {
+              e.stopPropagation();
+              if (!tab.closable || tab.key === "/") return;
+              setTabs((prev) => {
+                const idx = prev.findIndex((t) => t.key === tab.key);
+                const next = prev.filter((t) => t.key !== tab.key);
+                saveTabs(next);
+                // 如果关的是当前页，则跳到相邻的那个
+                if (tab.key === activeTabKey) {
+                  const fallback = next[Math.max(0, idx - 1)] || next[0] || homeTab;
+                  navigate(fallback.key, { replace: true });
+                }
+                return next.length ? next : [homeTab];
+              });
+            };
+
             return (
               <div
                 key={tab.key}
                 onClick={() => navigate(tab.key)}
+                onDoubleClick={handleClose}
                 style={{
-                  height: "28px",
-                  padding: "0 12px",
+                  flexShrink: 0, // 核心修复：阻止 flex 子元素被挤压，从而触发外层容器的滚动
+                  height: "32px",
+                  padding: "0 16px",
                   borderRadius: "6px",
                   display: "flex",
                   alignItems: "center",
-                  gap: "6px",
+                  gap: "8px",
                   cursor: "pointer",
-                  fontSize: "13px",
+                  fontSize: "14px",
                   background: isActive ? "var(--z-primary)" : "var(--z-bg)",
                   color: isActive ? "#fff" : "var(--z-text)",
                   border: "1px solid",
                   borderColor: isActive ? "var(--z-primary)" : "var(--z-border)",
                   transition: "all 0.2s",
-                  whiteSpace: "nowrap"
+                  whiteSpace: "nowrap",
+                  userSelect: "none" // 阻止双击时默认选中文字的行为
                 }}
               >
                 <span>{tab.title}</span>
                 {tab.closable && (
                   <CloseOutlined
-                    style={{ fontSize: 10, opacity: 0.6 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (tab.key === "/") return;
-                      setTabs((prev) => {
-                        const idx = prev.findIndex((t) => t.key === tab.key);
-                        const next = prev.filter((t) => t.key !== tab.key);
-                        saveTabs(next);
-                        // 如果关的是当前页，则跳到相邻的那个
-                        if (tab.key === activeTabKey) {
-                          const fallback = next[Math.max(0, idx - 1)] || next[0] || homeTab;
-                          navigate(fallback.key, { replace: true });
-                        }
-                        return next.length ? next : [homeTab];
-                      });
-                    }}
+                    style={{ fontSize: 12, opacity: 0.6 }}
+                    onClick={handleClose}
                   />
                 )}
               </div>

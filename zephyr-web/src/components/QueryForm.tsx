@@ -31,7 +31,7 @@ export function QueryForm<T>({ form, onSearch, onReset, children, loading }: Que
   const offset = itemsInLastRow === 0 ? 18 : (3 - itemsInLastRow) * 6;
 
   return (
-    <Card style={{ marginBottom: 16 }} styles={{ body: { padding: "24px 24px 24px 24px" } }}>
+    <Card style={{ marginBottom: 8 }} styles={{ body: { padding: "24px 24px 24px 24px" } }}>
       <Form
         form={form}
         layout="horizontal"
