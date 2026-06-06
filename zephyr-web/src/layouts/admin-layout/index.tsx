@@ -111,13 +111,41 @@ function calcOpenKeys(pathname: string) {
   return seg ? [`/${seg}`] : [];
 }
 
+function sortRoutesByMenus(routeList: AppRoute[], menus: any[]): AppRoute[] {
+  if (!menus || menus.length === 0) return routeList;
+
+  // Build order map from menus (works for both backend MenuVO and defaultMenus)
+  const orderMap = new Map<string, number>();
+  menus.forEach((m, idx) => {
+    // try to match by path
+    if (m.path) orderMap.set(m.path, idx);
+  });
+
+  const sorted = [...routeList].sort((a, b) => {
+    const idxA = orderMap.has(a.path) ? orderMap.get(a.path)! : 999;
+    const idxB = orderMap.has(b.path) ? orderMap.get(b.path)! : 999;
+    return idxA - idxB;
+  });
+
+  return sorted.map((r) => {
+    if (r.children) {
+      // Find the corresponding menu node to get its children's order
+      const backendNode = menus.find((m) => m.path === r.path);
+      if (backendNode && backendNode.children) {
+        return { ...r, children: sortRoutesByMenus(r.children, backendNode.children) };
+      }
+    }
+    return r;
+  });
+}
+
 /* ── component ───────────────────────────────────────────── */
 
 export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout, user } = useAuthStore();
+  const { logout, user, menus } = useAuthStore();
   const { 
     isDark, 
     toggleTheme, 
@@ -135,8 +163,9 @@ export default function AdminLayout() {
   
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const all = useMemo(() => flattenRoutes(routes), []);
-  const menuItems = useMemo(() => buildMenuItems(routes), []);
+  const sortedRoutes = useMemo(() => sortRoutesByMenus(routes, menus || []), [menus]);
+  const all = useMemo(() => flattenRoutes(sortedRoutes), [sortedRoutes]);
+  const menuItems = useMemo(() => buildMenuItems(sortedRoutes), [sortedRoutes]);
 
   const homeTab: TabItem = useMemo(
     () => ({ key: "/", title: "概览", closable: false }),

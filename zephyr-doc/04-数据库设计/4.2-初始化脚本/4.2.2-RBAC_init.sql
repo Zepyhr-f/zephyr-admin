@@ -60,16 +60,44 @@ INSERT INTO `zephyr_sys_user_role` (user_code, role_code) VALUES
 -- 5. 菜单/权限
 -- ===============================
 INSERT INTO `zephyr_sys_menu` (id, code, parent_code, menu_name, menu_type, path, perms, order_num, status, tenant_code, create_user) VALUES
-(1, 'system', '-1', '系统管理', 'M', 'system', NULL, 1, 1, '000000', 1),
-(2, 'user', 'system', '用户管理', 'C', 'user', 'sys:user:list', 1, 1, '000000', 1),
-(3, 'role', 'system', '角色管理', 'C', 'role', 'sys:role:list', 2, 1, '000000', 1),
-(4, 'user_query', 'user', '用户查询', 'F', NULL, 'sys:user:query', 1, 1, '000000', 1),
-(5, 'user_add', 'user', '用户新增', 'F', NULL, 'sys:user:add', 2, 1, '000000', 1),
-(6, 'user_edit', 'user', '用户修改', 'F', NULL, 'sys:user:edit', 3, 1, '000000', 1);
+(1, 'dashboard', '-1', '概览', 'C', '/', 'sys:dashboard', 1, 1, '000000', 1),
+(2, 'system', '-1', '系统管理', 'M', '/system', NULL, 2, 1, '000000', 1),
+(3, 'user', 'system', '用户管理', 'C', '/system/users', 'sys:user:list', 1, 1, '000000', 1),
+(4, 'dept', 'system', '部门管理', 'C', '/system/depts', 'sys:dept:list', 2, 1, '000000', 1),
+(5, 'post', 'system', '岗位管理', 'C', '/system/posts', 'sys:post:list', 3, 1, '000000', 1),
+(6, 'menu', 'system', '菜单管理', 'C', '/system/menus', 'sys:menu:list', 4, 1, '000000', 1),
+(7, 'role', 'system', '角色管理', 'C', '/system/roles', 'sys:role:list', 5, 1, '000000', 1),
+(8, 'security', '-1', '安全审计', 'M', '/security', NULL, 3, 1, '000000', 1),
+(9, 'login_log', 'security', '登录日志', 'C', '/security/login-log', 'sys:loginlog:list', 1, 1, '000000', 1),
+(10, 'oper_log', 'security', '操作日志', 'C', '/security/op-log', 'sys:operlog:list', 2, 1, '000000', 1),
+(11, 'online', 'security', '在线用户', 'C', '/security/online', 'sys:online:list', 3, 1, '000000', 1),
+(12, 'monitor', '-1', '系统监控', 'M', '/monitor', NULL, 4, 1, '000000', 1),
+(13, 'server', 'monitor', '服务监控', 'C', '/monitor/server', 'sys:server:list', 1, 1, '000000', 1),
+(14, 'cache', 'monitor', '缓存监控', 'C', '/monitor/cache', 'sys:cache:list', 2, 1, '000000', 1),
+(15, 'datasource', 'monitor', '数据源监控', 'C', '/monitor/datasource', 'sys:db:list', 3, 1, '000000', 1),
+(16, 'cron', 'monitor', '任务调度', 'C', '/monitor/cron', 'sys:job:list', 4, 1, '000000', 1),
+(17, 'infra', '-1', '基础设施', 'M', '/infrastructure', NULL, 5, 1, '000000', 1),
+(18, 'dict', 'infra', '字典管理', 'C', '/infrastructure/dict', 'sys:dict:list', 1, 1, '000000', 1),
+(19, 'param', 'infra', '参数配置', 'C', '/infrastructure/params', 'sys:config:list', 2, 1, '000000', 1),
+(20, 'file', 'infra', '文件管理', 'C', '/infrastructure/files', 'sys:file:list', 3, 1, '000000', 1),
+(21, 'notice', 'infra', '通知公告', 'C', '/infrastructure/notices', 'sys:notice:list', 4, 1, '000000', 1),
+(22, 'devtools', '-1', '开发工具', 'M', '/devtools', NULL, 6, 1, '000000', 1),
+(23, 'codegen', 'devtools', '代码生成', 'C', '/devtools/codegen', 'dev:codegen:list', 1, 1, '000000', 1),
+(24, 'api_doc', 'devtools', '接口文档', 'C', '/devtools/api-doc', 'dev:api:list', 2, 1, '000000', 1),
+(25, 'sql_terminal', 'devtools', 'SQL 终端', 'C', '/devtools/sql', 'dev:sql:list', 3, 1, '000000', 1),
+(26, 'user_query', 'user', '用户查询', 'F', NULL, 'sys:user:query', 1, 1, '000000', 1),
+(27, 'user_add', 'user', '用户新增', 'F', NULL, 'sys:user:add', 2, 1, '000000', 1),
+(28, 'user_edit', 'user', '用户修改', 'F', NULL, 'sys:user:edit', 3, 1, '000000', 1),
+(29, 'user_remove', 'user', '用户删除', 'F', NULL, 'sys:user:remove', 4, 1, '000000', 1);
 
 -- ===============================
 -- 6. 角色-菜单关联 (使用编码关联)
 -- ===============================
 INSERT INTO `zephyr_sys_role_menu` (role_code, menu_code) VALUES
-('admin', 'system'), ('admin', 'user'), ('admin', 'role'), ('admin', 'user_query'), ('admin', 'user_add'), ('admin', 'user_edit'),
-('common', 'system'), ('common', 'user'), ('common', 'user_query');
+('admin', 'dashboard'), ('admin', 'system'), ('admin', 'user'), ('admin', 'dept'), ('admin', 'post'), ('admin', 'menu'), ('admin', 'role'),
+('admin', 'security'), ('admin', 'login_log'), ('admin', 'oper_log'), ('admin', 'online'),
+('admin', 'monitor'), ('admin', 'server'), ('admin', 'cache'), ('admin', 'datasource'), ('admin', 'cron'),
+('admin', 'infra'), ('admin', 'dict'), ('admin', 'param'), ('admin', 'file'), ('admin', 'notice'),
+('admin', 'devtools'), ('admin', 'codegen'), ('admin', 'api_doc'), ('admin', 'sql_terminal'),
+('admin', 'user_query'), ('admin', 'user_add'), ('admin', 'user_edit'), ('admin', 'user_remove'),
+('common', 'dashboard'), ('common', 'system'), ('common', 'user'), ('common', 'user_query');

@@ -34,13 +34,33 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
 
     private List<MenuVO> buildTree(List<MenuVO> all, String parentCode) {
         List<MenuVO> children = new ArrayList<>();
+        boolean targetIsRoot = parentCode == null || parentCode.trim().isEmpty() || "-1".equals(parentCode) || "0".equals(parentCode);
+        
         for (MenuVO vo : all) {
             String pCode = vo.getParentCode();
-            if ((pCode == null && parentCode == null) || (pCode != null && pCode.equals(parentCode))) {
+            boolean isRoot = pCode == null || pCode.trim().isEmpty() || "-1".equals(pCode) || "0".equals(pCode);
+            
+            if ((targetIsRoot && isRoot) || (!isRoot && pCode.equals(parentCode))) {
                 vo.setChildren(buildTree(all, vo.getCode()));
                 children.add(vo);
             }
         }
         return children;
+    }
+
+    @Override
+    public boolean removeByIds(java.util.Collection<?> idList) {
+        if (idList != null && !idList.isEmpty()) {
+            for (Object id : idList) {
+                Menu menu = getById((java.io.Serializable) id);
+                if (menu != null) {
+                    long count = count(new LambdaQueryWrapper<Menu>().eq(Menu::getParentCode, menu.getCode()));
+                    if (count > 0) {
+                        throw new RuntimeException("包含下级菜单，不允许删除");
+                    }
+                }
+            }
+        }
+        return super.removeByIds(idList);
     }
 }
