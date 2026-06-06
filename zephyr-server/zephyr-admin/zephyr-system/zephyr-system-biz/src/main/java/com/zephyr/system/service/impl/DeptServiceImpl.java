@@ -37,9 +37,13 @@ public class DeptServiceImpl extends ServiceImpl<DeptMapper, Dept> implements ID
 
     private List<DeptVO> buildTree(List<DeptVO> all, String parentCode) {
         List<DeptVO> children = new ArrayList<>();
+        boolean targetIsRoot = parentCode == null || parentCode.trim().isEmpty() || "0".equals(parentCode);
+        
         for (DeptVO vo : all) {
             String pCode = vo.getParentCode();
-            if ((pCode == null && parentCode == null) || (pCode != null && pCode.equals(parentCode))) {
+            boolean isRoot = pCode == null || pCode.trim().isEmpty() || "0".equals(pCode);
+            
+            if ((targetIsRoot && isRoot) || (!isRoot && pCode.equals(parentCode))) {
                 vo.setChildren(buildTree(all, vo.getCode()));
                 children.add(vo);
             }
