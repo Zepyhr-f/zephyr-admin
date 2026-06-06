@@ -9,6 +9,7 @@ import {
   Typography,
   Button,
   Tabs,
+  Drawer,
 } from "antd";
 import type { MenuProps } from "antd";
 import {
@@ -22,6 +23,7 @@ import {
   UserOutlined,
   CloseOutlined,
   AppstoreOutlined,
+  CheckOutlined,
 } from "@ant-design/icons";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useThemeStore } from "@/store/use-theme-store";
@@ -37,6 +39,15 @@ export type TabItem = {
   title: string;
   closable?: boolean;
 };
+
+const PRESET_COLORS = [
+  "#1E40AF", // 默认深蓝 (Zephyr)
+  "#1890FF", // Ant Design 蓝 (Daybreak)
+  "#2F54EB", // Geekblue
+  "#0284C7", // Sky blue
+  "#0EA5E9", // Light blue
+  "#8B5CF6", // Violet
+];
 
 const TABS_CACHE_KEY = "zephyr_tabs";
 
@@ -98,7 +109,9 @@ export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useAuthStore();
-  const { isDark, toggleTheme } = useThemeStore();
+  const { isDark, toggleTheme, primaryColor, setPrimaryColor, buttonHoverColor, setButtonHoverColor } = useThemeStore();
+  
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const all = useMemo(() => flattenRoutes(routes), []);
   const menuItems = useMemo(() => buildMenuItems(routes), []);
@@ -283,8 +296,8 @@ export default function AdminLayout() {
             <Button
               type="text"
               icon={<SettingOutlined style={{ fontSize: 18 }} />}
-              title="系统设置"
-              onClick={() => navigate('/todo')}
+              title="系统配置"
+              onClick={() => setSettingsOpen(true)}
             />
             <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
               <Button type="text" style={{ padding: "0 8px" }}>
@@ -342,10 +355,10 @@ export default function AdminLayout() {
                   gap: "8px",
                   cursor: "pointer",
                   fontSize: "14px",
-                  background: isActive ? "var(--z-primary)" : "var(--z-bg)",
-                  color: isActive ? "#fff" : "var(--z-text)",
+                  background: isActive ? "color-mix(in srgb, var(--z-button-hover) 15%, transparent)" : "var(--z-bg)",
+                  color: isActive ? "var(--z-primary)" : "var(--z-text)",
                   border: "1px solid",
-                  borderColor: isActive ? "var(--z-primary)" : "var(--z-border)",
+                  borderColor: isActive ? "color-mix(in srgb, var(--z-button-hover) 30%, transparent)" : "var(--z-border)",
                   transition: "all 0.2s",
                   whiteSpace: "nowrap",
                   userSelect: "none" // 阻止双击时默认选中文字的行为
@@ -367,6 +380,79 @@ export default function AdminLayout() {
         <Content style={{ overflow: "auto" }}>
           <Outlet />
         </Content>
+        {/* ── 配置抽屉 ─────────────────────────────── */}
+        <Drawer
+          title="系统配置"
+          placement="right"
+          onClose={() => setSettingsOpen(false)}
+          open={settingsOpen}
+          width={280}
+        >
+          <div style={{ marginBottom: 16 }}>
+            <Typography.Text strong style={{ fontSize: 14 }}>
+              系统主题色
+            </Typography.Text>
+          </div>
+          <Space size={16} wrap style={{ marginBottom: 32 }}>
+            {PRESET_COLORS.map((color) => (
+              <div
+                key={color}
+                onClick={() => setPrimaryColor(color)}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  backgroundColor: color,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow:
+                    primaryColor === color
+                      ? `0 0 0 2px var(--z-surface), 0 0 0 4px ${color}`
+                      : "none",
+                }}
+              >
+                {primaryColor === color && (
+                  <CheckOutlined style={{ color: "#fff", fontSize: 16 }} />
+                )}
+              </div>
+            ))}
+          </Space>
+
+          <div style={{ marginBottom: 16 }}>
+            <Typography.Text strong style={{ fontSize: 14 }}>
+              按钮颜色 (悬浮极淡色)
+            </Typography.Text>
+          </div>
+          <Space size={16} wrap>
+            {PRESET_COLORS.map((color) => (
+              <div
+                key={color}
+                onClick={() => setButtonHoverColor(color)}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow:
+                    buttonHoverColor === color
+                      ? `0 0 0 2px var(--z-surface), 0 0 0 4px color-mix(in srgb, ${color} 40%, transparent)`
+                      : "none",
+                }}
+              >
+                {buttonHoverColor === color && (
+                  <CheckOutlined style={{ color: color, fontSize: 16 }} />
+                )}
+              </div>
+            ))}
+          </Space>
+        </Drawer>
       </Layout>
     </Layout>
   );
