@@ -49,9 +49,18 @@ function App() {
             headerBg: "var(--z-surface)",
             siderBg: "var(--z-surface)",
           },
-          Menu: { itemBorderRadius: 10 },
+          Menu: { 
+            itemBorderRadius: 10,
+            itemSelectedBg: "color-mix(in srgb, var(--z-button-hover) 15%, transparent)",
+            itemSelectedColor: "var(--z-primary)",
+            itemHoverBg: "color-mix(in srgb, var(--z-button-hover) 6%, transparent)",
+            itemHoverColor: "var(--z-primary)",
+          },
           Card: { borderRadiusLG: 14 },
           Button: {
+            // 让所有的 primary 按钮和 link 按钮使用单独配置的“按钮颜色”
+            colorPrimary: "var(--z-button-hover)",
+            
             // 默认按钮：白底（暗黑模式下透明或深灰），悬浮变深色
             defaultBg: isDark ? "rgba(255,255,255,0.04)" : "#FFFFFF",
             defaultHoverBg: isDark ? "rgba(255,255,255,0.12)" : "#F1F5F9",
@@ -59,9 +68,9 @@ function App() {
             defaultHoverBorderColor: isDark ? "#475569" : "#CBD5E1",
             defaultHoverColor: isDark ? "#E2E8F0" : "#334155",
             
-            // 无底色按钮 (text/link)：选中/悬浮变成极淡的浅蓝色 (跟随独立的按钮配置色)
-            textHoverBg: isDark ? "rgba(255,255,255,0.06)" : "color-mix(in srgb, var(--z-button-hover) 6%, transparent)",
-            textActiveBg: isDark ? "rgba(255,255,255,0.12)" : "color-mix(in srgb, var(--z-button-hover) 12%, transparent)",
+            // 无底色按钮 (text/link)：悬浮浅色蓝，选中深色蓝 (避免使用 transparent 导致发黑，浅色模式直接混入白色)
+            textHoverBg: isDark ? "rgba(255,255,255,0.06)" : "color-mix(in srgb, var(--z-button-hover) 10%, #ffffff)",
+            textActiveBg: isDark ? "rgba(255,255,255,0.12)" : "color-mix(in srgb, var(--z-button-hover) 25%, #ffffff)",
           },
         },
       }}

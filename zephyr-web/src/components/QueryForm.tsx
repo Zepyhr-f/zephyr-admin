@@ -54,7 +54,7 @@ export function QueryForm<T>({ form, onSearch, onReset, children, loading }: Que
               {/* 左侧空出 70px 跨过上方 Label 的位置，然后占用 200px 对齐上方 Input。 */}
               {/* 在这 200px 内通过 space-between 两端对齐，并保持按钮统一的小巧宽度 */}
               <div style={{ marginLeft: 70, display: "flex", justifyContent: "space-between", width: 200 }}>
-                <Button htmlType="submit" loading={loading} style={{ width: 80 }}>
+                <Button type="primary" className="solid-primary" htmlType="submit" loading={loading} style={{ width: 80 }}>
                   查询
                 </Button>
                 <Button

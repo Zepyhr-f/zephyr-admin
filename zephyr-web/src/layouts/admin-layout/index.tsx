@@ -434,7 +434,7 @@ export default function AdminLayout() {
                   width: 32,
                   height: 32,
                   borderRadius: "50%",
-                  backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
+                  background: `linear-gradient(135deg, color-mix(in srgb, ${color} 12%, ${isDark ? "#141414" : "#ffffff"}) 50%, ${color} 50%)`,
                   border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
                   cursor: "pointer",
                   display: "flex",
@@ -447,7 +447,7 @@ export default function AdminLayout() {
                 }}
               >
                 {buttonHoverColor === color && (
-                  <CheckOutlined style={{ color: color, fontSize: 16 }} />
+                  <CheckOutlined style={{ color: "#fff", fontSize: 16, filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.4))" }} />
                 )}
               </div>
             ))}
