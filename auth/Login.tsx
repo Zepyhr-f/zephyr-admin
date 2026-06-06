@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button, Checkbox, Divider, Form, Input, Space, Typography, message } from "antd";
 import { LockOutlined, SafetyCertificateOutlined, UserOutlined } from "@ant-design/icons";
-import { useNavigate, useLocation } from "react-router";
-import axios from "axios";
-import { useAuthStore } from "@/store/use-auth-store";
-import client from "@/api/client";
+import { useLocation, useNavigate } from "react-router-dom";
+import { loginDemo } from "@/app/auth";
 import "./login.css";
 
 type FormValues = {
@@ -13,56 +11,30 @@ type FormValues = {
   remember: boolean;
 };
 
-interface LoginResponse {
-  token: string;
-}
-
-export default function LoginPage() {
+export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const setToken = useAuthStore((state) => state.setToken);
-  const setUserInfo = useAuthStore((state) => state.setUserInfo);
-  const setMenus = useAuthStore((state) => state.setMenus);
 
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
+  const redirectTo = useMemo(() => {
+    const s = location.state as { from?: string } | null;
+    return s?.from || "/";
+  }, [location.state]);
 
   async function onFinish(values: FormValues) {
     setLoading(true);
     try {
-      const { remember, ...loginPayload } = values;
-      const res = await client.post<any, LoginResponse>("zephyr-auth/login", loginPayload);
-      const token = res.token;
+      // demo：做一点“真实感”的延迟
+      await new Promise((r) => setTimeout(r, 450));
 
-      // 1. 保存 token
-      setToken(token);
-
-      // 2. 拉取用户信息 & 菜单
-      const headers = { Authorization: `Bearer ${token}` };
-      const baseURL = import.meta.env.VITE_API_BASE_URL;
-      const [infoRes, menuRes] = await Promise.all([
-        axios.get(`${baseURL}zephyr-auth/info`, { headers, withCredentials: true }),
-        axios.get(`${baseURL}zephyr-system/menu/tree`, { headers, withCredentials: true }),
-      ]);
-      const infoData = infoRes.data?.data;
-      const menuData = menuRes.data?.data;
-      if (infoData) {
-        setUserInfo(infoData.user, infoData.roles, infoData.permissions);
-      }
-      setMenus(menuData || []);
-
-      // 3. 记住我
-      if (remember) {
-        localStorage.setItem("remember_user", values.username);
-      } else {
-        localStorage.removeItem("remember_user");
+      if (!values.username || !values.password) {
+        message.error("请输入账号与密码");
+        return;
       }
 
+      loginDemo(values.username);
       message.success("登录成功");
-      navigate(from, { replace: true });
-    } catch (error) {
-      console.error("Login failed:", error);
-      message.error("登录失败，请检查用户名或密码");
+      navigate(redirectTo, { replace: true });
     } finally {
       setLoading(false);
     }
@@ -70,7 +42,6 @@ export default function LoginPage() {
 
   return (
     <div className="z-auth">
-      {/* ── 左侧品牌区 ── */}
       <section className="z-auth__brand" aria-label="产品介绍">
         <div className="z-auth__brandInner">
           <div className="z-auth__logo" aria-hidden="true" />
@@ -96,16 +67,15 @@ export default function LoginPage() {
         </div>
       </section>
 
-      {/* ── 右侧表单区 ── */}
       <section className="z-auth__cardWrap" aria-label="登录表单">
         <div className="z-auth__card">
           <h2 className="z-auth__cardTitle">欢迎回来</h2>
-          <p className="z-auth__cardDesc">请使用你的账号登录系统。</p>
+          <p className="z-auth__cardDesc">请使用你的账号登录。演示环境：任意账号/密码均可。</p>
 
           <Form<FormValues>
             layout="vertical"
             requiredMark={false}
-            initialValues={{ username: "", password: "", remember: false }}
+            initialValues={{ username: "admin", password: "123456", remember: true }}
             onFinish={onFinish}
           >
             <Form.Item
@@ -139,7 +109,7 @@ export default function LoginPage() {
               <Form.Item name="remember" valuePropName="checked" style={{ marginBottom: 0 }}>
                 <Checkbox>记住我</Checkbox>
               </Form.Item>
-              <Typography.Link onClick={() => message.info("可对接重置密码/短信/邮箱验证码流程")}>
+              <Typography.Link onClick={() => message.info("可对接“重置密码/短信/邮箱验证码”流程")}>
                 忘记密码？
               </Typography.Link>
             </div>
@@ -176,3 +146,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

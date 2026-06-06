@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import {
   Breadcrumb,
@@ -8,15 +8,19 @@ import {
   Space,
   Typography,
   Button,
+  Tabs,
 } from "antd";
 import type { MenuProps } from "antd";
 import {
+  ReloadOutlined,
+  SettingOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   MoonOutlined,
   SunOutlined,
   UserOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useThemeStore } from "@/store/use-theme-store";
@@ -26,6 +30,31 @@ import client from "@/api/client";
 const { Header, Sider, Content } = Layout;
 
 /* ── helpers ─────────────────────────────────────────────── */
+
+export type TabItem = {
+  key: string;
+  title: string;
+  closable?: boolean;
+};
+
+const TABS_CACHE_KEY = "zephyr_tabs";
+
+function loadTabs(): TabItem[] {
+  try {
+    const raw = localStorage.getItem(TABS_CACHE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveTabs(tabs: TabItem[]) {
+  try {
+    localStorage.setItem(TABS_CACHE_KEY, JSON.stringify(tabs));
+  } catch {
+    // ignore
+  }
+}
 
 function flattenRoutes(rs: AppRoute[]): AppRoute[] {
   const out: AppRoute[] = [];
@@ -73,6 +102,18 @@ export default function AdminLayout() {
   const all = useMemo(() => flattenRoutes(routes), []);
   const menuItems = useMemo(() => buildMenuItems(routes), []);
 
+  const homeTab: TabItem = useMemo(
+    () => ({ key: "/", title: "概览", closable: false }),
+    []
+  );
+  const [tabs, setTabs] = useState<TabItem[]>(() => {
+    const initial = loadTabs();
+    const withHome = initial.length ? initial : [homeTab];
+    // 兜底：保证有首页
+    if (!withHome.some((t) => t.key === "/")) return [homeTab, ...withHome];
+    return withHome;
+  });
+
   const selectedKeys = useMemo(
     () => [location.pathname === "/" ? "/" : location.pathname],
     [location.pathname]
@@ -82,6 +123,30 @@ export default function AdminLayout() {
     () => calcOpenKeys(location.pathname),
     [location.pathname]
   );
+
+  const activeTabKey = useMemo(
+    () => (location.pathname === "/" ? "/" : location.pathname),
+    [location.pathname]
+  );
+
+  // 每次进入一个页面，都确保“开一个标签”（若已存在则激活，不重复添加）
+  useEffect(() => {
+    const pathname = activeTabKey;
+    const hit = all.find((r) => r.path === pathname || (pathname === "/" && r.path === "/"));
+    const title = hit?.label || (pathname === "/" ? "概览" : pathname);
+    const tab: TabItem = {
+      key: pathname,
+      title,
+      closable: pathname !== "/"
+    };
+
+    setTabs((prev) => {
+      if (prev.some((t) => t.key === tab.key)) return prev;
+      const next = [...prev, tab];
+      saveTabs(next);
+      return next;
+    });
+  }, [activeTabKey, all]);
 
   const breadcrumbItems = useMemo(() => {
     const hit = all.find(
@@ -111,7 +176,7 @@ export default function AdminLayout() {
     items: [
       { key: "profile", label: "个人信息", icon: <UserOutlined /> },
       { type: "divider" },
-      { key: "logout",  label: "退出登录", icon: <LogoutOutlined />, danger: true },
+      { key: "logout", label: "退出登录", icon: <LogoutOutlined />, danger: true },
     ],
     onClick: ({ key }) => {
       if (key === "logout") handleLogout();
@@ -190,6 +255,12 @@ export default function AdminLayout() {
             >
               {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </Typography.Link>
+            <Button
+              type="text"
+              icon={<ReloadOutlined />}
+              title="刷新当前页面"
+              onClick={() => window.location.reload()}
+            />
             <Breadcrumb items={breadcrumbItems} />
           </Space>
 
@@ -199,6 +270,12 @@ export default function AdminLayout() {
               icon={isDark ? <SunOutlined /> : <MoonOutlined />}
               onClick={toggleTheme}
               title={isDark ? "切换亮色" : "切换暗色"}
+            />
+            <Button
+              type="text"
+              icon={<SettingOutlined />}
+              title="系统设置"
+              onClick={() => navigate('/todo')}
             />
             <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
               <Typography.Link>
@@ -210,6 +287,67 @@ export default function AdminLayout() {
             </Dropdown>
           </Space>
         </Header>
+
+        {/* ── 页面标签栏 ─────────────────────────────── */}
+        <div
+          style={{
+            background: "var(--z-surface)",
+            borderBottom: "1px solid var(--z-border)",
+            padding: "8px 12px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            overflowX: "auto"
+          }}
+        >
+          {tabs.map((tab) => {
+            const isActive = tab.key === activeTabKey;
+            return (
+              <div
+                key={tab.key}
+                onClick={() => navigate(tab.key)}
+                style={{
+                  height: "28px",
+                  padding: "0 12px",
+                  borderRadius: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  cursor: "pointer",
+                  fontSize: "13px",
+                  background: isActive ? "var(--z-primary)" : "var(--z-bg)",
+                  color: isActive ? "#fff" : "var(--z-text)",
+                  border: "1px solid",
+                  borderColor: isActive ? "var(--z-primary)" : "var(--z-border)",
+                  transition: "all 0.2s",
+                  whiteSpace: "nowrap"
+                }}
+              >
+                <span>{tab.title}</span>
+                {tab.closable && (
+                  <CloseOutlined
+                    style={{ fontSize: 10, opacity: 0.6 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (tab.key === "/") return;
+                      setTabs((prev) => {
+                        const idx = prev.findIndex((t) => t.key === tab.key);
+                        const next = prev.filter((t) => t.key !== tab.key);
+                        saveTabs(next);
+                        // 如果关的是当前页，则跳到相邻的那个
+                        if (tab.key === activeTabKey) {
+                          const fallback = next[Math.max(0, idx - 1)] || next[0] || homeTab;
+                          navigate(fallback.key, { replace: true });
+                        }
+                        return next.length ? next : [homeTab];
+                      });
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
 
         {/* ── 内容区 ─────────────────────────────── */}
         <Content style={{ overflow: "auto" }}>

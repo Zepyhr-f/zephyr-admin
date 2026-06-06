@@ -53,7 +53,7 @@ export type AppRoute = {
 export const routes: AppRoute[] = [
   {
     key: "dashboard",
-    path: "/dashboard",
+    path: "/",
     label: "概览",
     icon: <DashboardOutlined />,
     element: <DashboardOverview />,
