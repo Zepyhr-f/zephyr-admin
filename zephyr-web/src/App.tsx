@@ -52,9 +52,9 @@ function App() {
           Menu: { 
             itemBorderRadius: 10,
             itemSelectedBg: "color-mix(in srgb, var(--z-button-hover) 15%, transparent)",
-            itemSelectedColor: "var(--z-primary)",
+            itemSelectedColor: isDark ? "#ffffff" : "var(--z-primary)",
             itemHoverBg: "color-mix(in srgb, var(--z-button-hover) 6%, transparent)",
-            itemHoverColor: "var(--z-primary)",
+            itemHoverColor: isDark ? "#ffffff" : "var(--z-primary)",
           },
           Card: { borderRadiusLG: 14 },
           Button: {

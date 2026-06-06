@@ -303,3 +303,9 @@ code, kbd, samp, pre {
   background: #EF4444 !important;
   color: #fff !important;
 }
+
+/* ===== 9. Menu Overrides ===== */
+[data-theme="dark"] .ant-menu-submenu-selected > .ant-menu-submenu-title,
+[data-theme="dark"] .ant-menu-submenu-active > .ant-menu-submenu-title {
+  color: #ffffff !important;
+}
