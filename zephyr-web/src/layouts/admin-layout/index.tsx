@@ -187,7 +187,7 @@ export default function AdminLayout() {
     <Layout className="z-app">
       {/* ── 侧边栏 ─────────────────────────────── */}
       <Sider
-        width={260}
+        width={220}
         collapsible
         collapsed={collapsed}
         trigger={null}
@@ -240,8 +240,7 @@ export default function AdminLayout() {
         <Header
           style={{
             padding: "0 16px",
-            background: "var(--z-surface)",
-            borderBottom: "1px solid var(--z-border)",
+            background: "transparent",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -291,9 +290,8 @@ export default function AdminLayout() {
         {/* ── 页面标签栏 ─────────────────────────────── */}
         <div
           style={{
-            background: "var(--z-surface)",
-            borderBottom: "1px solid var(--z-border)",
-            padding: "8px 12px",
+            background: "transparent",
+            padding: "8px 16px",
             display: "flex",
             alignItems: "center",
             gap: "8px",
