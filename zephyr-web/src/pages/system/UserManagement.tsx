@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { EditOutlined, StopOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -6,7 +7,8 @@ import {
   Modal,
   Select,
   Space,
-  Tag
+  Tag,
+  Tooltip
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PageShell } from "@/components/PageShell";
@@ -62,11 +64,13 @@ export function UserManagement() {
         key: "actions",
         width: 120,
         render: () => (
-          <Space size="small">
-            <Button type="link" style={{ padding: 0 }}>编辑</Button>
-            <Button type="link" danger style={{ padding: 0 }}>
-              禁用
-            </Button>
+          <Space size={12}>
+            <Tooltip title="编辑账号">
+              <Button shape="circle" icon={<EditOutlined />} className="btn-action-edit" />
+            </Tooltip>
+            <Tooltip title="禁用账号">
+              <Button shape="circle" icon={<StopOutlined />} className="btn-action-delete" />
+            </Tooltip>
           </Space>
         )
       }

@@ -1,4 +1,5 @@
-import { Button, Form, Input, Space, Tag } from "antd";
+import { PoweroffOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Space, Tag, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PageShell } from "@/components/PageShell";
 import { QueryForm } from "@/components/QueryForm";
@@ -32,9 +33,9 @@ const columns: ColumnsType<Row> = [
     key: "actions",
     width: 140,
     render: () => (
-      <Button danger type="link" style={{ padding: 0 }}>
-        强制下线
-      </Button>
+      <Tooltip title="强制下线">
+        <Button shape="circle" icon={<PoweroffOutlined />} className="btn-action-delete" />
+      </Tooltip>
     )
   }
 ];

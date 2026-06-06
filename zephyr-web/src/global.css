@@ -162,11 +162,11 @@ code, kbd, samp, pre {
   --z-accent: #D97706;
   --z-bg: #F8FAFC;
   --z-surface: #FFFFFF;
-  --z-text: #0F172A;
-  --z-text-muted: #475569;
   --z-border: #E2E8F0;
-  --z-button-soft-bg: color-mix(in srgb, var(--z-button-hover) 12%, var(--z-bg));
-  --z-button-soft-hover: color-mix(in srgb, var(--z-button-hover) 25%, var(--z-bg));
+  --z-soft-bg-opacity: 12%;
+  --z-soft-hover-opacity: 25%;
+  --z-button-soft-bg: color-mix(in srgb, var(--z-button-hover) var(--z-soft-bg-opacity), var(--z-bg));
+  --z-button-soft-hover: color-mix(in srgb, var(--z-button-hover) var(--z-soft-hover-opacity), var(--z-bg));
 }
 
 [data-theme="dark"] {
@@ -176,8 +176,10 @@ code, kbd, samp, pre {
   --z-text: #F9FAFB;
   --z-text-muted: #9CA3AF;
   --z-border: #374151;
-  --z-button-soft-bg: color-mix(in srgb, var(--z-button-hover) 24%, var(--z-bg));
-  --z-button-soft-hover: color-mix(in srgb, var(--z-button-hover) 35%, var(--z-bg));
+  --z-soft-bg-opacity: 24%;
+  --z-soft-hover-opacity: 35%;
+  --z-button-soft-bg: color-mix(in srgb, var(--z-button-hover) var(--z-soft-bg-opacity), var(--z-bg));
+  --z-button-soft-hover: color-mix(in srgb, var(--z-button-hover) var(--z-soft-hover-opacity), var(--z-bg));
 }
 
 .z-app {
@@ -269,4 +271,35 @@ code, kbd, samp, pre {
 .ant-btn-primary.solid-primary:not(:disabled):active {
   background: color-mix(in srgb, var(--z-button-hover) 85%, #000000) !important;
   box-shadow: none !important;
+}
+
+/* 列表操作列图标按钮（编辑/删除） */
+.btn-action-edit:not(:disabled) {
+  background: var(--z-button-soft-bg) !important;
+  color: var(--z-button-hover) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+.btn-action-edit:not(:disabled):hover {
+  background: var(--z-button-soft-hover) !important;
+  color: var(--z-button-hover) !important;
+}
+.btn-action-edit:not(:disabled):active {
+  background: var(--z-button-hover) !important;
+  color: #fff !important;
+}
+
+.btn-action-delete:not(:disabled) {
+  background: color-mix(in srgb, #EF4444 var(--z-soft-bg-opacity), var(--z-bg)) !important;
+  color: #EF4444 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+.btn-action-delete:not(:disabled):hover {
+  background: color-mix(in srgb, #EF4444 var(--z-soft-hover-opacity), var(--z-bg)) !important;
+  color: #EF4444 !important;
+}
+.btn-action-delete:not(:disabled):active {
+  background: #EF4444 !important;
+  color: #fff !important;
 }

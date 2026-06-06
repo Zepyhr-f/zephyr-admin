@@ -1,4 +1,5 @@
-import { Button, Form, Input, Select, Space, Tag } from "antd";
+import { EditOutlined, DeleteOutlined, KeyOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Select, Space, Tag, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PageShell } from "@/components/PageShell";
 import { QueryForm } from "@/components/QueryForm";
@@ -32,12 +33,16 @@ const columns: ColumnsType<RoleRow> = [
     key: "actions",
     width: 220,
     render: () => (
-      <Space>
-        <Button type="link" style={{ padding: 0 }}>权限分配</Button>
-        <Button type="link" style={{ padding: 0 }}>编辑</Button>
-        <Button type="link" danger style={{ padding: 0 }}>
-          删除
-        </Button>
+      <Space size={12}>
+        <Tooltip title="权限分配">
+          <Button shape="circle" icon={<KeyOutlined />} className="btn-action-edit" />
+        </Tooltip>
+        <Tooltip title="编辑角色">
+          <Button shape="circle" icon={<EditOutlined />} className="btn-action-edit" />
+        </Tooltip>
+        <Tooltip title="删除角色">
+          <Button shape="circle" icon={<DeleteOutlined />} className="btn-action-delete" />
+        </Tooltip>
       </Space>
     )
   }
