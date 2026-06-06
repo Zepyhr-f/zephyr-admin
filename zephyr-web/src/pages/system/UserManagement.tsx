@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { EditOutlined, StopOutlined } from "@ant-design/icons";
+import { useState, useEffect } from "react";
+import { EditOutlined, DeleteOutlined, KeyOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -7,110 +7,176 @@ import {
   Modal,
   Select,
   Space,
-  Tag,
-  Tooltip
+  Tooltip,
+  Switch,
+  Popconfirm,
+  message
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PageShell } from "@/components/PageShell";
 import { QueryForm } from "@/components/QueryForm";
 import { DataTable } from "@/components/DataTable";
-
-type UserRow = {
-  id: string;
-  username: string;
-  name: string;
-  dept: string;
-  role: string;
-  status: "正常" | "禁用";
-};
-
-const mockUsers: UserRow[] = [
-  {
-    id: "u_1001",
-    username: "admin",
-    name: "系统管理员",
-    dept: "总部/IT",
-    role: "管理员",
-    status: "正常"
-  },
-  {
-    id: "u_1002",
-    username: "auditor",
-    name: "审计专员",
-    dept: "总部/合规",
-    role: "审计员",
-    status: "正常"
-  }
-];
+import { getUserList, submitUser, updateUserStatus, removeUsers, resetUserPassword } from "@/api/user";
+import type { UserVO, UserForm } from "@/api/user";
 
 export function UserManagement() {
   const [open, setOpen] = useState(false);
-  const [form] = Form.useForm();
+  const [queryForm] = Form.useForm();
+  const [modalForm] = Form.useForm();
+  
+  const [data, setData] = useState<UserVO[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [queryParams, setQueryParams] = useState<Record<string, unknown>>({});
+  
+  const [editingUser, setEditingUser] = useState<UserVO | null>(null);
 
-  const columns: ColumnsType<UserRow> = useMemo(
-    () => [
+  const fetchData = async (params = queryParams) => {
+    setLoading(true);
+    try {
+      const res = await getUserList(params);
+      setData(res as unknown as UserVO[]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryParams]);
+
+  const onSearch = (values: Record<string, unknown>) => {
+    setQueryParams(values);
+  };
+
+  const onStatusChange = async (checked: boolean, record: UserVO) => {
+    try {
+      await updateUserStatus(record.id, checked ? 1 : 0);
+      message.success("状态已更新");
+      fetchData();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onDelete = async (record: UserVO) => {
+    try {
+      await removeUsers([record.id]);
+      message.success("删除成功");
+      fetchData();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onResetPassword = async (record: UserVO) => {
+    try {
+      await resetUserPassword(record.id);
+      message.success("密码已重置为123456");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const openAddModal = () => {
+    setEditingUser(null);
+    modalForm.resetFields();
+    setOpen(true);
+  };
+
+  const openEditModal = (record: UserVO) => {
+    setEditingUser(record);
+    modalForm.setFieldsValue({
+      ...record,
+      nickName: record.username, // Map username back to nickName for the form
+    });
+    setOpen(true);
+  };
+
+  const onModalOk = async () => {
+    try {
+      const values = await modalForm.validateFields();
+      const payload: UserForm = {
+        ...values,
+      };
+      if (editingUser) {
+        payload.id = editingUser.id;
+        // preserve code for existing user if code isn't modified in form
+        payload.code = editingUser.code;
+      } else {
+        // give a default status of 1 (正常) if not set
+        if (payload.status === undefined) payload.status = 1;
+      }
+      
+      await submitUser(payload);
+      message.success(editingUser ? "修改成功" : "新增成功");
+      setOpen(false);
+      fetchData();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const columns: ColumnsType<UserVO> = [
       { title: "账号", dataIndex: "username" },
-      { title: "姓名", dataIndex: "name" },
-      { title: "部门", dataIndex: "dept" },
-      { title: "角色", dataIndex: "role" },
+      { title: "真实姓名", dataIndex: "realName" },
+      { title: "部门", dataIndex: "deptName" },
+      { title: "手机号", dataIndex: "phone" },
+      { title: "角色", dataIndex: "roleCodes", render: (roles: string[]) => roles?.join(", ") || "-" },
       {
         title: "状态",
         dataIndex: "status",
-        render: (v) =>
-          v === "正常" ? <Tag color="green">正常</Tag> : <Tag color="red">禁用</Tag>
+        render: (status: number, record) => (
+          <Switch 
+             checked={status === 1} 
+             onChange={(checked) => onStatusChange(checked, record)} 
+             checkedChildren="正常"
+             unCheckedChildren="停用"
+          />
+        )
       },
+      { title: "创建时间", dataIndex: "createTime" },
       {
         title: "操作",
         key: "actions",
-        width: 120,
-        render: () => (
+        width: 150,
+        render: (_, record) => (
           <Space size={12}>
             <Tooltip title="编辑账号">
-              <Button shape="circle" icon={<EditOutlined />} className="btn-action-edit" />
+              <Button className="btn-action-edit" shape="circle" icon={<EditOutlined />} onClick={() => openEditModal(record)} />
             </Tooltip>
-            <Tooltip title="禁用账号">
-              <Button shape="circle" icon={<StopOutlined />} className="btn-action-delete" />
+            <Tooltip title="重置密码">
+              <Popconfirm title="确定重置该用户的密码吗？" onConfirm={() => onResetPassword(record)}>
+                <Button className="btn-action-edit" shape="circle" icon={<KeyOutlined />} />
+              </Popconfirm>
+            </Tooltip>
+            <Tooltip title="删除账号">
+              <Popconfirm title="确定删除该用户吗？" onConfirm={() => onDelete(record)}>
+                <Button className="btn-action-delete" shape="circle" icon={<DeleteOutlined />} />
+              </Popconfirm>
             </Tooltip>
           </Space>
         )
       }
-    ],
-    []
-  );
+    ];
 
   return (
     <PageShell>
       <QueryForm
-        form={form}
-        onSearch={(values) => console.log("查询:", values)}
+        form={queryForm}
+        onSearch={onSearch}
       >
-        <Form.Item label="关键词" name="keyword">
-          <Input placeholder="账号/姓名" allowClear style={{ width: 200 }} />
+        <Form.Item label="账号/姓名" name="username">
+          <Input placeholder="输入账号或姓名" allowClear style={{ width: 200 }} />
         </Form.Item>
         <Form.Item label="手机号" name="phone">
           <Input placeholder="输入手机号" allowClear style={{ width: 200 }} />
         </Form.Item>
-        <Form.Item label="角色" name="role">
-          <Select
-            allowClear
-            placeholder="选择角色"
-            style={{ width: 200 }}
-            options={[
-              { label: "超级管理员", value: "admin" },
-              { label: "普通用户", value: "user" }
-            ]}
-          />
-        </Form.Item>
-        <Form.Item label="部门" name="dept">
-          <Select
-            allowClear
-            placeholder="选择部门"
-            style={{ width: 200 }}
-            options={[
-              { label: "总部/IT", value: "总部/IT" },
-              { label: "总部/合规", value: "总部/合规" }
-            ]}
-          />
+        <Form.Item label="部门编码" name="deptCode">
+          <Input placeholder="输入部门编码" allowClear style={{ width: 200 }} />
         </Form.Item>
         <Form.Item label="状态" name="status">
           <Select
@@ -118,8 +184,8 @@ export function UserManagement() {
             placeholder="全部"
             style={{ width: 200 }}
             options={[
-              { label: "正常", value: "正常" },
-              { label: "禁用", value: "禁用" }
+              { label: "正常", value: 1 },
+              { label: "停用", value: 0 }
             ]}
           />
         </Form.Item>
@@ -128,11 +194,12 @@ export function UserManagement() {
       <DataTable
         rowKey="id"
         columns={columns}
-        dataSource={mockUsers}
-        pagination={{ pageSize: 10, showSizeChanger: true, total: 50 }}
+        dataSource={data}
+        loading={loading}
+        pagination={{ pageSize: 10, showSizeChanger: true }}
         extraActions={
           <Space>
-            <Button type="primary" onClick={() => setOpen(true)}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal}>
               新增用户
             </Button>
           </Space>
@@ -140,44 +207,36 @@ export function UserManagement() {
       />
 
       <Modal
-        title="新增用户"
+        title={editingUser ? "编辑用户" : "新增用户"}
         open={open}
         onCancel={() => setOpen(false)}
-        onOk={() => setOpen(false)}
+        onOk={onModalOk}
         okText="保存"
+        width={600}
       >
-        <Form form={form} layout="vertical" requiredMark="optional">
+        <Form form={modalForm} layout="vertical" requiredMark="optional">
           <Form.Item
-            name="username"
-            label="账号"
+            name="nickName"
+            label="账号(登录名)"
             rules={[{ required: true, message: "请输入账号" }]}
           >
             <Input placeholder="如：admin01" autoComplete="off" />
           </Form.Item>
           <Form.Item
-            name="name"
-            label="姓名"
-            rules={[{ required: true, message: "请输入姓名" }]}
+            name="realName"
+            label="真实姓名"
+            rules={[{ required: true, message: "请输入真实姓名" }]}
           >
             <Input placeholder="如：张三" />
           </Form.Item>
-          <Form.Item name="dept" label="部门" rules={[{ required: true }]}>
-            <Select
-              placeholder="选择部门"
-              options={[
-                { label: "总部/IT", value: "总部/IT" },
-                { label: "总部/合规", value: "总部/合规" }
-              ]}
-            />
+          <Form.Item name="deptCode" label="部门编码">
+            <Input placeholder="如：总部/IT，后期将替换为树形选择器" />
           </Form.Item>
-          <Form.Item name="role" label="角色" rules={[{ required: true }]}>
-            <Select
-              placeholder="选择角色"
-              options={[
-                { label: "管理员", value: "管理员" },
-                { label: "审计员", value: "审计员" }
-              ]}
-            />
+          <Form.Item name="phone" label="手机号">
+            <Input placeholder="请输入手机号" />
+          </Form.Item>
+          <Form.Item name="email" label="邮箱">
+            <Input placeholder="请输入邮箱" />
           </Form.Item>
         </Form>
       </Modal>

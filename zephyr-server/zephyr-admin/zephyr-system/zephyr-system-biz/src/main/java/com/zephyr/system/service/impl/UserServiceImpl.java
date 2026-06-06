@@ -56,7 +56,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public List<UserVO> listWithDept(String username, String phone, Integer status, String deptCode) {
         // 查询用户
         List<User> users = list(new LambdaQueryWrapper<User>()
-                .like(username != null && !username.isEmpty(), User::getNickName, username)
+                .and(username != null && !username.isEmpty(), wrapper -> wrapper
+                        .like(User::getNickName, username)
+                        .or()
+                        .like(User::getRealName, username))
                 .eq(phone != null && !phone.isEmpty(), User::getPhone, phone)
                 .eq(status != null, User::getStatus, status)
                 .eq(deptCode != null, User::getDeptCode, deptCode)
