@@ -1,6 +1,8 @@
-import { Button, Card, Space, Table, Tag } from "antd";
+import { Button, Form, Input, Select, Space, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PageShell } from "@/components/PageShell";
+import { QueryForm } from "@/components/QueryForm";
+import { DataTable } from "@/components/DataTable";
 
 type RoleRow = {
   id: string;
@@ -31,9 +33,9 @@ const columns: ColumnsType<RoleRow> = [
     width: 220,
     render: () => (
       <Space>
-        <Button type="link">权限分配</Button>
-        <Button type="link">编辑</Button>
-        <Button type="link" danger>
+        <Button type="link" style={{ padding: 0 }}>权限分配</Button>
+        <Button type="link" style={{ padding: 0 }}>编辑</Button>
+        <Button type="link" danger style={{ padding: 0 }}>
           删除
         </Button>
       </Space>
@@ -42,25 +44,48 @@ const columns: ColumnsType<RoleRow> = [
 ];
 
 export function RoleManagement() {
+  const [form] = Form.useForm();
+
   return (
     <PageShell
       title="角色管理"
       description="关键能力：菜单/按钮级权限 + 数据范围（Data Scope）。"
-      extra={
-        <Space>
-          <Button>导出</Button>
-          <Button type="primary">新增角色</Button>
-        </Space>
-      }
     >
-      <Card>
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={data}
-          pagination={{ pageSize: 10 }}
-        />
-      </Card>
+      <QueryForm
+        form={form}
+        onSearch={(values) => console.log("查询:", values)}
+      >
+        <Form.Item label="角色名称" name="name">
+          <Input placeholder="输入角色名称" allowClear style={{ width: 200 }} />
+        </Form.Item>
+        <Form.Item label="角色标识" name="key">
+          <Input placeholder="输入角色标识" allowClear style={{ width: 200 }} />
+        </Form.Item>
+        <Form.Item label="状态" name="status">
+          <Select
+            allowClear
+            placeholder="全部"
+            style={{ width: 200 }}
+            options={[
+              { label: "启用", value: "启用" },
+              { label: "停用", value: "停用" }
+            ]}
+          />
+        </Form.Item>
+      </QueryForm>
+
+      <DataTable
+        rowKey="id"
+        columns={columns}
+        dataSource={data}
+        pagination={{ pageSize: 10, total: 50 }}
+        extraActions={
+          <Space>
+            <Button>导出</Button>
+            <Button type="primary">新增角色</Button>
+          </Space>
+        }
+      />
     </PageShell>
   );
 }

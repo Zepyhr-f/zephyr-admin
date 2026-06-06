@@ -1,6 +1,8 @@
-import { Button, Card, Space, Table, Tag } from "antd";
+import { Button, Form, Input, Space, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PageShell } from "@/components/PageShell";
+import { QueryForm } from "@/components/QueryForm";
+import { DataTable } from "@/components/DataTable";
 
 type Row = {
   id: string;
@@ -30,7 +32,7 @@ const columns: ColumnsType<Row> = [
     key: "actions",
     width: 140,
     render: () => (
-      <Button danger type="link">
+      <Button danger type="link" style={{ padding: 0 }}>
         强制下线
       </Button>
     )
@@ -38,19 +40,33 @@ const columns: ColumnsType<Row> = [
 ];
 
 export function OnlineUsers() {
+  const [form] = Form.useForm();
+
   return (
     <PageShell
       title="在线用户"
       description="实时展示当前系统活跃会话，支持强退（高危操作建议二次确认）。"
-      extra={
-        <Space>
-          <Button>刷新</Button>
-        </Space>
-      }
     >
-      <Card>
-        <Table rowKey="id" columns={columns} dataSource={data} pagination={false} />
-      </Card>
+      <QueryForm form={form} onSearch={(values) => console.log("查询:", values)}>
+        <Form.Item label="账号" name="username">
+          <Input placeholder="输入账号" allowClear style={{ width: 200 }} />
+        </Form.Item>
+        <Form.Item label="IP地址" name="ip">
+          <Input placeholder="输入IP" allowClear style={{ width: 200 }} />
+        </Form.Item>
+      </QueryForm>
+
+      <DataTable
+        rowKey="id"
+        columns={columns}
+        dataSource={data}
+        pagination={{ pageSize: 10, total: 50 }}
+        extraActions={
+          <Space>
+            <Button>刷新</Button>
+          </Space>
+        }
+      />
     </PageShell>
   );
 }

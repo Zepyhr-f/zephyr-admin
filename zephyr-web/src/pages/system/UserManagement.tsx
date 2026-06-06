@@ -1,17 +1,17 @@
 import { useMemo, useState } from "react";
 import {
   Button,
-  Card,
   Form,
   Input,
   Modal,
   Select,
   Space,
-  Table,
   Tag
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PageShell } from "@/components/PageShell";
+import { QueryForm } from "@/components/QueryForm";
+import { DataTable } from "@/components/DataTable";
 
 type UserRow = {
   id: string;
@@ -47,25 +47,24 @@ export function UserManagement() {
 
   const columns: ColumnsType<UserRow> = useMemo(
     () => [
-      { title: "账号", dataIndex: "username", width: 160 },
-      { title: "姓名", dataIndex: "name", width: 160 },
+      { title: "账号", dataIndex: "username" },
+      { title: "姓名", dataIndex: "name" },
       { title: "部门", dataIndex: "dept" },
-      { title: "角色", dataIndex: "role", width: 140 },
+      { title: "角色", dataIndex: "role" },
       {
         title: "状态",
         dataIndex: "status",
-        width: 120,
         render: (v) =>
           v === "正常" ? <Tag color="green">正常</Tag> : <Tag color="red">禁用</Tag>
       },
       {
         title: "操作",
         key: "actions",
-        width: 180,
+        width: 120,
         render: () => (
-          <Space>
-            <Button type="link">编辑</Button>
-            <Button type="link" danger>
+          <Space size="small">
+            <Button type="link" style={{ padding: 0 }}>编辑</Button>
+            <Button type="link" danger style={{ padding: 0 }}>
               禁用
             </Button>
           </Space>
@@ -76,58 +75,65 @@ export function UserManagement() {
   );
 
   return (
-    <PageShell
-      title="用户管理"
-      description="账号维护、分配角色；典型模式：筛选区 + 表格 + 抽屉/弹窗编辑。"
-      extra={
-        <Space>
-          <Button onClick={() => form.resetFields()}>重置</Button>
-          <Button type="primary" onClick={() => setOpen(true)}>
-            新增用户
-          </Button>
-        </Space>
-      }
-    >
-      <Card>
-        <Form layout="inline" style={{ marginBottom: 12 }}>
-          <Form.Item label="关键词">
-            <Input placeholder="账号/姓名" allowClear style={{ width: 220 }} />
-          </Form.Item>
-          <Form.Item label="部门">
-            <Select
-              allowClear
-              placeholder="选择部门"
-              style={{ width: 200 }}
-              options={[
-                { label: "总部/IT", value: "总部/IT" },
-                { label: "总部/合规", value: "总部/合规" }
-              ]}
-            />
-          </Form.Item>
-          <Form.Item label="状态">
-            <Select
-              allowClear
-              placeholder="全部"
-              style={{ width: 140 }}
-              options={[
-                { label: "正常", value: "正常" },
-                { label: "禁用", value: "禁用" }
-              ]}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary">查询</Button>
-          </Form.Item>
-        </Form>
+    <PageShell>
+      <QueryForm
+        form={form}
+        onSearch={(values) => console.log("查询:", values)}
+      >
+        <Form.Item label="关键词" name="keyword">
+          <Input placeholder="账号/姓名" allowClear style={{ width: 200 }} />
+        </Form.Item>
+        <Form.Item label="手机号" name="phone">
+          <Input placeholder="输入手机号" allowClear style={{ width: 200 }} />
+        </Form.Item>
+        <Form.Item label="角色" name="role">
+          <Select
+            allowClear
+            placeholder="选择角色"
+            style={{ width: 200 }}
+            options={[
+              { label: "超级管理员", value: "admin" },
+              { label: "普通用户", value: "user" }
+            ]}
+          />
+        </Form.Item>
+        <Form.Item label="部门" name="dept">
+          <Select
+            allowClear
+            placeholder="选择部门"
+            style={{ width: 200 }}
+            options={[
+              { label: "总部/IT", value: "总部/IT" },
+              { label: "总部/合规", value: "总部/合规" }
+            ]}
+          />
+        </Form.Item>
+        <Form.Item label="状态" name="status">
+          <Select
+            allowClear
+            placeholder="全部"
+            style={{ width: 200 }}
+            options={[
+              { label: "正常", value: "正常" },
+              { label: "禁用", value: "禁用" }
+            ]}
+          />
+        </Form.Item>
+      </QueryForm>
 
-        <Table
-          rowKey="id"
-          size="middle"
-          columns={columns}
-          dataSource={mockUsers}
-          pagination={{ pageSize: 10, showSizeChanger: true }}
-        />
-      </Card>
+      <DataTable
+        rowKey="id"
+        columns={columns}
+        dataSource={mockUsers}
+        pagination={{ pageSize: 10, showSizeChanger: true, total: 50 }}
+        extraActions={
+          <Space>
+            <Button type="primary" onClick={() => setOpen(true)}>
+              新增用户
+            </Button>
+          </Space>
+        }
+      />
 
       <Modal
         title="新增用户"

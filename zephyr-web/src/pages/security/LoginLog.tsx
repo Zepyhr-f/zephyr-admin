@@ -1,6 +1,8 @@
-import { Card, Table, Tag } from "antd";
+import { Form, Input, Select, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { PageShell } from "@/components/PageShell";
+import { QueryForm } from "@/components/QueryForm";
+import { DataTable } from "@/components/DataTable";
 
 type Row = {
   id: string;
@@ -44,11 +46,31 @@ const columns: ColumnsType<Row> = [
 ];
 
 export function LoginLog() {
+  const [form] = Form.useForm();
+
   return (
     <PageShell title="登录日志" description="记录登录/登出行为及 IP、浏览器等信息。">
-      <Card>
-        <Table rowKey="id" columns={columns} dataSource={data} pagination={{ pageSize: 10 }} />
-      </Card>
+      <QueryForm form={form} onSearch={(values) => console.log("查询:", values)}>
+        <Form.Item label="账号" name="username">
+          <Input placeholder="输入账号" allowClear style={{ width: 200 }} />
+        </Form.Item>
+        <Form.Item label="IP地址" name="ip">
+          <Input placeholder="输入IP" allowClear style={{ width: 200 }} />
+        </Form.Item>
+        <Form.Item label="登录结果" name="result">
+          <Select
+            allowClear
+            placeholder="全部"
+            style={{ width: 200 }}
+            options={[
+              { label: "成功", value: "成功" },
+              { label: "失败", value: "失败" }
+            ]}
+          />
+        </Form.Item>
+      </QueryForm>
+
+      <DataTable rowKey="id" columns={columns} dataSource={data} pagination={{ pageSize: 10, total: 50 }} />
     </PageShell>
   );
 }
