@@ -165,6 +165,19 @@ code, kbd, samp, pre {
   --z-text: #0F172A;
   --z-text-muted: #475569;
   --z-border: #E2E8F0;
+  --z-button-soft-bg: color-mix(in srgb, var(--z-button-hover) 12%, var(--z-bg));
+  --z-button-soft-hover: color-mix(in srgb, var(--z-button-hover) 25%, var(--z-bg));
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --z-bg: #0B0F19;
+  --z-surface: #111827;
+  --z-text: #F9FAFB;
+  --z-text-muted: #9CA3AF;
+  --z-border: #374151;
+  --z-button-soft-bg: color-mix(in srgb, var(--z-button-hover) 24%, var(--z-bg));
+  --z-button-soft-hover: color-mix(in srgb, var(--z-button-hover) 35%, var(--z-bg));
 }
 
 .z-app {
@@ -228,13 +241,13 @@ code, kbd, samp, pre {
 /* Primary Button 重写为 Soft/Tint 质感 */
 .ant-btn-primary:not(:disabled):not(.solid-primary) {
   box-shadow: none !important;
-  background: color-mix(in srgb, var(--z-button-hover) 12%, var(--z-bg)) !important;
+  background: var(--z-button-soft-bg) !important;
   color: var(--z-button-hover) !important;
   border-color: transparent !important;
   transition: all 0.3s ease;
 }
 .ant-btn-primary:not(:disabled):not(.solid-primary):hover {
-  background: color-mix(in srgb, var(--z-button-hover) 25%, var(--z-bg)) !important;
+  background: var(--z-button-soft-hover) !important;
   color: var(--z-button-hover) !important;
 }
 .ant-btn-primary:not(:disabled):not(.solid-primary):active {

@@ -49,6 +49,15 @@ const PRESET_COLORS = [
   "#8B5CF6", // Violet
 ];
 
+const PRESET_COLORS_DARK = [
+  "#3B82F6", // 亮蓝 (默认)
+  "#40A9FF", // 亮 Ant 蓝
+  "#597EF7", // 亮 Geekblue
+  "#38BDF8", // 亮 Sky blue
+  "#7DD3FC", // 亮淡蓝
+  "#A78BFA", // 亮紫
+];
+
 const TABS_CACHE_KEY = "zephyr_tabs";
 
 function loadTabs(): TabItem[] {
@@ -109,7 +118,20 @@ export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useAuthStore();
-  const { isDark, toggleTheme, primaryColor, setPrimaryColor, buttonHoverColor, setButtonHoverColor } = useThemeStore();
+  const { 
+    isDark, 
+    toggleTheme, 
+    primaryColor, 
+    darkPrimaryColor,
+    setPrimaryColor, 
+    buttonHoverColor, 
+    darkButtonHoverColor,
+    setButtonHoverColor 
+  } = useThemeStore();
+
+  const currentPrimaryColor = isDark ? darkPrimaryColor : primaryColor;
+  const currentButtonHoverColor = isDark ? darkButtonHoverColor : buttonHoverColor;
+  const presetColors = isDark ? PRESET_COLORS_DARK : PRESET_COLORS;
   
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -170,8 +192,13 @@ export default function AdminLayout() {
     const seg = location.pathname.split("/").filter(Boolean)[0];
     const group = seg ? routes.find((r) => r.path === `/${seg}`) : undefined;
     const list: { title: React.ReactNode }[] = [];
-    if (group && group.path !== "/") list.push({ title: group.label });
-    if (hit.path !== "/" && hit.label) list.push({ title: hit.label });
+    
+    if (location.pathname === "/") {
+      list.push({ title: hit.label || "概览" });
+    } else {
+      if (group && group.path !== "/") list.push({ title: group.label });
+      if (hit.path !== "/" && hit.label) list.push({ title: hit.label });
+    }
     return list;
   }, [all, location.pathname]);
 
@@ -394,7 +421,7 @@ export default function AdminLayout() {
             </Typography.Text>
           </div>
           <Space size={16} wrap style={{ marginBottom: 32 }}>
-            {PRESET_COLORS.map((color) => (
+            {presetColors.map((color) => (
               <div
                 key={color}
                 onClick={() => setPrimaryColor(color)}
@@ -408,12 +435,12 @@ export default function AdminLayout() {
                   alignItems: "center",
                   justifyContent: "center",
                   boxShadow:
-                    primaryColor === color
+                    currentPrimaryColor === color
                       ? `0 0 0 2px var(--z-surface), 0 0 0 4px ${color}`
                       : "none",
                 }}
               >
-                {primaryColor === color && (
+                {currentPrimaryColor === color && (
                   <CheckOutlined style={{ color: "#fff", fontSize: 16 }} />
                 )}
               </div>
@@ -426,7 +453,7 @@ export default function AdminLayout() {
             </Typography.Text>
           </div>
           <Space size={16} wrap>
-            {PRESET_COLORS.map((color) => (
+            {presetColors.map((color) => (
               <div
                 key={color}
                 onClick={() => setButtonHoverColor(color)}
@@ -434,19 +461,19 @@ export default function AdminLayout() {
                   width: 32,
                   height: 32,
                   borderRadius: "50%",
-                  background: `linear-gradient(135deg, color-mix(in srgb, ${color} 12%, ${isDark ? "#141414" : "#ffffff"}) 50%, ${color} 50%)`,
+                  background: `linear-gradient(135deg, color-mix(in srgb, ${color} ${isDark ? "24%" : "12%"}, ${isDark ? "#141414" : "#ffffff"}) 50%, ${color} 50%)`,
                   border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   boxShadow:
-                    buttonHoverColor === color
+                    currentButtonHoverColor === color
                       ? `0 0 0 2px var(--z-surface), 0 0 0 4px color-mix(in srgb, ${color} 40%, transparent)`
                       : "none",
                 }}
               >
-                {buttonHoverColor === color && (
+                {currentButtonHoverColor === color && (
                   <CheckOutlined style={{ color: "#fff", fontSize: 16, filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.4))" }} />
                 )}
               </div>

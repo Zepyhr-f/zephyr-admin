@@ -7,7 +7,9 @@ interface ThemeState {
   mode: ThemeMode;
   isDark: boolean;
   primaryColor: string;
+  darkPrimaryColor: string;
   buttonHoverColor: string;
+  darkButtonHoverColor: string;
   setMode: (mode: ThemeMode) => void;
   toggleTheme: () => void;
   setPrimaryColor: (color: string) => void;
@@ -37,29 +39,47 @@ export const useThemeStore = create<ThemeState>()(
       mode: "light",
       isDark: false,
       primaryColor: "#1E40AF",
-      buttonHoverColor: "rgba(30, 64, 175, 0.06)",
+      darkPrimaryColor: "#3B82F6",
+      buttonHoverColor: "#1E40AF", // 暂存默认，实际可以独立配置
+      darkButtonHoverColor: "#3B82F6",
 
       setMode: (mode) => {
         const isDark = resolveDark(mode);
-        applyTheme(isDark, get().primaryColor, get().buttonHoverColor);
+        const pColor = isDark ? get().darkPrimaryColor : get().primaryColor;
+        const bColor = isDark ? get().darkButtonHoverColor : get().buttonHoverColor;
+        applyTheme(isDark, pColor, bColor);
         set({ mode, isDark });
       },
 
       toggleTheme: () => {
         const nextMode = get().isDark ? "light" : "dark";
         const isDark = resolveDark(nextMode);
-        applyTheme(isDark, get().primaryColor, get().buttonHoverColor);
+        const pColor = isDark ? get().darkPrimaryColor : get().primaryColor;
+        const bColor = isDark ? get().darkButtonHoverColor : get().buttonHoverColor;
+        applyTheme(isDark, pColor, bColor);
         set({ mode: nextMode, isDark });
       },
       
-      setPrimaryColor: (primaryColor) => {
-        applyTheme(get().isDark, primaryColor, get().buttonHoverColor);
-        set({ primaryColor });
+      setPrimaryColor: (color) => {
+        const isDark = get().isDark;
+        if (isDark) {
+          applyTheme(isDark, color, get().darkButtonHoverColor);
+          set({ darkPrimaryColor: color });
+        } else {
+          applyTheme(isDark, color, get().buttonHoverColor);
+          set({ primaryColor: color });
+        }
       },
 
-      setButtonHoverColor: (buttonHoverColor) => {
-        applyTheme(get().isDark, get().primaryColor, buttonHoverColor);
-        set({ buttonHoverColor });
+      setButtonHoverColor: (color) => {
+        const isDark = get().isDark;
+        if (isDark) {
+          applyTheme(isDark, get().darkPrimaryColor, color);
+          set({ darkButtonHoverColor: color });
+        } else {
+          applyTheme(isDark, get().primaryColor, color);
+          set({ buttonHoverColor: color });
+        }
       }
     }),
     {
@@ -67,12 +87,15 @@ export const useThemeStore = create<ThemeState>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           const isDark = resolveDark(state.mode);
-          const color = state.primaryColor || "#1E40AF";
-          const hoverColor = state.buttonHoverColor || "rgba(30, 64, 175, 0.06)";
-          applyTheme(isDark, color, hoverColor);
+          const pColor = isDark ? (state.darkPrimaryColor || "#3B82F6") : (state.primaryColor || "#1E40AF");
+          const bColor = isDark ? (state.darkButtonHoverColor || "#3B82F6") : (state.buttonHoverColor || "#1E40AF");
+          applyTheme(isDark, pColor, bColor);
           state.isDark = isDark;
-          state.primaryColor = color;
-          state.buttonHoverColor = hoverColor;
+          // Fallback init
+          state.primaryColor = state.primaryColor || "#1E40AF";
+          state.darkPrimaryColor = state.darkPrimaryColor || "#3B82F6";
+          state.buttonHoverColor = state.buttonHoverColor || "#1E40AF";
+          state.darkButtonHoverColor = state.darkButtonHoverColor || "#3B82F6";
         }
       },
     }
