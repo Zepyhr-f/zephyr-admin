@@ -1,6 +1,6 @@
 # Java 与 Spring 最佳实践
 
-本规范旨在整合 Java 17 与 Spring Boot 3 的核心优势，提升系统性能与开发效率。
+本规范旨在整合 Java 21 与 Spring Boot 3 的核心优势，提升系统性能与开发效率（具体版本以《版本与环境矩阵》为准）。
 
 ## RESTful API 设计规范
 
