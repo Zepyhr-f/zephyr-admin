@@ -1,0 +1,148 @@
+services:
+  # ------------------------------
+  # MySQL
+  # ------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-nacos
+    restart: always
+    mem_limit: 1024m
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: nacos_config
+      TZ: Asia/Shanghai
+    ports:
+      - "${MYSQL_PORT:-3307}:3306"
+    volumes:
+      - ${DATA_DIR:-./data}/mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max_connections=50 --bind-address=0.0.0.0 --performance_schema=OFF --innodb_buffer_pool_size=256M --innodb_log_file_size=64M --skip-host-cache --skip-name-resolve
+
+  # ------------------------------
+  # PostgreSQL
+  # ------------------------------
+  postgres:
+    image: postgres:14
+    container_name: pgsql
+    restart: always
+    mem_limit: 256m
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: appdb
+      TZ: Asia/Shanghai
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - ${DATA_DIR:-./data}/postgres/data:/var/lib/postgresql/data
+    command: -c listen_addresses='*'
+
+  # ------------------------------
+  # Redis
+  # ------------------------------
+  redis:
+    image: redis:7.2
+    container_name: redis
+    restart: always
+    mem_limit: 128m
+    command: [ "redis-server", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru", "--bind", "0.0.0.0" ]
+    ports:
+      - "${REDIS_PORT:-6380}:6379"
+    volumes:
+      - ${DATA_DIR:-./data}/redis/data:/data
+
+  # ------------------------------
+  # Nacos
+  # ------------------------------
+  nacos:
+    image: nacos/nacos-server:v2.3.2-slim
+    container_name: nacos
+    restart: always
+    mem_limit: 768m
+    depends_on:
+      - mysql
+    environment:
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: mysql
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_USER: root
+      MYSQL_SERVICE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_SERVICE_DB_PARAM: "characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true"
+      NACOS_AUTH_ENABLE: "true"
+      # 注意：Token 必须是 Base64 编码且长度足够。这里提供一个默认值，建议正式环境修改。
+      NACOS_AUTH_TOKEN: ${NACOS_AUTH_TOKEN:-U2VjcmV0S2V5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5}
+      NACOS_AUTH_IDENTITY_KEY: ${NACOS_AUTH_IDENTITY_KEY:-nacos}
+      NACOS_AUTH_IDENTITY_VALUE: ${NACOS_AUTH_IDENTITY_VALUE:-nacos}
+      JVM_XMS: 256m
+      JVM_XMX: 512m
+      JVM_XMN: 128m
+    ports:
+      - "${NACOS_PORT:-8849}:8848"
+      - "${NACOS_PORT_RPC:-9849}:9848" # 建议配置: NACOS_PORT+1000
+      - "${NACOS_PORT_GRPC:-9850}:9849" # 建议配置: NACOS_PORT+1001
+    volumes:
+      - ${DATA_DIR:-./data}/nacos/logs:/home/nacos/logs
+      - ${DATA_DIR:-./data}/nacos/data:/home/nacos/data
+
+  # ------------------------------
+  # Prometheus
+  # ------------------------------
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    user: "0" # 强制 root 运行或在宿主机 chown，这里配合 init.sh 修复
+    mem_limit: 512m
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${DATA_DIR:-./data}/prometheus/data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9091}:9090"
+
+  # ------------------------------
+  # Grafana
+  # ------------------------------
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    user: "0"
+    mem_limit: 256m
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - ${DATA_DIR:-./data}/grafana/data:/var/lib/grafana
+
+  # ------------------------------
+  # Node Exporter
+  # ------------------------------
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter
+    restart: always
+    mem_limit: 64m
+    ports:
+      - "${NODE_EXPORTER_PORT:-9101}:9100"
+
+  # ------------------------------
+  # cAdvisor
+  # ------------------------------
+  cadvisor:
+    # 通过可访问的代理源拉取 gcr.io 镜像，避免服务器直连 gcr.io 超时
+    image: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    restart: always
+    privileged: true
+    mem_limit: 256m
+    ports:
+      - "${CADVISOR_PORT:-8081}:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
