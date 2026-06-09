@@ -1,11 +1,13 @@
 package com.zephyr.gateway.filter;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zephyr.gateway.config.properties.DefaultSkipProp;
-import com.zephyr.gateway.config.properties.AuthProperties;
-import com.zephyr.gateway.util.RequestUtils;
+import com.zephyr.gateway.config.AuthProperties;
+import com.zephyr.gateway.constant.GatewayConstant;
+import com.zephyr.security.SecurityConstants;
+import com.zephyr.gateway.rbac.RbacService;
+import com.zephyr.security.GatewaySignUtil;
+import com.zephyr.gateway.security.NonceStore;
 import com.zephyr.jwt.util.JwtUtil;
 import com.zephyr.redis.Constant.RedisConstant;
 import com.zephyr.redis.util.RedisUtil;
@@ -13,7 +15,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -27,23 +28,15 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-import static com.zephyr.core.tool.constant.WebConstants.*;
-import static com.zephyr.jwt.config.JwtConstant.*;
+import static com.zephyr.jwt.config.JwtConstant.HEADER_STRING;
+import static com.zephyr.jwt.config.JwtConstant.TOKEN_PREFIX;
+import static com.zephyr.jwt.config.JwtConstant.TOKEN_PREFIX_LENGTH;
+import static com.zephyr.jwt.config.JwtConstant.JTI;
+import static com.zephyr.jwt.config.JwtConstant.TENANT_CODE;
 
-/**
- * 认证过滤器
- *
- * @author Zephyr
- * @since 2025-09-07
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -53,119 +46,100 @@ public class AuthFilter implements GlobalFilter, Ordered {
     private final ObjectMapper objectMapper;
     private final RedisUtil redisUtil;
     private final JwtUtil jwtUtil;
+    private final RbacService rbacService;
+    private final GatewaySignUtil signUtil;
+    private final NonceStore nonceStore;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
-
-    @Value("${zephyr.gateway.secret:zephyr-default-secret}")
-    private String gatewaySecret;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpResponse response = exchange.getResponse();
-
-        // 路径校验
-        String originalRequestUrl = RequestUtils.getOriginalRequestUrl(exchange);
         String path = exchange.getRequest().getURI().getPath();
-        if (this.isSkip(path) || this.isSkip(originalRequestUrl)) {
+        String method = exchange.getRequest().getMethod().name();
+
+        // 1. 白名单放行
+        if (isWhiteList(path)) {
             return chain.filter(exchange);
         }
 
-        // token校验
+        // 2. Token 校验
         String authHeader = exchange.getRequest().getHeaders().getFirst(HEADER_STRING);
         if (authHeader == null) {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return unAuth(response, "Token缺失");
+            return unAuth(response, "未授权，Token缺失");
         }
-        String token = authHeader.startsWith(TOKEN_PREFIX) ?
-                authHeader.substring(TOKEN_PREFIX_LENGTH) : authHeader;
+        
+        String token = authHeader.startsWith(TOKEN_PREFIX) ? authHeader.substring(TOKEN_PREFIX_LENGTH) : authHeader;
 
         Claims claims;
         try {
             claims = jwtUtil.extractAllClaims(token);
         } catch (JwtException e) {
             log.error("JWT解析异常: {}", e.getMessage());
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return unAuth(response, "Token格式非法或已过期");
         }
 
-        // 校验 jti 黑名单（可选）
-        String jti = claims.get(JTI, String.class);
-        if (jti != null) {
-            String blacklisted = redisUtil.getString(RedisConstant.BLACKLIST_PREFIX + jti);
-            if (blacklisted != null) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return unAuth(response, "Token已被注销");
-            }
+        if (jwtUtil.isTokenExpired(token)) {
+            return unAuth(response, "Token已过期");
         }
 
-        // 校验过期（extractAllClaims 已经校验签名，但显式再校验一次 exp 更安全）
-        if (jwtUtil.isTokenExpired(token)) {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return unAuth(response, "Token已过期");
+        String jti = claims.get(JTI, String.class);
+        if (jti != null) {
+            if (redisUtil.getString(RedisConstant.BLACKLIST_PREFIX + jti) != null) {
+                return unAuth(response, "Token已被注销");
+            }
         }
 
         String userCode = claims.getSubject();
         String tenantCode = claims.get(TENANT_CODE, String.class);
 
-        // 基础认证校验 / 严格鉴权校验
-        if (!isBasic(path) && !isBasic(originalRequestUrl)) {
-            // 严格鉴权路径，获取用户信息确保处于登录状态
-            Map userInfo = redisUtil.getObject(RedisConstant.USER_INFO_PREFIX + tenantCode + ":" + userCode, Map.class);
-            if (userInfo == null) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return unAuth(response, "登录已失效，请重新登录");
+        // 3. 基础认证与严格鉴权
+        Set<String> roles = rbacService.getUserRoles(tenantCode, userCode);
+        if (!isBasic(path)) {
+            // RBAC strict
+            if (!rbacService.checkPermission(tenantCode, method, path, roles)) {
+                return forbidden(response, "权限不足，禁止访问");
             }
-            
-            // 注意：因为数据库中存储的 perms 是如 "sys:menu:list" 的权限标识，
-            // 而当前请求的 path 是类似 "/zephyr-system/menu/routes" 的 URL，
-            // 二者不可能通过 antPathMatcher 匹配成功，所以这里直接放行，把细粒度的权限校验交给后端（如 @PreAuthorize）来处理。
-            /* 
-            List<String> perms = (List<String>) userInfo.get("perms");
-            boolean hasPermission = false;
-            for (String perm : perms) {
-                if (antPathMatcher.match(perm.trim(), path) || antPathMatcher.match(perm.trim(), originalRequestUrl)) {
-                    hasPermission = true;
-                    break;
-                }
-            }
-
-            if (!hasPermission) {
-                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                return unAuth(response, "没有访问权限");
-            }
-            */
         }
 
-        // 生成签名
-        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
-        String sign = generateGatewaySign(userCode, tenantCode, timestamp);
+        // 4. 上下文透传与网关签名
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String nonce = nonceStore.generateNonce();
+        String requestId = exchange.getRequest().getHeaders().getFirst(GatewayConstant.X_REQUEST_ID);
+        if(requestId == null) requestId = "";
 
-        // 透传用户信息（新规范）
-        ServerHttpRequest.Builder mutate = exchange.getRequest().mutate();
-        addHeader(mutate, USER_CODE_HEADER, userCode);
-        addHeader(mutate, TENANT_CODE_HEADER, tenantCode);
-        addHeader(mutate, TIMESTAMP_HEADER, timestamp);
-        addHeader(mutate, GATEWAY_SIGN_HEADER, sign);
+        String sign = signUtil.generateSign(timestamp, nonce, method, path, tenantCode, userCode, requestId);
 
-        ServerHttpRequest buildRequest = mutate.build();
-        ServerWebExchange newExchange = exchange.mutate().request(buildRequest).build();
+        ServerHttpRequest request = exchange.getRequest().mutate()
+                .header(SecurityConstants.USER_CODE_HEADER, userCode)
+                .header(SecurityConstants.TENANT_CODE_HEADER, tenantCode)
+                .header(SecurityConstants.ROLES_HEADER, String.join(",", roles))
+                .header(SecurityConstants.TIMESTAMP_HEADER, timestamp)
+                .header(SecurityConstants.NONCE_HEADER, nonce)
+                .header(SecurityConstants.GATEWAY_SIGN_HEADER, sign)
+                .build();
 
-        return chain.filter(newExchange);
+        return chain.filter(exchange.mutate().request(request).build());
     }
 
-    private boolean isSkip(String path) {
-        return DefaultSkipProp.getDefaultSkipUrl().stream().anyMatch(pattern -> antPathMatcher.match(pattern, path))
-                || authProperties.getWhiteApi().stream().anyMatch(pattern -> antPathMatcher.match(pattern, path));
+    private boolean isWhiteList(String path) {
+        return authProperties.getWhiteApi().stream().anyMatch(pattern -> antPathMatcher.match(pattern, path));
     }
 
     private boolean isBasic(String path) {
-        if (authProperties.getBasicApi() == null) {
-            return false;
-        }
+        if (authProperties.getBasicApi() == null) return false;
         return authProperties.getBasicApi().stream().anyMatch(pattern -> antPathMatcher.match(pattern, path));
     }
 
     private Mono<Void> unAuth(ServerHttpResponse resp, String msg) {
-        resp.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return jsonResponse(resp, HttpStatus.UNAUTHORIZED, msg);
+    }
+    
+    private Mono<Void> forbidden(ServerHttpResponse resp, String msg) {
+        return jsonResponse(resp, HttpStatus.FORBIDDEN, msg);
+    }
+
+    private Mono<Void> jsonResponse(ServerHttpResponse resp, HttpStatus status, String msg) {
+        resp.setStatusCode(status);
         resp.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
         String result = "";
         try {
@@ -177,30 +151,8 @@ public class AuthFilter implements GlobalFilter, Ordered {
         return resp.writeWith(Flux.just(buffer));
     }
 
-    private void addHeader(ServerHttpRequest.Builder mutate, String name, Object value) {
-        if (value == null) {
-            return;
-        }
-        String valueStr = value.toString();
-        String valueEncode = URLEncoder.encode(valueStr, StandardCharsets.UTF_8);
-        mutate.header(name, valueEncode);
-    }
-
-    private String generateGatewaySign(String userCode, String tenantCode, String timestamp) {
-        try {
-            String data = String.valueOf(userCode) + String.valueOf(tenantCode) + timestamp;
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(gatewaySecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            byte[] signBytes = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(signBytes);
-        } catch (Exception e) {
-            log.error("网关签名生成失败", e);
-            throw new RuntimeException("网关签名生成失败", e);
-        }
-    }
-
     @Override
     public int getOrder() {
-        return -1;
+        return 0; // After HeaderSanitizeFilter
     }
 }

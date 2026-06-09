@@ -4,7 +4,7 @@ set -e
 # 获取脚本所在根目录
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SERVER_DIR="$ROOT_DIR/zephyr-server"
-LOG_DIR="$ROOT_DIR/logs"
+LOG_DIR="$SERVER_DIR/logs"
 
 ACTION=$1
 
@@ -27,7 +27,7 @@ case "$ACTION" in
     fi
     
     # 调用并执行后端详细逻辑
-    sh "$SERVER_DIR/server.sh" "$ACTION"
+    sh "$SERVER_DIR/scripts/z-server.sh" "$ACTION"
     
     echo "====================================="
     echo "✅ 后端 $ACTION 流程已下发！"

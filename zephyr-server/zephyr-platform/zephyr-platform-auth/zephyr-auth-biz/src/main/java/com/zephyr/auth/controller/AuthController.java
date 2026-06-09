@@ -4,6 +4,7 @@ package com.zephyr.auth.controller;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.zephyr.auth.pojo.dto.LoginRequest;
 import com.zephyr.auth.pojo.vo.LoginResponse;
+import com.zephyr.auth.service.ZephyrUserDetailsService;
 import com.zephyr.auth.service.ZephyrUser;
 import com.zephyr.core.boot.web.UserContextHolder;
 import com.zephyr.core.boot.web.UserSession;
@@ -18,11 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +46,8 @@ import static com.zephyr.redis.Constant.RedisConstant.USER_INFO_PREFIX;
 @RequiredArgsConstructor
 @Tag(name = "登录/登出", description = "登录/登出")
 public class AuthController {
-    private final AuthenticationManager authenticationManager;
+    private final ZephyrUserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
     private final IUserClient userClient;
@@ -71,14 +69,17 @@ public class AuthController {
                 UserContextHolder.set(session);
             }
 
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
-                            request.getPassword()
-                    )
-            );
+            ZephyrUser userDetails;
+            try {
+                userDetails = (ZephyrUser) userDetailsService.loadUserByUsername(request.getUsername());
+            } catch (Exception e) {
+                return R.fail("用户不存在或状态异常");
+            }
 
-            ZephyrUser userDetails = (ZephyrUser) authentication.getPrincipal();
+            if (userDetails == null || !passwordEncoder.matches(request.getPassword(), userDetails.getPassword())) {
+                return R.fail("用户名或密码错误");
+            }
+
             String tenantCode = StringUtils.defaultIfBlank(request.getTenantCode(), "000000");
 
             Map<String, Object> claims = new HashMap<>();
@@ -109,9 +110,7 @@ public class AuthController {
             return R.data(LoginResponse.builder()
                     .token(accessToken)
                     .build());
-        } catch (BadCredentialsException e) {
-            return R.fail("用户名或密码错误");
-        } catch (AuthenticationException e) {
+        } catch (Exception e) {
             return R.fail("认证失败: " + e.getMessage());
         }
     }

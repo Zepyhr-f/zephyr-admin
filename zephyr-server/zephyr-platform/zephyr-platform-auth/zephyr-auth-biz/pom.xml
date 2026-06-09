@@ -20,8 +20,13 @@
 
         <dependency>
             <groupId>com.zephyr</groupId>
-            <artifactId>zephyr-starter-auth</artifactId>
+            <artifactId>zephyr-starter-security</artifactId>
             <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
         <dependency>

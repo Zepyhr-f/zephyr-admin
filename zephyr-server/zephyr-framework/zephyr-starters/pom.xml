@@ -15,7 +15,7 @@
 
     <modules>
         <module>zephyr-starter-api</module>
-        <module>zephyr-starter-auth</module>
+        <module>zephyr-starter-security</module>
         <module>zephyr-starter-jwt</module>
         <module>zephyr-starter-mybatis</module>
         <module>zephyr-starter-redis</module>
