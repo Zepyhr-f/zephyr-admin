@@ -26,29 +26,34 @@ public class FeignContextInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate template) {
         UserSession session = UserContextHolder.get();
-        if (session == null || session.getUserCode() == null || "-1".equals(session.getUserCode())) {
-            return;
+        String userCode = "";
+        String tenantCode = "";
+        
+        if (session != null) {
+            userCode = session.getUserCode() == null ? "" : session.getUserCode();
+            tenantCode = session.getTenantCode() == null ? "" : session.getTenantCode();
         }
-
-        String userCode = session.getUserCode();
-        String tenantCode = session.getTenantCode();
-        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
-        String sign = generateSign(userCode, tenantCode, timestamp);
+        
+        // Always generate signature for Feign calls so the target service accepts it
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String nonce = java.util.UUID.randomUUID().toString().replace("-", "");
+        String requestId = java.util.UUID.randomUUID().toString().replace("-", "");
+        String sign = generateSign(timestamp, nonce, tenantCode, userCode, requestId);
 
         template.header(USER_CODE_HEADER, userCode);
-        if (tenantCode != null) {
-            template.header(TENANT_CODE_HEADER, tenantCode);
-        }
+        template.header(TENANT_CODE_HEADER, tenantCode);
         template.header(TIMESTAMP_HEADER, timestamp);
+        template.header("X-Gateway-Nonce", nonce);
+        template.header("X-Request-Id", requestId);
         template.header(GATEWAY_SIGN_HEADER, sign);
     }
 
-    private String generateSign(String userCode, String tenantCode, String timestamp) {
+    private String generateSign(String timestamp, String nonce, String tenantCode, String userCode, String requestId) {
         try {
-            String data = String.valueOf(userCode) + String.valueOf(tenantCode) + timestamp;
+            String canonicalString = timestamp + "\n" + nonce + "\n" + tenantCode + "\n" + userCode + "\n" + requestId;
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(gatewaySecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            return Base64.getEncoder().encodeToString(mac.doFinal(data.getBytes(StandardCharsets.UTF_8)));
+            return Base64.getEncoder().encodeToString(mac.doFinal(canonicalString.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             throw new RuntimeException("Feign 签名生成失败", e);
         }

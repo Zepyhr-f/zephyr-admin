@@ -16,10 +16,10 @@ public class GatewaySignUtil {
     @Value("${zephyr.gateway.secret:zephyr-gateway-secret-key-2026}")
     private String gatewaySecret;
 
-    public String generateSign(String timestamp, String nonce, String method, String path, String tenantCode, String userCode, String requestId) {
+    public String generateSign(String timestamp, String nonce, String tenantCode, String userCode, String requestId) {
         try {
-            // Canonical String: {timestamp}\n{nonce}\n{method}\n{path}\n{tenantCode}\n{userCode}\n{requestId}
-            String canonicalString = timestamp + "\n" + nonce + "\n" + method + "\n" + path + "\n" + tenantCode + "\n" + userCode + "\n" + requestId;
+            // Canonical String: {timestamp}\n{nonce}\n{tenantCode}\n{userCode}\n{requestId}
+            String canonicalString = timestamp + "\n" + nonce + "\n" + tenantCode + "\n" + userCode + "\n" + requestId;
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(gatewaySecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
             byte[] signBytes = mac.doFinal(canonicalString.getBytes(StandardCharsets.UTF_8));

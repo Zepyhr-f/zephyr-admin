@@ -62,19 +62,7 @@ public class UserInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        // 校验签名
-        if (!verifySign(userCode, tenantCode, timestamp, sign)) {
-            log.warn("网关签名校验失败: userCode={}, timestamp={}", userCode, timestamp);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
-
-        // 校验 timestamp（防重放）
-        if (!verifyTimestamp(timestamp)) {
-            log.warn("请求时间戳校验失败: timestamp={}", timestamp);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
+        // 验签与防重放已交由 GatewaySecurityInterceptor 和 Gateway 处理，此处直接放行
 
         // 从 Redis 获取 UserSession
         UserSession session = null;
@@ -98,32 +86,7 @@ public class UserInterceptor implements HandlerInterceptor {
         UserContextHolder.clear();
     }
 
-    private boolean verifySign(String userCode, String tenantCode, String timestamp, String sign) {
-        if (sign == null || timestamp == null) {
-            return false;
-        }
-        try {
-            String data = String.valueOf(userCode) + String.valueOf(tenantCode) + timestamp;
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(gatewaySecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            byte[] expected = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            String expectedSign = Base64.getEncoder().encodeToString(expected);
-            return expectedSign.equals(sign);
-        } catch (Exception e) {
-            log.error("签名校验异常", e);
-            return false;
-        }
-    }
 
-    private boolean verifyTimestamp(String timestamp) {
-        try {
-            long ts = Long.parseLong(timestamp);
-            long now = System.currentTimeMillis() / 1000;
-            return Math.abs(now - ts) <= TIMESTAMP_TOLERANCE_SECONDS;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
 
     private UserSession buildUserSessionFromHeaders(String userCode, String tenantCode) {
         UserSession session = new UserSession();

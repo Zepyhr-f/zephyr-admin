@@ -57,57 +57,59 @@ public class AuthFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
         String method = exchange.getRequest().getMethod().name();
 
-        // 1. 白名单放行
-        if (isWhiteList(path)) {
-            return chain.filter(exchange);
-        }
+        boolean isWhite = isWhiteList(path);
+        String userCode = "";
+        String tenantCode = "";
+        Set<String> roles = java.util.Collections.emptySet();
 
-        // 2. Token 校验
-        String authHeader = exchange.getRequest().getHeaders().getFirst(HEADER_STRING);
-        if (authHeader == null) {
-            return unAuth(response, "未授权，Token缺失");
-        }
-        
-        String token = authHeader.startsWith(TOKEN_PREFIX) ? authHeader.substring(TOKEN_PREFIX_LENGTH) : authHeader;
+        if (!isWhite) {
+            // 2. Token 校验
+            String authHeader = exchange.getRequest().getHeaders().getFirst(HEADER_STRING);
+            if (authHeader == null) {
+                return unAuth(response, "未授权，Token缺失");
+            }
+            
+            String token = authHeader.startsWith(TOKEN_PREFIX) ? authHeader.substring(TOKEN_PREFIX_LENGTH) : authHeader;
 
-        Claims claims;
-        try {
-            claims = jwtUtil.extractAllClaims(token);
-        } catch (JwtException e) {
-            log.error("JWT解析异常: {}", e.getMessage());
-            return unAuth(response, "Token格式非法或已过期");
-        }
+            Claims claims;
+            try {
+                claims = jwtUtil.extractAllClaims(token);
+            } catch (JwtException e) {
+                log.error("JWT解析异常: {}", e.getMessage());
+                return unAuth(response, "Token格式非法或已过期");
+            }
 
-        if (jwtUtil.isTokenExpired(token)) {
-            return unAuth(response, "Token已过期");
-        }
+            if (jwtUtil.isTokenExpired(token)) {
+                return unAuth(response, "Token已过期");
+            }
 
-        String jti = claims.get(JTI, String.class);
-        if (jti != null) {
-            if (redisUtil.getString(RedisConstant.BLACKLIST_PREFIX + jti) != null) {
-                return unAuth(response, "Token已被注销");
+            String jti = claims.get(JTI, String.class);
+            if (jti != null) {
+                if (redisUtil.getString(RedisConstant.BLACKLIST_PREFIX + jti) != null) {
+                    return unAuth(response, "Token已被注销");
+                }
+            }
+
+            userCode = claims.getSubject();
+            tenantCode = claims.get(TENANT_CODE, String.class);
+
+            // 3. 基础认证与严格鉴权
+            roles = rbacService.getUserRoles(tenantCode, userCode);
+            if (!isBasic(path)) {
+                // RBAC strict
+                if (!rbacService.checkPermission(tenantCode, method, path, roles)) {
+                    return forbidden(response, "权限不足，禁止访问");
+                }
             }
         }
 
-        String userCode = claims.getSubject();
-        String tenantCode = claims.get(TENANT_CODE, String.class);
-
-        // 3. 基础认证与严格鉴权
-        Set<String> roles = rbacService.getUserRoles(tenantCode, userCode);
-        if (!isBasic(path)) {
-            // RBAC strict
-            if (!rbacService.checkPermission(tenantCode, method, path, roles)) {
-                return forbidden(response, "权限不足，禁止访问");
-            }
-        }
-
-        // 4. 上下文透传与网关签名
+        // 4. 上下文透传与网关签名 (所有请求都必须签名，防止绕过网关)
         String timestamp = String.valueOf(System.currentTimeMillis());
         String nonce = nonceStore.generateNonce();
         String requestId = exchange.getRequest().getHeaders().getFirst(GatewayConstant.X_REQUEST_ID);
         if(requestId == null) requestId = "";
 
-        String sign = signUtil.generateSign(timestamp, nonce, method, path, tenantCode, userCode, requestId);
+        String sign = signUtil.generateSign(timestamp, nonce, tenantCode, userCode, requestId);
 
         ServerHttpRequest request = exchange.getRequest().mutate()
                 .header(SecurityConstants.USER_CODE_HEADER, userCode)
@@ -117,6 +119,8 @@ public class AuthFilter implements GlobalFilter, Ordered {
                 .header(SecurityConstants.NONCE_HEADER, nonce)
                 .header(SecurityConstants.GATEWAY_SIGN_HEADER, sign)
                 .build();
+
+        log.info("Gateway generated headers - Path: {}, Sign: {}, Timestamp: {}, Nonce: {}", path, sign, timestamp, nonce);
 
         return chain.filter(exchange.mutate().request(request).build());
     }

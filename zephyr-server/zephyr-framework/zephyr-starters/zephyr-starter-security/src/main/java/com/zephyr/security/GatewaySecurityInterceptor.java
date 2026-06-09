@@ -59,8 +59,6 @@ public class GatewaySecurityInterceptor implements HandlerInterceptor {
         String expectedSign = gatewaySignUtil.generateSign(
                 timestamp,
                 nonce,
-                method,
-                path,
                 tenantCode == null ? "" : tenantCode,
                 userCode == null ? "" : userCode,
                 requestId == null ? "" : requestId
