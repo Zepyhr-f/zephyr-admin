@@ -14,12 +14,11 @@ interface User {
 }
 
 export default function SystemUserPage() {
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
-  // 模拟数据
   const data: User[] = [
     {
       id: '1',

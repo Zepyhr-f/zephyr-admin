@@ -31,6 +31,11 @@ public class RedisUtil {
         redisTemplate.opsForValue().set(key, value, timeout, unit);
     }
 
+    /** 存字符串（不过期） */
+    public void setString(String key, String value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
+
     /** 存对象（自动序列化为 JSON） */
     public void setObject(String key, Object obj, long timeout, TimeUnit unit) {
         try {

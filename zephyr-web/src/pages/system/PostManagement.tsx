@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Space, Switch, Modal, Form, Input, InputNumber, Radio, message, Popconfirm, Select, Button } from 'antd';
-import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { PageShell } from '@/components/PageShell';
 import { DataTable } from '@/components/DataTable';
 import { QueryForm } from '@/components/QueryForm';

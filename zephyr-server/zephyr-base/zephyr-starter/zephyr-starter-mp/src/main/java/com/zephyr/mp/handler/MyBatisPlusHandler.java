@@ -43,9 +43,11 @@ public class MyBatisPlusHandler implements MetaObjectHandler {
     }
 
     private String getCurrentUserCode() {
-        return StringUtils.isEmpty(UserContextHolder.get().getUserCode()) ?
-                UserContextHolder.get().getUserCode() :
-                DEFAULT_USER_ID;
+        com.zephyr.core.boot.web.UserSession session = UserContextHolder.get();
+        if (session != null && !StringUtils.isEmpty(session.getUserCode())) {
+            return session.getUserCode();
+        }
+        return DEFAULT_USER_ID;
     }
 
 }

@@ -26,11 +26,18 @@ public class MenuController {
 
     private final IMenuService service;
 
-    @GetMapping("/tree")
-    @ApiOperationSupport(order = 1)
-    @Operation(summary = "菜单树", description = "查询全部菜单树形结构")
-    public R<List<MenuVO>> tree() {
-        return R.data(service.listTree());
+//    @GetMapping("/tree")
+//    @ApiOperationSupport(order = 1)
+//    @Operation(summary = "菜单树", description = "查询全部菜单树形结构")
+//    public R<List<MenuVO>> tree() {
+//        return R.data(service.listTree());
+//    }
+
+    @GetMapping("/routes")
+    @ApiOperationSupport(order = 2)
+    @Operation(summary = "用户路由菜单", description = "查询当前用户拥有的菜单树形结构")
+    public R<List<MenuVO>> routes() {
+        return R.data(service.listRoutes());
     }
 
     @GetMapping("/detail")

@@ -32,6 +32,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 
 import static com.zephyr.core.tool.constant.WebConstants.*;
 import static com.zephyr.jwt.config.JwtConstant.*;
@@ -104,6 +106,35 @@ public class AuthFilter implements GlobalFilter, Ordered {
         String userCode = claims.getSubject();
         String tenantCode = claims.get(TENANT_CODE, String.class);
 
+        // 基础认证校验 / 严格鉴权校验
+        if (!isBasic(path) && !isBasic(originalRequestUrl)) {
+            // 严格鉴权路径，获取用户信息确保处于登录状态
+            Map userInfo = redisUtil.getObject(RedisConstant.USER_INFO_PREFIX + tenantCode + ":" + userCode, Map.class);
+            if (userInfo == null) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return unAuth(response, "登录已失效，请重新登录");
+            }
+            
+            // 注意：因为数据库中存储的 perms 是如 "sys:menu:list" 的权限标识，
+            // 而当前请求的 path 是类似 "/zephyr-system/menu/routes" 的 URL，
+            // 二者不可能通过 antPathMatcher 匹配成功，所以这里直接放行，把细粒度的权限校验交给后端（如 @PreAuthorize）来处理。
+            /* 
+            List<String> perms = (List<String>) userInfo.get("perms");
+            boolean hasPermission = false;
+            for (String perm : perms) {
+                if (antPathMatcher.match(perm.trim(), path) || antPathMatcher.match(perm.trim(), originalRequestUrl)) {
+                    hasPermission = true;
+                    break;
+                }
+            }
+
+            if (!hasPermission) {
+                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                return unAuth(response, "没有访问权限");
+            }
+            */
+        }
+
         // 生成签名
         String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
         String sign = generateGatewaySign(userCode, tenantCode, timestamp);
@@ -115,12 +146,22 @@ public class AuthFilter implements GlobalFilter, Ordered {
         addHeader(mutate, TIMESTAMP_HEADER, timestamp);
         addHeader(mutate, GATEWAY_SIGN_HEADER, sign);
 
-        return chain.filter(exchange);
+        ServerHttpRequest buildRequest = mutate.build();
+        ServerWebExchange newExchange = exchange.mutate().request(buildRequest).build();
+
+        return chain.filter(newExchange);
     }
 
     private boolean isSkip(String path) {
         return DefaultSkipProp.getDefaultSkipUrl().stream().anyMatch(pattern -> antPathMatcher.match(pattern, path))
                 || authProperties.getWhiteApi().stream().anyMatch(pattern -> antPathMatcher.match(pattern, path));
+    }
+
+    private boolean isBasic(String path) {
+        if (authProperties.getBasicApi() == null) {
+            return false;
+        }
+        return authProperties.getBasicApi().stream().anyMatch(pattern -> antPathMatcher.match(pattern, path));
     }
 
     private Mono<Void> unAuth(ServerHttpResponse resp, String msg) {

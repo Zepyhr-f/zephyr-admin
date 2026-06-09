@@ -18,7 +18,7 @@ import org.springframework.context.annotation.ComponentScan;
  *
  * @author Zephyr
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {com.github.xiaoymin.knife4j.spring.configuration.Knife4jAutoConfiguration.class})
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = {"com.zephyr.**.feign"})
 @ComponentScan(basePackages = "com.zephyr")

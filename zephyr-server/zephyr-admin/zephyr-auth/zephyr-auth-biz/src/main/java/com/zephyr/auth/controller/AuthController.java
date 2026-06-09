@@ -23,7 +23,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.BadCredentialsException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -34,7 +34,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import com.zephyr.system.feign.IUserClient;
 
+import static com.zephyr.core.tool.constant.WebConstants.TENANT_CODE_HEADER;
+import static com.zephyr.core.tool.constant.WebConstants.USER_CODE_HEADER;
 import static com.zephyr.jwt.config.JwtConstant.*;
+import static com.zephyr.redis.Constant.RedisConstant.USER_INFO_PREFIX;
 
 /**
  * 登录登出
@@ -43,7 +46,7 @@ import static com.zephyr.jwt.config.JwtConstant.*;
  * @since 2025-09-13
  */
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "登录/登出", description = "登录/登出")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
@@ -76,7 +79,7 @@ public class AuthController {
             );
 
             ZephyrUser userDetails = (ZephyrUser) authentication.getPrincipal();
-            String tenantCode = StringUtils.defaultString(request.getTenantCode());
+            String tenantCode = StringUtils.defaultIfBlank(request.getTenantCode(), "000000");
 
             Map<String, Object> claims = new HashMap<>();
             claims.put(USER_CODE, userDetails.getUserCode());
@@ -136,7 +139,7 @@ public class AuthController {
             // 解析 userCode 和 tenantCode
             String[] parts = redisValue.split(":");
             String userCode = parts[0];
-            String tenantCode = parts.length > 1 ? parts[1] : "";
+            String tenantCode = parts.length > 1 ? StringUtils.defaultIfBlank(parts[1], "000000") : "000000";
 
             // 生成新的 Access Token
             Map<String, Object> claims = new HashMap<>();
@@ -171,19 +174,23 @@ public class AuthController {
     @GetMapping("/info")
     @Operation(summary = "获取用户信息", description = "从 token 中提取并在数据库查询")
     public R<Map<String, Object>> getUserInfo(HttpServletRequest request) {
-        String authHeader = request.getHeader(HEADER_STRING);
-        if (StringUtils.isBlank(authHeader)) {
+        String userCode = request.getHeader(USER_CODE_HEADER);
+        String tenantCode = request.getHeader(TENANT_CODE_HEADER);
+
+        if (StringUtils.isNotBlank(userCode)) {
+            userCode = java.net.URLDecoder.decode(userCode, java.nio.charset.StandardCharsets.UTF_8);
+        }
+        if (StringUtils.isNotBlank(tenantCode)) {
+            tenantCode = java.net.URLDecoder.decode(tenantCode, java.nio.charset.StandardCharsets.UTF_8);
+        }
+
+        if (StringUtils.isBlank(userCode) || StringUtils.isBlank(tenantCode)) {
             return R.fail("未检测到登录令牌 (Header missing)");
         }
 
-        String token = authHeader.startsWith(TOKEN_PREFIX) ?
-                authHeader.substring(TOKEN_PREFIX_LENGTH) : authHeader;
-
         try {
-            String userCode = jwtUtil.extractUserCode(token);
-            String tenantCode = getTenantCode();
-            User user = userClient.getUserByCode(userCode, tenantCode);
 
+            User user = userClient.getUserByCode(userCode, tenantCode);
             if (user == null) {
                 return R.fail("用户不存在");
             }
@@ -200,7 +207,11 @@ public class AuthController {
             userMap.put("username", user.getNickName());
             userInfo.put("user", userMap);
             userInfo.put("roles", roleCodes);
-            userInfo.put("permissions", perms);
+            userInfo.put("perms", perms);
+
+            // 将用户会话信息缓存到 Redis，供 UserInterceptor 和 Gateway 读取
+            String sessionRedisKey = USER_INFO_PREFIX + tenantCode + ":" + userCode;
+            redisUtil.setObject(sessionRedisKey, userInfo, 2, TimeUnit.HOURS);
 
             return R.data(userInfo);
         } catch (Exception e) {

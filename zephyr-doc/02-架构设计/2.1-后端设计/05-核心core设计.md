@@ -47,6 +47,12 @@ com.zephyr.core
 └── util/               # 纯 Java 工具（谨慎收敛，避免“大杂烩”）
 ```
 
+> [!IMPORTANT]
+> ### util/ “大杂烩”防御铁律（必须遵守）
+> 1) **禁止**在 `zephyr-core` 中手写第三方成熟库已覆盖的工具类（如 `StringUtils/DateUtils/CollectionUtils` 等“轮子”）。  
+> 2) `zephyr-core` 的 util 仅允许收敛**与 core 模型强相关**、且 JDK 本身缺失的少量辅助能力；否则应放到 `zephyr-starter-*` 或具体业务模块中。  
+> 3) 如确需引入通用工具库（例如 `commons-lang3` / `hutool-core`），必须评估其对 `zephyr-core` 的“底座纯净性”和依赖体积影响，并走架构评审；默认优先将此类依赖放到 starter 或上层模块，而非 core。
+
 ---
 
 ## 3. 统一响应体设计（`R<T>`）
@@ -75,6 +81,12 @@ public class R<T> {
 - `success=true` 时：`code=200`（或 `ResultCode.SUCCESS`），`msg` 可为空
 - `success=false` 时：`data` 必须为 `null`（避免误用）
 - `traceId` 由网关或 web starter 注入（`zephyr-core` 只提供字段与模型）
+
+> [!IMPORTANT]
+> ### R<T> 序列化/反序列化协同（RPC/Feign 防坑）
+> - 在错误响应（`success=false`）场景，**推荐将 `data` 字段直接省略**（而不是显式输出 `"data": null`），以降低跨语言/严格 JSON 解析器在 `R<Void>` 等泛型下的反序列化风险。  
+> - 若 `zephyr-core` 已引入 `jackson-annotations`，建议在 `R<T>` 上增加：`@JsonInclude(JsonInclude.Include.NON_NULL)`，让 `data/traceId/ts` 等可选字段在为 `null` 时不输出。  
+> - 如果 `zephyr-core` 不希望引入任何 Jackson 相关依赖，则应在 `zephyr-starter-web` 中通过 `ObjectMapper` 全局配置或 Mixin 的方式实现同等效果；保持“模型在 core，序列化策略在 starter”。
 
 ---
 
@@ -186,11 +198,11 @@ public abstract class BaseEntity {
 
 ## 8. 上下文与链路字段（可选）
 
-`zephyr-core` 可提供“无框架绑定”的上下文载体，具体注入由网关/web starter 完成。
+`zephyr-core` 只提供“无框架绑定”的上下文 POJO（建议命名为 `ZephyrContext` 或 `RequestContext`），**不负责 ThreadLocal/清理**；具体承载与注入由网关与各类 starter 完成。
 
 示例：
 ```java
-public final class RequestContext {
+public final class ZephyrContext {
     private String traceId;
     private String userCode;
     private String tenantCode;
@@ -199,7 +211,17 @@ public final class RequestContext {
 ```
 
 注意：
-- 不要在 `zephyr-core` 中使用 `ThreadLocal` 强行绑定框架行为；如需 ThreadLocal，请在 `zephyr-starter-web` 中封装生命周期管理。
+- 不要在 `zephyr-core` 中使用 `ThreadLocal` 强行绑定框架行为；如需 ThreadLocal/上下文透传，请在 `zephyr-starter-web` 中封装生命周期管理（创建、传递、清理）。
+
+### 8.1 线程安全与异步/线程池透传的推荐落地（在 starter-web）
+
+建议在 `zephyr-starter-web` 中采用以下策略承载上下文：
+
+1. **同步请求链路**：在 Filter/Interceptor 中解析并写入上下文；在请求结束时统一清理。  
+2. **异步/线程池链路**：使用 **TransmittableThreadLocal (TTL)** 承载 `ZephyrContext`，并对线程池进行 TTL 包装，确保在异步任务、线程池、以及常见的限流/熔断/隔离组件场景下上下文不丢失。  
+3. **跨服务调用**：在 Feign `RequestInterceptor`（或 HTTP Client 拦截器）中从上下文读取 `traceId/userCode/tenantCode` 等并透传。  
+
+> 备注：TTL 的“复制与清理”必须由 starter 统一封装，业务代码只做读取，不做绑定与清理，避免线程池环境下的上下文泄漏风险。
 
 ---
 
@@ -220,3 +242,41 @@ public final class RequestContext {
 - 对外字段新增采用“可选字段”方式，避免破坏前端与网关兼容
 - 重大调整必须走版本号升级与迁移说明（写入 changelog）
 
+---
+
+## 11. 模块依赖与演进拓扑图（推荐）
+
+### 11.1 依赖拓扑（禁止反向依赖）
+
+```mermaid
+flowchart TB
+  CORE[zephyr-core\n(纯模型/错误语义/上下文POJO)]
+  SW[zephyr-starter-web\n(序列化/异常处理/上下文注入与清理)]
+  SS[zephyr-starter-security\n(认证鉴权能力)]
+  SMP[zephyr-starter-mybatis\n(BaseEntity填充/MP集成)]
+  API[zephyr-api/*\n(契约/DTO/Feign接口)]
+  GW[zephyr-gateway]
+  PS[zephyr-platform-service]
+  BS[zephyr-business-service]
+
+  SW --> CORE
+  SS --> CORE
+  SMP --> CORE
+  API --> CORE
+  GW --> CORE
+  PS --> CORE
+  BS --> CORE
+
+  PS --> SW
+  PS --> SS
+  PS --> SMP
+  BS --> SW
+  BS --> SS
+  BS --> SMP
+```
+
+### 11.2 上下文落地分工（POJO vs 承载）
+
+- `zephyr-core`：只定义 `ZephyrContext`（POJO）与字段含义  
+- `zephyr-starter-web`：负责上下文的生命周期（创建/透传/清理），以及必要的线程池透传（如 TTL）  
+- `zephyr-gateway`：负责生成/透传 `traceId`，注入可信 Header，并对下游服务可观测性字段打点

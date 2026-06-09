@@ -23,7 +23,18 @@ public class DefaultSkipProp {
             "/oauth/revoke/**",
             "/oauth/refresh/**",
             "/token/**",
-            "/zephyr-auth/logout"
+            "/zephyr-auth/logout",
+            
+            /* Knife4j & Swagger 放行 */
+            "/doc.html",
+            "/doc.html*",
+            "/webjars/**",
+            "/v3/api-docs/**",
+            "/*/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/favicon.ico"
     );
 
     /**

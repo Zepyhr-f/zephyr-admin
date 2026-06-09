@@ -1,6 +1,10 @@
 server:
   port: 8072
 
+zephyr:
+  gateway:
+    secret: zephyr-gateway-secret-key-2026
+
 spring:
   application:
     name: zephyr-common

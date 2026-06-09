@@ -9,6 +9,8 @@ import com.zephyr.system.pojo.vo.MenuVO;
 import com.zephyr.system.service.IMenuService;
 import org.springframework.stereotype.Service;
 
+import com.zephyr.core.boot.web.UserContextHolder;
+import com.zephyr.core.boot.web.UserSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +27,31 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
     public List<MenuVO> listTree() {
         List<Menu> allMenus = list(new LambdaQueryWrapper<Menu>()
                 .orderByAsc(Menu::getOrderNum));
+        List<MenuVO> allVos = allMenus.stream().map(menu -> {
+            MenuVO vo = MenuConvert.INSTANCE.toVo(menu);
+            return vo;
+        }).collect(Collectors.toList());
+        return buildTree(allVos, null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.zephyr.redis.util.RedisUtil redisUtil;
+
+    @Override
+    public List<MenuVO> listRoutes() {
+        UserSession session = UserContextHolder.get();
+        if (session == null) {
+            return new ArrayList<>();
+        }
+        
+        List<Menu> allMenus;
+        String rolesStr = redisUtil.getString(com.zephyr.redis.Constant.RedisConstant.AUTH_USER_ROLES_PREFIX + session.getTenantCode() + ":" + session.getUserCode());
+        if (rolesStr != null && java.util.Arrays.asList(rolesStr.split(",")).contains("admin")) {
+            allMenus = list(new LambdaQueryWrapper<Menu>().orderByAsc(Menu::getOrderNum));
+        } else {
+            allMenus = baseMapper.selectMenusByUserCode(session.getUserCode(), session.getTenantCode());
+        }
+
         List<MenuVO> allVos = allMenus.stream().map(menu -> {
             MenuVO vo = MenuConvert.INSTANCE.toVo(menu);
             return vo;

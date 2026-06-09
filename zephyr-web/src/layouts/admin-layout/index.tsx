@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import {
   Breadcrumb,
   Dropdown,
@@ -8,7 +8,6 @@ import {
   Space,
   Typography,
   Button,
-  Tabs,
   Drawer,
 } from "antd";
 import type { MenuProps } from "antd";
@@ -27,8 +26,9 @@ import {
 } from "@ant-design/icons";
 import { useAuthStore } from "@/store/use-auth-store";
 import { useThemeStore } from "@/store/use-theme-store";
-import { routes, type AppRoute } from "@/routes/route-config";
 import client from "@/api/client";
+import { DynamicRoutes } from "@/routes/dynamic-routes";
+import { getIconElement } from "@/components/IconMapper";
 
 const { Header, Sider, Content } = Layout;
 
@@ -77,32 +77,45 @@ function saveTabs(tabs: TabItem[]) {
   }
 }
 
-function flattenRoutes(rs: AppRoute[]): AppRoute[] {
-  const out: AppRoute[] = [];
-  for (const r of rs) {
-    out.push(r);
-    if (r.children) out.push(...flattenRoutes(r.children));
+function flattenMenus(menus: any[]): any[] {
+  const out: any[] = [];
+  for (const m of menus) {
+    out.push(m);
+    if (m.children) out.push(...flattenMenus(m.children));
   }
   return out;
 }
 
-function buildMenuItems(rs: AppRoute[]): MenuProps["items"] {
-  return rs
-    .filter((r) => r.children?.length || r.element)
-    .map((r) => {
-      if (r.children?.length) {
+function buildMenuItems(menus: any[]): MenuProps["items"] {
+  return menus
+    .filter((m) => m.menuType !== "F") // 过滤掉按钮权限
+    .map((m) => {
+      const baseItem = {
+        key: m.path || m.code,
+        icon: getIconElement(m.icon),
+        label: m.menuName,
+      };
+
+      // 只有目录类型(M)才可能作为 SubMenu
+      if (m.menuType === "M") {
+        let childrenItems = undefined;
+        if (m.children && m.children.length > 0) {
+          const items = buildMenuItems(m.children);
+          if (items && items.length > 0) {
+            childrenItems = items;
+          }
+        }
         return {
-          key: r.path,
-          icon: r.icon,
-          label: r.label,
-          children: r.children.map((c) => ({
-            key: c.path,
-            icon: c.icon,
-            label: c.label,
-          })),
+          ...baseItem,
+          children: childrenItems, // 如果没有子项则为 undefined，仍然表现为普通项但不可跳转（符合目录预期）
         };
       }
-      return { key: r.path, icon: r.icon, label: r.label };
+
+      // 菜单类型(C) 或其他，直接作为可点击路由项
+      return {
+        ...baseItem,
+        label: <Link to={m.path || "/"}>{m.menuName}</Link>,
+      };
     });
 }
 
@@ -111,33 +124,6 @@ function calcOpenKeys(pathname: string) {
   return seg ? [`/${seg}`] : [];
 }
 
-function sortRoutesByMenus(routeList: AppRoute[], menus: any[]): AppRoute[] {
-  if (!menus || menus.length === 0) return routeList;
-
-  // Build order map from menus (works for both backend MenuVO and defaultMenus)
-  const orderMap = new Map<string, number>();
-  menus.forEach((m, idx) => {
-    // try to match by path
-    if (m.path) orderMap.set(m.path, idx);
-  });
-
-  const sorted = [...routeList].sort((a, b) => {
-    const idxA = orderMap.has(a.path) ? orderMap.get(a.path)! : 999;
-    const idxB = orderMap.has(b.path) ? orderMap.get(b.path)! : 999;
-    return idxA - idxB;
-  });
-
-  return sorted.map((r) => {
-    if (r.children) {
-      // Find the corresponding menu node to get its children's order
-      const backendNode = menus.find((m) => m.path === r.path);
-      if (backendNode && backendNode.children) {
-        return { ...r, children: sortRoutesByMenus(r.children, backendNode.children) };
-      }
-    }
-    return r;
-  });
-}
 
 /* ── component ───────────────────────────────────────────── */
 
@@ -163,9 +149,8 @@ export default function AdminLayout() {
   
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const sortedRoutes = useMemo(() => sortRoutesByMenus(routes, menus || []), [menus]);
-  const all = useMemo(() => flattenRoutes(sortedRoutes), [sortedRoutes]);
-  const menuItems = useMemo(() => buildMenuItems(sortedRoutes), [sortedRoutes]);
+  const all = useMemo(() => flattenMenus(menus || []), [menus]);
+  const menuItems = useMemo(() => buildMenuItems(menus || []), [menus]);
 
   const homeTab: TabItem = useMemo(
     () => ({ key: "/", title: "概览", closable: false }),
@@ -198,7 +183,7 @@ export default function AdminLayout() {
   useEffect(() => {
     const pathname = activeTabKey;
     const hit = all.find((r) => r.path === pathname || (pathname === "/" && r.path === "/"));
-    const title = hit?.label || (pathname === "/" ? "概览" : pathname);
+    const title = hit?.menuName || (pathname === "/" ? "概览" : pathname);
     const tab: TabItem = {
       key: pathname,
       title,
@@ -218,15 +203,16 @@ export default function AdminLayout() {
       (r) => r.path === location.pathname || (location.pathname === "/" && r.path === "/")
     );
     if (!hit) return [{ title: "Zephyr" }];
-    const seg = location.pathname.split("/").filter(Boolean)[0];
-    const group = seg ? routes.find((r) => r.path === `/${seg}`) : undefined;
+    
+    // Attempt to find parent using the menus hierarchy, but a flat search for parentCode works too.
+    const parent = all.find(m => m.code === hit.parentCode);
     const list: { title: React.ReactNode }[] = [];
     
     if (location.pathname === "/") {
-      list.push({ title: hit.label || "概览" });
+      list.push({ title: hit.menuName || "概览" });
     } else {
-      if (group && group.path !== "/") list.push({ title: group.label });
-      if (hit.path !== "/" && hit.label) list.push({ title: hit.label });
+      if (parent && parent.code !== "-1") list.push({ title: parent.menuName });
+      if (hit.path !== "/" && hit.menuName) list.push({ title: hit.menuName });
     }
     return list;
   }, [all, location.pathname]);
@@ -434,7 +420,7 @@ export default function AdminLayout() {
 
         {/* ── 内容区 ─────────────────────────────── */}
         <Content style={{ overflow: "auto" }}>
-          <Outlet />
+          <DynamicRoutes />
         </Content>
         {/* ── 配置抽屉 ─────────────────────────────── */}
         <Drawer

@@ -1,4 +1,4 @@
-package com.zephyr.system.runner;
+package com.zephyr.common.runner;
 
 import com.zephyr.redis.util.RedisUtil;
 import com.zephyr.system.mapper.UserMapper;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.zephyr.redis.Constant.RedisConstant.ROLE_PREFIX;
+import static com.zephyr.redis.Constant.RedisConstant.AUTH_ROLE_PERMS_PREFIX;
 
 /**
  * 角色权限加载器（已适配新版 RBAC 表结构：sys_role_menu + sys_menu.perms）
@@ -45,10 +45,11 @@ public class RolePermsLoader implements ApplicationRunner {
                     .filter(p -> p != null && !p.isEmpty())
                     .collect(Collectors.toSet());
 
-            String redisKey = ROLE_PREFIX + role.getCode();
+            String redisKey = AUTH_ROLE_PERMS_PREFIX + role.getTenantCode() + ":" + role.getCode();
             redisUtil.deleteKey(redisKey);
             if (!perms.isEmpty()) {
-                redisUtil.addSet(redisKey, perms);
+                String permsStr = String.join(",", perms);
+                redisUtil.setString(redisKey, permsStr);
             }
         }
         log.info("[RolePermsLoader] 角色权限缓存加载完毕，共加载 {} 个角色", roleList.size());

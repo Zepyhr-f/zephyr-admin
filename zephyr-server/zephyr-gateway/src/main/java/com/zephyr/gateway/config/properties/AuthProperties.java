@@ -24,4 +24,9 @@ public class AuthProperties {
      * 白名单API
      */
     private List<String> whiteApi = new ArrayList<>();
+
+    /**
+     * 基础认证API
+     */
+    private List<String> basicApi = new ArrayList<>();
 }

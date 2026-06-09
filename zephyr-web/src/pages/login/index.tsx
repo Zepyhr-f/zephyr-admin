@@ -40,15 +40,14 @@ export default function LoginPage() {
       // 2. 拉取用户信息 & 菜单
       const headers = { Authorization: `Bearer ${token}` };
       const baseURL = import.meta.env.VITE_API_BASE_URL;
-      const [infoRes, menuRes] = await Promise.all([
-        axios.get(`${baseURL}zephyr-auth/info`, { headers, withCredentials: true }),
-        axios.get(`${baseURL}zephyr-system/menu/tree`, { headers, withCredentials: true }),
-      ]);
+      const infoRes = await axios.get(`${baseURL}zephyr-auth/info`, { headers, withCredentials: true });
       const infoData = infoRes.data?.data;
-      const menuData = menuRes.data?.data;
       if (infoData) {
         setUserInfo(infoData.user, infoData.roles, infoData.permissions);
       }
+
+      const menuRes = await axios.get(`${baseURL}zephyr-system/menu/routes`, { headers, withCredentials: true });
+      const menuData = menuRes.data?.data;
       setMenus(menuData || []);
 
       // 3. 记住我

@@ -17,4 +17,9 @@ public interface IMenuService extends IService<Menu> {
      * 查询全部菜单，以树形结构返回
      */
     List<MenuVO> listTree();
+
+    /**
+     * 查询当前用户的路由菜单树
+     */
+    List<MenuVO> listRoutes();
 }

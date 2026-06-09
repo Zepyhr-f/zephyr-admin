@@ -237,6 +237,17 @@
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
             </dependency>
+            <!-- SpringDoc 2.7.0 适配 Spring Boot 3.4.x -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>2.7.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <version>2.7.0</version>
+            </dependency>
             <dependency>
                 <groupId>com.ly.smart-doc</groupId>
                 <artifactId>smart-doc-maven-plugin</artifactId>

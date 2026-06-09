@@ -5,6 +5,14 @@ spring:
   application:
     name: zephyr-gateway
 
+  data:
+    redis:
+      host: 81.70.160.181
+      port: 6380
+      password: ""
+      database: 0
+      timeout: 2000
+
   cloud:
     nacos:
       discovery:
@@ -62,14 +70,15 @@ zephyr:
     white-api:
       - /zephyr-auth/login
       - /zephyr-auth/auth/refresh
-      - /zephyr-auth/logout
-      - /zephyr-auth/info
       - /get
       - /zephyr-ops/ops/cpu/usage
       - /doc.html
       - /v3/api-docs/**
       - /favicon.ico
-      - /webjars/**
+      - /webjars/**pi
+    basic-api:
+      - /zephyr-auth/info
+      - /zephyr-auth/logout
   gateway:
     secret: zephyr-gateway-secret-key-2026 # 网关签名密钥，下游服务需保持一致
 

@@ -38,7 +38,7 @@ public class ZephyrUserDetailsService implements UserDetailsService {
     }
 
     private String getTenantCode() {
-        var session = UserContextHolder.get();
+        com.zephyr.core.boot.web.UserSession session = UserContextHolder.get();
         return session != null ? session.getTenantCode() : null;
     }
 

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router";
+import { Routes, Route } from "react-router";
 import { ConfigProvider, theme as antdTheme } from "antd";
 import zhCN from "antd/locale/zh_CN";
 import { useThemeStore } from "@/store/use-theme-store";
@@ -8,24 +8,7 @@ import AdminLayout from "@/layouts/admin-layout";
 import BlankLayout from "@/layouts/blank-layout";
 import LoginPage from "@/pages/login";
 import AuthGuard from "@/components/auth-guard";
-import { routes, type AppRoute } from "@/routes/route-config";
 
-/* 递归把 route-config 转为 <Route> 节点 */
-function renderRoutes(rs: AppRoute[]): React.ReactNode {
-  return rs.flatMap((r) => {
-    if (r.children?.length) {
-      return renderRoutes(r.children);
-    }
-    if (!r.element) return [];
-    return (
-      <Route
-        key={r.path}
-        path={r.path === "/" ? "/" : r.path}
-        element={r.element}
-      />
-    );
-  });
-}
 
 function App() {
   const { isDark } = useThemeStore();
@@ -70,7 +53,6 @@ function App() {
             
             // 无底色按钮 (text/link)：悬浮浅色蓝，选中深色蓝 (避免使用 transparent 导致发黑，浅色模式直接混入白色)
             textHoverBg: isDark ? "rgba(255,255,255,0.06)" : "color-mix(in srgb, var(--z-button-hover) 10%, #ffffff)",
-            textActiveBg: isDark ? "rgba(255,255,255,0.12)" : "color-mix(in srgb, var(--z-button-hover) 25%, #ffffff)",
           },
         },
       }}
@@ -83,15 +65,13 @@ function App() {
 
         {/* 后台管理布局（受保护） */}
         <Route
+          path="/*"
           element={
             <AuthGuard>
               <AdminLayout />
             </AuthGuard>
           }
-        >
-          {renderRoutes(routes)}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
+        />
       </Routes>
     </ConfigProvider>
   );

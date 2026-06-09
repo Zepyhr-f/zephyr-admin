@@ -1,6 +1,7 @@
-import { Form, Space, Button, Card, Row, Col } from "antd";
+import { Form, Button, Card, Row, Col } from "antd";
 import type { FormInstance } from "antd";
-import React, { ReactNode } from "react";
+import React, { Children } from "react";
+import type { ReactNode } from "react";
 
 interface QueryFormProps<T = any> {
   /** Ant Design Form 实例 */
@@ -21,7 +22,7 @@ interface QueryFormProps<T = any> {
  * 按钮始终停靠在最后一行右侧。
  */
 export function QueryForm<T>({ form, onSearch, onReset, children, loading }: QueryFormProps<T>) {
-  const childArray = React.Children.toArray(children);
+  const childArray = Children.toArray(children);
   
   // 每行 4 个条件，计算最后一行还有多少个条件
   const itemsInLastRow = childArray.length % 4;
@@ -44,7 +45,7 @@ export function QueryForm<T>({ form, onSearch, onReset, children, loading }: Que
             <Col span={6} key={idx}>
               {React.isValidElement(child)
                 ? React.cloneElement(child as React.ReactElement<any>, {
-                    style: { ...child.props.style, marginBottom: 0 }
+                    style: { ...(child as React.ReactElement<any>).props.style, marginBottom: 0 }
                   })
                 : child}
             </Col>

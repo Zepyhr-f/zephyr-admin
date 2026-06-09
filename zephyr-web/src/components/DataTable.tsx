@@ -1,6 +1,6 @@
 import { Table, Card } from "antd";
 import type { TableProps } from "antd";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface DataTableProps<RecordType> extends TableProps<RecordType> {
   /** 表格左上角的操作区（比如新增、导出按钮） */
@@ -20,7 +20,7 @@ export function DataTable<RecordType extends object>({
   const mergedPagination =
     pagination !== false
       ? {
-          position: ["bottomCenter"] as const,
+          position: ["bottomCenter"] as any,
           showTotal: (total: number) => `共 ${total} 条`,
           showSizeChanger: true,
           showQuickJumper: true,

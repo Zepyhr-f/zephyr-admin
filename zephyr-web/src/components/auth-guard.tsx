@@ -68,15 +68,14 @@ export default function AuthGuard({ children }: AuthGuardProps) {
             if (accessToken) {
                 headers.Authorization = `Bearer ${accessToken}`;
             }
-            const [infoRes, menuRes] = await Promise.all([
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}zephyr-auth/info`, { headers, withCredentials: true }),
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}zephyr-system/menu/tree`, { headers, withCredentials: true }),
-            ]);
+            const infoRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}zephyr-auth/info`, { headers, withCredentials: true });
             const infoData = infoRes.data?.data;
-            const menuData = menuRes.data?.data;
             if (infoData) {
                 setUserInfo(infoData.user, infoData.roles, infoData.permissions);
             }
+            
+            const menuRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}zephyr-system/menu/routes`, { headers, withCredentials: true });
+            const menuData = menuRes.data?.data;
             setMenus(menuData || []);
         } catch (e) {
             console.error('加载用户信息失败:', e);
