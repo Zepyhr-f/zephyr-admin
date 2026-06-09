@@ -10,10 +10,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>zephyr-bom</module>
-        <module>zephyr-base</module>
-        <module>zephyr-admin</module>
-        <module>zephyr-biz</module>
+        <module>zephyr-framework</module>
+        <module>zephyr-api</module>
+        <module>zephyr-platform</module>
+        <module>zephyr-business</module>
         <module>zephyr-gateway</module>
     </modules>
 

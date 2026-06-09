@@ -1,4 +1,4 @@
-# zephyr-core 核心基类设计
+# 核心core设计
 
 > 本文档定义 `zephyr-framework/zephyr-core` 的职责边界、包结构与核心基类/通用模型的设计规范。`zephyr-core` 是**全工程最底层**公共依赖，必须保持“纯净、稳定、可复用、零业务”。
 
