@@ -13,6 +13,7 @@ public interface WebConstants {
     String GATEWAY_SIGN_HEADER = "X-Gateway-Sign";
     String REQUEST_ID_HEADER = "X-Request-Id";
     String CLIENT_TYPE_HEADER = "X-Client-Type";
+    String ROLES_HEADER = "X-User-Roles";
 
     // 旧常量已废弃，保留向下兼容（后续可删除）
     @Deprecated

@@ -15,4 +15,5 @@ import java.util.Set;
 public class UserSession {
     private String userCode;
     private String tenantCode;
+    private List<String> roles;
 }

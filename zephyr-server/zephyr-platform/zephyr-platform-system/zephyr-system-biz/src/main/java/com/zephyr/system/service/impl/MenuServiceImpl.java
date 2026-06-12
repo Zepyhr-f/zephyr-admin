@@ -40,13 +40,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
     @Override
     public List<MenuVO> listRoutes() {
         UserSession session = UserContextHolder.get();
-        if (session == null) {
+        if (session == null || session.getUserCode() == null) {
             return new ArrayList<>();
         }
         
         List<Menu> allMenus;
-        String rolesStr = redisUtil.getString(com.zephyr.redis.Constant.RedisConstant.AUTH_USER_ROLES_PREFIX + session.getTenantCode() + ":" + session.getUserCode());
-        if (rolesStr != null && java.util.Arrays.asList(rolesStr.split(",")).contains("admin")) {
+        List<String> roles = session.getRoles();
+        if (roles != null && roles.contains("admin")) {
             allMenus = list(new LambdaQueryWrapper<Menu>().orderByAsc(Menu::getOrderNum));
         } else {
             allMenus = baseMapper.selectMenusByUserCode(session.getUserCode(), session.getTenantCode());

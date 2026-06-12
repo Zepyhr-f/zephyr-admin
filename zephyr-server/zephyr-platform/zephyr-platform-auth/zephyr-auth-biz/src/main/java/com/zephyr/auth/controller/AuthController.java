@@ -212,6 +212,13 @@ public class AuthController {
             String sessionRedisKey = USER_INFO_PREFIX + tenantCode + ":" + userCode;
             redisUtil.setObject(sessionRedisKey, userInfo, 2, TimeUnit.HOURS);
 
+            // 同时将角色信息保存到 Redis 的 Set 中，供网关 RBAC 读取
+            if (roleCodes != null && !roleCodes.isEmpty()) {
+                String rolesRedisKey = RedisConstant.AUTH_USER_ROLES_PREFIX + tenantCode + ":" + userCode;
+                redisUtil.deleteKey(rolesRedisKey);
+                redisUtil.addSet(rolesRedisKey, 2, TimeUnit.HOURS, roleCodes.toArray(new String[0]));
+            }
+
             return R.data(userInfo);
         } catch (Exception e) {
             return R.fail("Token解析失败: " + e.getMessage());

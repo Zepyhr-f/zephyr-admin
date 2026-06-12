@@ -38,6 +38,7 @@ public class UserInterceptor implements HandlerInterceptor {
         String tenantCode = request.getHeader(TENANT_CODE_HEADER);
         String timestamp = request.getHeader(TIMESTAMP_HEADER);
         String sign = request.getHeader(GATEWAY_SIGN_HEADER);
+        String rolesStr = request.getHeader(ROLES_HEADER);
 
         // URL 解码（网关做了编码）
         if (userCode != null) {
@@ -63,17 +64,10 @@ public class UserInterceptor implements HandlerInterceptor {
         }
 
         // 验签与防重放已交由 GatewaySecurityInterceptor 和 Gateway 处理，此处直接放行
-
-        // 从 Redis 获取 UserSession
-        UserSession session = null;
-        if (redisUtil != null) {
-            session = redisUtil.getObject(RedisConstant.USER_INFO_PREFIX + tenantCode + ":" + userCode, UserSession.class);
-        }
-
-        if (session == null) {
-            // 直接从 Header 构建用户会话 (Fallback)
-            session = buildUserSessionFromHeaders(userCode, tenantCode);
-        }
+        
+        // 由于 Redis 中的 UserInfo 包含了复杂的嵌套结构，直接反序列化为 UserSession 会导致字段丢失
+        // 且 Gateway 已经可靠地通过 Header 传递了 userCode 和 tenantCode，因此直接从 Header 构建
+        UserSession session = buildUserSessionFromHeaders(userCode, tenantCode, rolesStr);
         
         UserContextHolder.set(session);
         return true;
@@ -88,10 +82,11 @@ public class UserInterceptor implements HandlerInterceptor {
 
 
 
-    private UserSession buildUserSessionFromHeaders(String userCode, String tenantCode) {
+    private UserSession buildUserSessionFromHeaders(String userCode, String tenantCode, String rolesStr) {
         UserSession session = new UserSession();
         session.setUserCode(userCode);
         session.setTenantCode(tenantCode);
+        session.setRoles(parseListHeader(rolesStr));
 
         return session;
     }
