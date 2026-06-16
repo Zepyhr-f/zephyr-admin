@@ -14,7 +14,7 @@
 后端需要同时满足：平台通用能力复用、甲方业务隔离、统一网关入口、跨服务调用标准化、以及团队协作下的结构可维护性。
 
 ### 决策
-采用 Maven 多模块分层：
+采用 Go 语言与 go-zero 微服务架构分层：
 - `zephyr-framework/`：纯技术底座（BOM/Core/Starters），不包含业务代码
 - `zephyr-api/`：跨服务调用契约（Feign + DTO），不包含实现
 - `zephyr-platform/`：平台域服务（`zephyr-platform-service` + platform 模块）
