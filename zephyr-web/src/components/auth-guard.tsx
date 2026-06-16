@@ -74,8 +74,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
                 setUserInfo(infoData.user, infoData.roles, infoData.permissions);
             }
             
-            const menuRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}zephyr-system/menu/routes`, { headers, withCredentials: true });
-            const menuData = menuRes.data?.data;
+            const menuRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}zephyr-system/menu/tree`, { headers, withCredentials: true });
+            const menuData = menuRes.data?.data?.list;
             setMenus(menuData || []);
         } catch (e) {
             console.error('加载用户信息失败:', e);

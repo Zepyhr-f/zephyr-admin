@@ -1,0 +1,8 @@
+Name: identity.rpc
+ListenOn: 0.0.0.0:8081
+Consul:
+  Host: host.docker.internal:8500
+  Key: identity.rpc
+
+Postgres:
+  DSN: postgres://postgres:postgres@host.docker.internal:5432/zephyr_db?sslmode=disable

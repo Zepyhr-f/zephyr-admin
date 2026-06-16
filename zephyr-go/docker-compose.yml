@@ -1,0 +1,46 @@
+services:
+  # ---------------- Microservices ---------------- #
+  identity:
+    build:
+      context: .
+      dockerfile: app/identity/Dockerfile
+    container_name: zephyr-identity
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "8081:8081"
+    networks:
+      - zephyr-net
+
+  auth:
+    build:
+      context: .
+      dockerfile: app/auth/Dockerfile
+    container_name: zephyr-auth
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "8080:8080"
+    depends_on:
+      - identity
+    networks:
+      - zephyr-net
+
+  gateway:
+    build:
+      context: .
+      dockerfile: app/gateway/Dockerfile
+    container_name: zephyr-gateway
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "8888:8888"
+    depends_on:
+      - auth
+      - identity
+    networks:
+      - zephyr-net
+
+networks:
+  zephyr-net:
+    driver: bridge

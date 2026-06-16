@@ -31,7 +31,7 @@ export interface MenuForm {
 }
 
 export const getMenuTree = () => {
-  return client.get("/zephyr-system/menu/routes");
+  return client.get("/zephyr-system/menu/tree");
 };
 
 export const getMenuDetail = (id: number) => {

@@ -46,8 +46,8 @@ export default function LoginPage() {
         setUserInfo(infoData.user, infoData.roles, infoData.permissions);
       }
 
-      const menuRes = await axios.get(`${baseURL}zephyr-system/menu/routes`, { headers, withCredentials: true });
-      const menuData = menuRes.data?.data;
+      const menuRes = await axios.get(`${baseURL}zephyr-system/menu/tree`, { headers, withCredentials: true });
+      const menuData = menuRes.data?.data?.list;
       setMenus(menuData || []);
 
       // 3. 记住我

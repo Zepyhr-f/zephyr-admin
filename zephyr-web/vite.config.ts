@@ -22,10 +22,15 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:8001',
+      '/api/zephyr-system': {
+        target: 'http://localhost:8888',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api\/zephyr-system/, '/api/v1/system'),
+      },
+      '/api/zephyr-auth': {
+        target: 'http://localhost:8888',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/zephyr-auth/, '/api/v1/auth'),
       },
     },
   },

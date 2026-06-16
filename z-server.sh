@@ -1,40 +1,83 @@
 #!/bin/bash
-set -e
 
 # 获取脚本所在根目录
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SERVER_DIR="$ROOT_DIR/zephyr-server"
-LOG_DIR="$SERVER_DIR/logs"
+SERVER_DIR="$ROOT_DIR/zephyr-go/app"
+LOG_DIR="$ROOT_DIR/logs"
 
 ACTION=$1
 
-# 检查 Docker 运行状态 (仅 start/restart 时)
-check_docker() {
-  if ! docker info > /dev/null 2>&1; then
-    echo "❌ 错误: Docker 引擎未运行，请先启动 Docker。"
-    exit 1
-  fi
+start_service() {
+    local svc_name=$1
+    local svc_dir=$2
+    local svc_main=$3
+    
+    echo "Starting $svc_name..."
+    cd "$svc_dir"
+    
+    # 编译 Go 二进制文件
+    go build -o "$svc_name-bin" "$svc_main"
+    
+    nohup "./$svc_name-bin" > "$LOG_DIR/${svc_name}.log" 2>&1 &
+    echo $! > "$LOG_DIR/${svc_name}.pid"
+    echo "$svc_name started with PID $(cat "$LOG_DIR/${svc_name}.pid")"
+}
+
+stop_service() {
+    local svc_name=$1
+    local pid_file="$LOG_DIR/${svc_name}.pid"
+    
+    if [ -f "$pid_file" ]; then
+        local pid=$(cat "$pid_file")
+        echo "Stopping $svc_name (PID: $pid)..."
+        kill -9 "$pid" 2>/dev/null || true
+        rm -f "$pid_file"
+        echo "$svc_name stopped."
+    else
+        echo "$svc_name is not running (no pid file)."
+        # 尝试通过名字杀掉
+        pkill -f "$svc_name-bin" || true
+    fi
 }
 
 case "$ACTION" in
-  start|stop|restart)
+  start)
     echo "====================================="
-    echo "🐳 Zephyr 后端服务执行: $ACTION"
+    echo "🚀 启动 Zephyr 后端服务 (Go Native)"
+    echo "====================================="
+    mkdir -p "$LOG_DIR"
+    
+    export PATH=$PATH:$(go env GOPATH)/bin
+    
+    start_service "identity" "$SERVER_DIR/identity" "identity.go"
+    sleep 2 # wait for identity to start
+    start_service "auth" "$SERVER_DIR/auth" "auth.go"
+    sleep 2 # wait for auth to start
+    start_service "gateway" "$SERVER_DIR/gateway" "gateway.go"
+    
+    echo "====================================="
+    echo "✅ 所有后端服务已启动！"
+    echo "日志位于 $LOG_DIR 目录。"
+    echo "你可以通过 tail -f logs/gateway.log 查看网关日志"
+    echo "====================================="
+    ;;
+  stop)
+    echo "====================================="
+    echo "🛑 停止 Zephyr 后端服务"
     echo "====================================="
     
-    if [ "$ACTION" != "stop" ]; then
-      check_docker
-    fi
-    
-    # 调用并执行后端详细逻辑
-    sh "$SERVER_DIR/scripts/z-server.sh" "$ACTION"
+    stop_service "gateway" "" "gateway.go"
+    stop_service "auth" "" "auth.go"
+    stop_service "identity" "" "identity.go"
     
     echo "====================================="
-    echo "✅ 后端 $ACTION 流程已下发！"
-    if [ "$ACTION" == "start" ] || [ "$ACTION" == "restart" ]; then
-      echo "▶ 实时查看日志请执行: tail -f $LOG_DIR/backend.log"
-    fi
+    echo "✅ 所有后端服务已停止！"
     echo "====================================="
+    ;;
+  restart)
+    $0 stop
+    sleep 2
+    $0 start
     ;;
   *)
     echo "Usage: $0 {start|stop|restart}"

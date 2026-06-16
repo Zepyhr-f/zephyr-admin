@@ -1,0 +1,30 @@
+package identityservicelogic
+
+import (
+	"context"
+
+	"zephyr-go/app/identity/internal/svc"
+	"zephyr-go/app/identity/pb"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type DeptUpdateLogic struct {
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+	logx.Logger
+}
+
+func NewDeptUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DeptUpdateLogic {
+	return &DeptUpdateLogic{
+		ctx:    ctx,
+		svcCtx: svcCtx,
+		Logger: logx.WithContext(ctx),
+	}
+}
+
+func (l *DeptUpdateLogic) DeptUpdate(in *pb.DeptUpdateReq) (*pb.SuccessResp, error) {
+	// todo: add your logic here and delete this line
+
+	return &pb.SuccessResp{}, nil
+}
