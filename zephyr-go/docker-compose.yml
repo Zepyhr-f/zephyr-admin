@@ -9,8 +9,6 @@ services:
       - TZ=Asia/Shanghai
     ports:
       - "8081:8081"
-    networks:
-      - zephyr-net
 
   auth:
     build:
@@ -23,8 +21,6 @@ services:
       - "8080:8080"
     depends_on:
       - identity
-    networks:
-      - zephyr-net
 
   gateway:
     build:
@@ -38,9 +34,8 @@ services:
     depends_on:
       - auth
       - identity
-    networks:
-      - zephyr-net
 
 networks:
-  zephyr-net:
-    driver: bridge
+  default:
+    name: opsdock_default
+    external: true

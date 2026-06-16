@@ -33,7 +33,7 @@ func (l *DeptTreeLogic) DeptTree() (resp *types.DeptTreeResp, err error) {
 		return nil, err
 	}
 
-	var list []types.DeptDetail
+	list := make([]types.DeptDetail, 0)
 	for _, v := range rpcResp.List {
 		list = append(list, mapDeptToTypes(v))
 	}
@@ -54,8 +54,11 @@ func mapDeptToTypes(v *identityservice.DeptDetail) types.DeptDetail {
 		Status:     v.Status,
 		CreateTime: v.CreateTime,
 	}
-	for _, child := range v.Children {
-		d.Children = append(d.Children, mapDeptToTypes(child))
+	if len(v.Children) > 0 {
+		d.Children = make([]types.DeptDetail, 0)
+		for _, child := range v.Children {
+			d.Children = append(d.Children, mapDeptToTypes(child))
+		}
 	}
 	return d
 }

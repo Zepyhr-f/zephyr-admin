@@ -39,7 +39,7 @@ func (l *UserListLogic) UserList(req *types.UserListReq) (resp *types.UserListRe
 		return nil, err
 	}
 
-	var list []types.UserDetail
+	list := make([]types.UserDetail, 0)
 	for _, v := range rpcResp.List {
 		list = append(list, types.UserDetail{
 			Id:         v.Id,

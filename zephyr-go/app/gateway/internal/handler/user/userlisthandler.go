@@ -26,7 +26,7 @@ func UserListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		if err != nil {
 			response.Error(w, err)
 		} else {
-			response.Success(w, resp.List)
+			response.Success(w, resp)
 		}
 	}
 }

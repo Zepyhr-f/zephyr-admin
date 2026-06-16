@@ -34,7 +34,7 @@ export function UserManagement() {
     setLoading(true);
     try {
       const res = await getUserList(params);
-      setData(res as unknown as UserVO[]);
+      setData((res as any).list || []);
     } catch (error) {
       console.error(error);
     } finally {

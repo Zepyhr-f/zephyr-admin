@@ -37,7 +37,7 @@ export function MenuManagement() {
     setLoading(true);
     try {
       const res = await getMenuTree();
-      const list = res as unknown as MenuVO[];
+      const list = (res as any).list || [];
       
       const cleanEmptyChildren = (data: MenuVO[]) => {
         data.forEach(item => {

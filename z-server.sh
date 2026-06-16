@@ -7,68 +7,27 @@ LOG_DIR="$ROOT_DIR/logs"
 
 ACTION=$1
 
-start_service() {
-    local svc_name=$1
-    local svc_dir=$2
-    local svc_main=$3
-    
-    echo "Starting $svc_name..."
-    cd "$svc_dir"
-    
-    # 编译 Go 二进制文件
-    go build -o "$svc_name-bin" "$svc_main"
-    
-    nohup "./$svc_name-bin" > "$LOG_DIR/${svc_name}.log" 2>&1 &
-    echo $! > "$LOG_DIR/${svc_name}.pid"
-    echo "$svc_name started with PID $(cat "$LOG_DIR/${svc_name}.pid")"
-}
-
-stop_service() {
-    local svc_name=$1
-    local pid_file="$LOG_DIR/${svc_name}.pid"
-    
-    if [ -f "$pid_file" ]; then
-        local pid=$(cat "$pid_file")
-        echo "Stopping $svc_name (PID: $pid)..."
-        kill -9 "$pid" 2>/dev/null || true
-        rm -f "$pid_file"
-        echo "$svc_name stopped."
-    else
-        echo "$svc_name is not running (no pid file)."
-        # 尝试通过名字杀掉
-        pkill -f "$svc_name-bin" || true
-    fi
-}
 
 case "$ACTION" in
   start)
     echo "====================================="
-    echo "🚀 启动 Zephyr 后端服务 (Go Native)"
+    echo "🚀 启动 Zephyr 后端服务 (Docker Compose)"
     echo "====================================="
-    mkdir -p "$LOG_DIR"
     
-    export PATH=$PATH:$(go env GOPATH)/bin
-    
-    start_service "identity" "$SERVER_DIR/identity" "identity.go"
-    sleep 2 # wait for identity to start
-    start_service "auth" "$SERVER_DIR/auth" "auth.go"
-    sleep 2 # wait for auth to start
-    start_service "gateway" "$SERVER_DIR/gateway" "gateway.go"
+    cd "$ROOT_DIR/zephyr-go"
+    docker-compose up -d --build
     
     echo "====================================="
-    echo "✅ 所有后端服务已启动！"
-    echo "日志位于 $LOG_DIR 目录。"
-    echo "你可以通过 tail -f logs/gateway.log 查看网关日志"
+    echo "✅ 所有后端服务已通过 Docker 启动！"
     echo "====================================="
     ;;
   stop)
     echo "====================================="
-    echo "🛑 停止 Zephyr 后端服务"
+    echo "🛑 停止 Zephyr 后端服务 (Docker Compose)"
     echo "====================================="
     
-    stop_service "gateway" "" "gateway.go"
-    stop_service "auth" "" "auth.go"
-    stop_service "identity" "" "identity.go"
+    cd "$ROOT_DIR/zephyr-go"
+    docker-compose down
     
     echo "====================================="
     echo "✅ 所有后端服务已停止！"

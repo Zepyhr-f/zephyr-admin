@@ -31,7 +31,7 @@ export function DepartmentManagement() {
     setLoading(true);
     try {
       const res = await getDeptTree();
-      const list = res as unknown as DeptVO[];
+      const list = (res as any).list || [];
       
       // Recursively remove empty children arrays so Antd Table knows it's a leaf node
       const cleanEmptyChildren = (data: DeptVO[]) => {

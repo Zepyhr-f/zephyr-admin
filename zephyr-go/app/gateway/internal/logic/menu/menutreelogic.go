@@ -33,22 +33,33 @@ func (l *MenuTreeLogic) MenuTree() (resp *types.MenuTreeResp, err error) {
 		return nil, err
 	}
 
-	var list []types.MenuDetail
+	list := make([]types.MenuDetail, 0)
 	for _, item := range rpcResp.List {
-		list = append(list, types.MenuDetail{
-			MenuCode:   item.MenuCode,
-			ParentCode: item.ParentCode,
-			MenuName:   item.MenuName,
-			Icon:       item.Icon,
-			MenuType:   item.MenuType,
-			Perms:      item.Perms,
-			Path:       item.Path,
-			Component:  item.Component,
-			OrderNum:   item.OrderNum,
-		})
+		list = append(list, mapMenuToTypes(item))
 	}
 
 	return &types.MenuTreeResp{
 		List: list,
 	}, nil
+}
+
+func mapMenuToTypes(v *identityservice.MenuDetail) types.MenuDetail {
+	m := types.MenuDetail{
+		MenuCode:   v.MenuCode,
+		ParentCode: v.ParentCode,
+		MenuName:   v.MenuName,
+		Icon:       v.Icon,
+		MenuType:   v.MenuType,
+		Perms:      v.Perms,
+		Path:       v.Path,
+		Component:  v.Component,
+		OrderNum:   v.OrderNum,
+	}
+	if len(v.Children) > 0 {
+		m.Children = make([]types.MenuDetail, 0)
+		for _, child := range v.Children {
+			m.Children = append(m.Children, mapMenuToTypes(child))
+		}
+	}
+	return m
 }
