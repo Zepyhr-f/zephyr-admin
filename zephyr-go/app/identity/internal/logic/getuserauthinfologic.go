@@ -30,8 +30,8 @@ func NewGetUserAuthInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 func (l *GetUserAuthInfoLogic) GetUserAuthInfo(in *pb.GetUserAuthInfoReq) (*pb.GetUserAuthInfoResp, error) {
 	var user model.SysUser
 
-	// 根据 username 查询用户
-	query := l.svcCtx.DB.Where("code = ?", in.Username)
+	// 根据 username 查询用户（支持用 code 或 nick_name 登录）
+	query := l.svcCtx.DB.Where("code = ? OR nick_name = ?", in.Username, in.Username)
 	if in.TenantCode != "" {
 		query = query.Where("tenant_code = ?", in.TenantCode)
 	}

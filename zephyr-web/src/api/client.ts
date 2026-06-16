@@ -29,7 +29,7 @@ client.interceptors.request.use(
             config.headers.Authorization = `Bearer ${token}`;
         }
         // 添加规范请求头
-        config.headers['X-Request-Id'] = crypto.randomUUID();
+        config.headers['X-Request-Id'] = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
         config.headers['X-Client-Type'] = 'web';
         return config;
     },

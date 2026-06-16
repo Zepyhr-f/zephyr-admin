@@ -1,0 +1,6 @@
+# Git ignore
+.env
+*.log
+.DS_Store
+.vscode
+data/
