@@ -1,5 +1,4 @@
 import { NavLink } from "react-router";
-import { BarChart3 } from "lucide-react";
 
 interface Props {
     size?: number;
@@ -9,7 +8,7 @@ interface Props {
 function Logo({ size = 28, className }: Props) {
     return (
         <NavLink to="/" className={className}>
-            <BarChart3 size={size} className="text-sky-400" />
+            <img src="/logo.svg" alt="logo" width={size} height={size} />
         </NavLink>
     );
 }

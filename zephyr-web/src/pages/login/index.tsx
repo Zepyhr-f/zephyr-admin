@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Checkbox, Divider, Form, Input, Space, Typography, message } from "antd";
+import { Button, Checkbox, Divider, Form, Input, Space, Typography, message, ConfigProvider } from "antd";
 import { LockOutlined, SafetyCertificateOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router";
 import axios from "axios";
@@ -16,6 +16,41 @@ type FormValues = {
 interface LoginResponse {
   token: string;
 }
+
+const TechGraphic = () => (
+  <div className="z-auth__graphic-wrap">
+    <svg className="z-auth__tech-graphic" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="200" r="150" stroke="url(#glowGradient)" strokeWidth="2" strokeDasharray="10 10" className="spin-slow" />
+      <circle cx="200" cy="200" r="110" stroke="#60a5fa" strokeWidth="1" opacity="0.6" className="spin-reverse-slow" strokeDasharray="4 8" />
+      <circle cx="200" cy="200" r="70" fill="url(#coreGradient)" className="pulse" />
+      
+      {/* Network Nodes */}
+      <circle cx="200" cy="50" r="5" fill="#3b82f6" className="node" style={{ animationDelay: '0s' }} />
+      <circle cx="306" cy="94" r="5" fill="#60a5fa" className="node" style={{ animationDelay: '0.5s' }} />
+      <circle cx="350" cy="200" r="5" fill="#2563eb" className="node" style={{ animationDelay: '1s' }} />
+      <circle cx="306" cy="306" r="5" fill="#3b82f6" className="node" style={{ animationDelay: '1.5s' }} />
+      <circle cx="200" cy="350" r="5" fill="#60a5fa" className="node" style={{ animationDelay: '2s' }} />
+      <circle cx="94" cy="306" r="5" fill="#2563eb" className="node" style={{ animationDelay: '2.5s' }} />
+      <circle cx="50" cy="200" r="5" fill="#3b82f6" className="node" style={{ animationDelay: '3s' }} />
+      <circle cx="94" cy="94" r="5" fill="#60a5fa" className="node" style={{ animationDelay: '3.5s' }} />
+      
+      {/* Connecting Lines */}
+      <path d="M200 50 L306 94 L350 200 L306 306 L200 350 L94 306 L50 200 L94 94 Z" stroke="rgba(59, 130, 246, 0.4)" strokeWidth="1" />
+      <path d="M200 50 L200 130 M350 200 L270 200 M200 350 L200 270 M50 200 L130 200" stroke="rgba(37, 99, 235, 0.3)" strokeWidth="1.5" strokeDasharray="4 4" />
+      
+      <defs>
+        <linearGradient id="glowGradient" x1="0" y1="0" x2="400" y2="400">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#a855f7" />
+        </linearGradient>
+        <radialGradient id="coreGradient" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#93c5fd" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#eff6ff" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+    </svg>
+  </div>
+);
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -68,110 +103,102 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="z-auth">
-      {/* ── 左侧品牌区 ── */}
-      <section className="z-auth__brand" aria-label="产品介绍">
-        <div className="z-auth__brandInner">
-          <div className="z-auth__logo" aria-hidden="true" />
-          <h1 className="z-auth__title">Zephyr 后台管理</h1>
-          <p className="z-auth__subtitle">
-            面向 RBAC、审计、监控场景的企业级后台模板。更快定位问题、更稳地做权限、让运维与合规协作更顺滑。
-          </p>
-
-          <div className="z-auth__kpis" aria-label="亮点">
-            <div className="z-auth__kpi">
-              <div className="z-auth__kpiLabel">权限颗粒度</div>
-              <div className="z-auth__kpiValue">按钮级</div>
-            </div>
-            <div className="z-auth__kpi">
-              <div className="z-auth__kpiLabel">审计追踪</div>
-              <div className="z-auth__kpiValue">全链路</div>
-            </div>
-            <div className="z-auth__kpi">
-              <div className="z-auth__kpiLabel">监控面板</div>
-              <div className="z-auth__kpiValue">可扩展</div>
+    <ConfigProvider theme={{ token: { colorPrimary: '#3b82f6', colorBgContainer: 'rgba(255,255,255,0.85)' } }}>
+      <div className="z-auth">
+        {/* ── 左侧品牌区 ── */}
+        <section className="z-auth__brand" aria-label="产品介绍">
+          <div className="z-auth__brandInner">
+            <TechGraphic />
+            
+            <div className="z-auth__logo-header">
+              <img src="/logo.svg" alt="logo" className="z-auth__logo" />
+              <h1 className="z-auth__title">Zephyr 管理系统</h1>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── 右侧表单区 ── */}
-      <section className="z-auth__cardWrap" aria-label="登录表单">
-        <div className="z-auth__card">
-          <h2 className="z-auth__cardTitle">欢迎回来</h2>
-          <p className="z-auth__cardDesc">请使用你的账号登录系统。</p>
+        {/* ── 右侧表单区 ── */}
+        <section className="z-auth__cardWrap" aria-label="登录表单">
+          <div className="z-auth__card">
+            <h2 className="z-auth__cardTitle">欢迎回来</h2>
+            <p className="z-auth__cardDesc">请使用您的专属账号登录系统</p>
 
-          <Form<FormValues>
-            layout="vertical"
-            requiredMark={false}
-            initialValues={{ username: "", password: "", remember: false }}
-            onFinish={onFinish}
-          >
-            <Form.Item
-              name="username"
-              label="账号"
-              rules={[{ required: true, message: "请输入账号" }]}
+            <Form<FormValues>
+              layout="vertical"
+              requiredMark={false}
+              initialValues={{ username: "admin", password: "admin123", remember: false }}
+              onFinish={onFinish}
             >
-              <Input
-                size="large"
-                autoFocus
-                autoComplete="username"
-                prefix={<UserOutlined />}
-                placeholder="请输入账号"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="password"
-              label="密码"
-              rules={[{ required: true, message: "请输入密码" }]}
-            >
-              <Input.Password
-                size="large"
-                autoComplete="current-password"
-                prefix={<LockOutlined />}
-                placeholder="请输入密码"
-              />
-            </Form.Item>
-
-            <div className="z-auth__helperRow">
-              <Form.Item name="remember" valuePropName="checked" style={{ marginBottom: 0 }}>
-                <Checkbox>记住我</Checkbox>
-              </Form.Item>
-              <Typography.Link onClick={() => message.info("可对接重置密码/短信/邮箱验证码流程")}>
-                忘记密码？
-              </Typography.Link>
-            </div>
-
-            <Form.Item style={{ marginTop: 16 }}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                loading={loading}
-                block
-                icon={<SafetyCertificateOutlined />}
+              <Form.Item
+                name="username"
+                label="账号"
+                rules={[{ required: true, message: "请输入账号" }]}
               >
-                登录
+                <Input
+                  size="large"
+                  autoFocus
+                  autoComplete="username"
+                  prefix={<UserOutlined style={{ color: '#94a3b8' }} />}
+                  placeholder="请输入账号"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="password"
+                label="密码"
+                rules={[{ required: true, message: "请输入密码" }]}
+              >
+                <Input.Password
+                  size="large"
+                  autoComplete="current-password"
+                  prefix={<LockOutlined style={{ color: '#94a3b8' }} />}
+                  placeholder="请输入密码"
+                />
+              </Form.Item>
+
+              <div className="z-auth__helperRow">
+                <Form.Item name="remember" valuePropName="checked" style={{ marginBottom: 0 }}>
+                  <Checkbox>记住密码</Checkbox>
+                </Form.Item>
+                <Typography.Link onClick={() => message.info("可对接重置密码/短信/邮箱验证码流程")}>
+                  忘记密码？
+                </Typography.Link>
+              </div>
+
+              <Form.Item style={{ marginTop: 24, marginBottom: 16 }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={loading}
+                  block
+                  icon={<SafetyCertificateOutlined />}
+                  style={{ height: 48, fontSize: 16, fontWeight: 500 }}
+                >
+                  安全登录
+                </Button>
+              </Form.Item>
+            </Form>
+
+            <Divider style={{ margin: "24px 0", borderColor: 'rgba(15,23,42,0.1)' }} plain>
+              <span style={{ color: '#64748b', fontSize: 13 }}>其他登录方式</span>
+            </Divider>
+            
+            <Space direction="vertical" style={{ width: "100%" }}>
+              <Button block size="large" onClick={() => message.info("可扩展：SSO / LDAP / OAuth / 钉钉/飞书登录")} style={{ background: 'rgba(255,255,255,0.6)', borderColor: 'rgba(15,23,42,0.1)', color: '#475569' }}>
+                企业级 SSO 登录
               </Button>
-            </Form.Item>
-          </Form>
+            </Space>
 
-          <Divider style={{ margin: "14px 0" }} />
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <Button block onClick={() => message.info("可扩展：SSO / LDAP / OAuth / 钉钉/飞书登录")}>
-              其他登录方式（占位）
-            </Button>
-          </Space>
-
-          <div className="z-auth__footer">
-            <span>登录即表示你同意</span>{" "}
-            <Typography.Link onClick={() => message.info("可对接：用户协议")}>用户协议</Typography.Link>{" "}
-            <span>与</span>{" "}
-            <Typography.Link onClick={() => message.info("可对接：隐私政策")}>隐私政策</Typography.Link>
+            <div className="z-auth__footer">
+              <span>登录即表示您同意我们的</span>{" "}
+              <a onClick={() => message.info("可对接：用户协议")}>用户协议</a>{" "}
+              <span>与</span>{" "}
+              <a onClick={() => message.info("可对接：隐私政策")}>隐私政策</a>
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </ConfigProvider>
   );
 }

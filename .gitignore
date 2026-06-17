@@ -32,3 +32,5 @@ build/
 temp/
 tmp/
 zephyr-web/.frontend.pid
+deployment_record.md
+deploy.sh

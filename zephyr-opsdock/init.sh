@@ -29,13 +29,13 @@ echo -e "数据目录: ${DATA_DIR}"
 
 echo -e "${YELLOW}创建数据目录...${NC}"
 mkdir -p "${DATA_DIR}/pgsql/data" "${DATA_DIR}/redis/data" "${DATA_DIR}/nats/data" "${DATA_DIR}/consul/data" "${DATA_DIR}/nginx/conf.d"
-if [ ! -f "${DATA_DIR}/nginx/conf.d/default.conf" ]; then
-    cp ./nginx/conf.d/default.conf "${DATA_DIR}/nginx/conf.d/default.conf"
-fi
-if grep -q "proxy_pass http://nacos:8848;" "${DATA_DIR}/nginx/conf.d/default.conf"; then
-    sed -i.bak 's|proxy_pass http://nacos:8848;|proxy_pass http://consul:8500;|g' "${DATA_DIR}/nginx/conf.d/default.conf"
-    rm -f "${DATA_DIR}/nginx/conf.d/default.conf.bak"
-fi
+cp ./nginx/conf.d/*.conf "${DATA_DIR}/nginx/conf.d/"
+for conf in "${DATA_DIR}/nginx/conf.d/"*.conf; do
+    if grep -q "proxy_pass http://nacos:8848;" "$conf"; then
+        sed -i.bak 's|proxy_pass http://nacos:8848;|proxy_pass http://consul:8500;|g' "$conf"
+        rm -f "${conf}.bak"
+    fi
+done
 
 echo -e "${YELLOW}检查冲突容器...${NC}"
 CONTAINER_NAMES=("pgsql-pgvector" "redis" "opsdock-nats" "consul" "nginx")
